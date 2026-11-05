@@ -13,6 +13,7 @@ Filters: binary markets only, self-trades dropped, degenerate prices dropped.
 """
 from __future__ import annotations
 
+import os
 from datetime import date, timedelta
 from pathlib import Path
 
@@ -34,6 +35,10 @@ def trade_files(raw_dir: Path, start: str, end: str) -> list[str]:
 
 
 def connect(mem: str = "5GB", threads: int | None = None) -> duckdb.DuckDBPyConnection:
+    """DuckDB with a memory cap. threads defaults to 2 (env PMGRAPH_THREADS): the per-wallet
+    DISTINCT/median aggregates spill per thread, and at 12 threads x 5 GB the wallet-feature
+    query filled 70 GB of temp space, while 2 threads finish it in 14 s."""
+    threads = threads or int(os.environ.get("PMGRAPH_THREADS", 2))
     con = duckdb.connect()
     con.execute(f"SET memory_limit='{mem}'")
     con.execute(f"SET temp_directory='{ROOT / 'data' / 'tmp'}'")

@@ -7,3 +7,4 @@ __pycache__/
 outputs/*.log
 .DS_Store
 *.tgz
+outputs/logs/
