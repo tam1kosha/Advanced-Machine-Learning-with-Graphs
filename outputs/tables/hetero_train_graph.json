@@ -1,0 +1,11 @@
+{
+  "wallets": 633082,
+  "markets": 13349,
+  "held_edges": 7462550,
+  "cp_nnz": 26134218,
+  "query_entries": 1109524,
+  "query_mf_edges": 10491560,
+  "frozen_max_ts": "2024-12-31 23:59:59+00:00",
+  "minutes": 3.8,
+  "mf_edges_count_ge_min": 13307223
+}

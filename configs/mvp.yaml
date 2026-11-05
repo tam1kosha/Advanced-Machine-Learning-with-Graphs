@@ -32,6 +32,8 @@ cleaning:
 graph:
   min_edge_trades: 1          # keep a (taker, maker) pair if it traded at least this often
   moved_first_window_min: 60  # derived edge u->v if v makes the same bet <= this many minutes after u
+  moved_first_max_leaders: 10 # only the <= 10 entries just before v's (raw pairs within 60 min: 497M)
+  moved_first_min_count: 2    # frozen graph: keep a (u, v) pair if it co-moves in >= 2 market-sides
 
 first_k:                      # iteration 2: inductive "first k fills" setting (scripts 07-09)
   populations: [new, existing]  # new = no fill in the graph window; existing = has a pre-cutoff node
@@ -39,6 +41,17 @@ first_k:                      # iteration 2: inductive "first k fills" setting (
                               #    observed history (population changes with k);
                               # kmax: after the max(k_buckets)-th fill for every k (fixed population, ~2x smaller)
   subsample: 1.0              # fraction of eligible wallets kept (1.0 = all; state the fraction if < 1)
+
+gnn:                          # sampled (Hetero)GraphSAGE for the first-k experiments (scripts 09)
+  hidden: 64
+  fanout: [10, 5]             # in-neighbours sampled per relation at hop 1 / hop 2 (with replacement)
+  batch: 1024
+  epochs: 40
+  patience: 6                 # epochs without val-AUPRC gain
+  lr: 0.003
+  eval_reps: 3                # neighbour samples averaged at inference
+  threads: 2
+  gpu_scale: false            # true: larger fan-out / hidden / epochs (set them above) on a GPU box
 
 eval:
   seeds: [0, 1, 2, 3, 4]
