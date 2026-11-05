@@ -9,7 +9,10 @@ uv venv --python 3.11 && source .venv/bin/activate && uv pip install -e ".[commu
 python -m pytest -q tests
 bash run_mvp.sh train          # download (~3 GB) -> prepare -> eda -> labels -> graph -> experiments -> plot
 python scripts/05_experiments.py train hist,xgb_own      # subset of methods; results merge into exp1_*_raw.csv
+python scripts/09_first_k_experiments.py train sage 1,3  # iteration 2: methods x k; parts in outputs/tables/exp2_parts/
 ```
+DuckDB runs with 2 threads by default (`PMGRAPH_THREADS`); more threads under the 5 GB cap spill tens of GB.
+On macOS xgboost and torch segfault in one process: keep XGBoost in `pmgraph.tabular` (subprocess).
 Data lives in `data/` (git-ignored; re-create with `scripts/download.py`). Numbered scripts are the pipeline;
 library code is in `src/pmgraph/`. Settings in `configs/mvp.yaml`.
 

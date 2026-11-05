@@ -17,3 +17,8 @@ python scripts/03_labels.py "$SPLIT"
 python scripts/04_build_graph.py "$SPLIT"
 python scripts/05_experiments.py "$SPLIT"
 python scripts/06_plot_results.py "$SPLIT"
+# iteration 2: first-k inductive setting (09 ~35 min on CPU)
+python scripts/07_first_k.py "$SPLIT"
+python scripts/08_hetero_graph.py "$SPLIT"
+python scripts/09_first_k_experiments.py "$SPLIT"
+python scripts/10_first_k_report.py "$SPLIT"
