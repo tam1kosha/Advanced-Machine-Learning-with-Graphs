@@ -12,16 +12,33 @@ from .labels import bets, skill_test
 CATS = ["Politics", "Sports", "Crypto", "Finance", "Culture", "Tech", "Weather"]
 
 
+def sides_sql(fills: Path | str, extra: str = "") -> str:
+    """One row per (fill, side): the wallet's view of the fill. `extra`: more fill columns."""
+    ex = f", {extra}" if extra else ""
+    return f"""
+        SELECT taker wallet, maker cp, 0 is_maker, taker_long long_,
+               CASE WHEN taker_long THEN price ELSE 1 - price END bp,
+               usd, ts, market_id, category, hours_to_close{ex} FROM '{fills}'
+        UNION ALL
+        SELECT maker, taker, 1, NOT taker_long, CASE WHEN taker_long THEN 1 - price ELSE price END,
+               usd, ts, market_id, category, hours_to_close{ex} FROM '{fills}'"""
+
+
 def wallet_features(con, fills: Path, cutoff: str, calib: pd.DataFrame) -> pd.DataFrame:
     """Behavioural features from graph-window fills (all of which are < cutoff)."""
+    f = side_features(con, sides_sql(fills), f"TIMESTAMPTZ '{cutoff}'")
+    hb = bets(con, fills, calib, closed_before=cutoff)
+    return add_history(f, hb)
+
+
+def side_features(con, sides: str, asof: str) -> pd.DataFrame:
+    """Behavioural features per wallet from a sides relation (columns of `sides_sql`).
+
+    asof: SQL expression for the reference time (a literal, or a per-row column such as `asof`).
+    """
     cat_cols = ",\n".join(f"avg((category = '{c}')::INT) AS cat_{c.lower()}" for c in CATS)
     f = con.execute(f"""
-      WITH s AS (
-        SELECT taker wallet, maker cp, 0 is_maker, CASE WHEN taker_long THEN price ELSE 1 - price END bp,
-               usd, ts, market_id, category, hours_to_close FROM '{fills}'
-        UNION ALL
-        SELECT maker, taker, 1, CASE WHEN taker_long THEN 1 - price ELSE price END,
-               usd, ts, market_id, category, hours_to_close FROM '{fills}')
+      WITH s AS ({sides})
       SELECT wallet,
              count(*)                                         AS n_fills,
              ln(1 + sum(usd))                                 AS log_usd,
@@ -34,17 +51,20 @@ def wallet_features(con, fills: Path, cutoff: str, calib: pd.DataFrame) -> pd.Da
              count(DISTINCT market_id)                        AS n_markets,
              count(DISTINCT cp)                               AS n_counterparties,
              count(DISTINCT date_trunc('day', ts))            AS active_days,
-             date_diff('hour', min(ts), TIMESTAMPTZ '{cutoff}') / 24.0 AS age_days,
-             date_diff('hour', max(ts), TIMESTAMPTZ '{cutoff}') / 24.0 AS days_since_last,
+             date_diff('hour', min(ts), max({asof})) / 24.0  AS age_days,
+             date_diff('hour', max(ts), max({asof})) / 24.0  AS days_since_last,
              {cat_cols}
       FROM s GROUP BY 1""").fetchdf().set_index("wallet")
     f["log_n_fills"] = np.log1p(f.pop("n_fills"))
     for c in ["n_markets", "n_counterparties", "active_days"]:
         f[c] = np.log1p(f[c])
+    return f
 
-    # history-only skill: same test, restricted to markets closed before the cutoff
-    hb = bets(con, fills, calib, closed_before=cutoff)
-    h = skill_test(hb)[["n_bets", "T", "z", "raw_edge", "profit"]]
+
+def add_history(f: pd.DataFrame, hb: pd.DataFrame) -> pd.DataFrame:
+    """History-only skill features from leak-free bets `hb` (markets closed before the as-of time)."""
+    cols = ["n_bets", "T", "z", "raw_edge", "profit"]
+    h = skill_test(hb)[cols] if len(hb) else pd.DataFrame(columns=cols, dtype=float)
     h.columns = ["hist_n_bets", "hist_T", "hist_z", "hist_raw_edge", "hist_profit"]
     f = f.join(h)
     f["hist_n_bets"] = np.log1p(f["hist_n_bets"].fillna(0))

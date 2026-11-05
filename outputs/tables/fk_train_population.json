@@ -1,0 +1,177 @@
+{
+  "label_after": "k",
+  "bet_unit": "market",
+  "subsample": 1.0,
+  "by_k": {
+    "1": {
+      "existing": {
+        "n": 15996,
+        "skill_z2": 0.0218,
+        "n_skill": 348,
+        "profitable": 0.4451,
+        "median_label_bets": 42.0,
+        "z_sd": 1.442
+      },
+      "new": {
+        "n": 18984,
+        "skill_z2": 0.0179,
+        "n_skill": 340,
+        "profitable": 0.4584,
+        "median_label_bets": 46.0,
+        "z_sd": 1.385
+      }
+    },
+    "3": {
+      "existing": {
+        "n": 14710,
+        "skill_z2": 0.022,
+        "n_skill": 323,
+        "profitable": 0.4409,
+        "median_label_bets": 43.0,
+        "z_sd": 1.473
+      },
+      "new": {
+        "n": 17981,
+        "skill_z2": 0.0187,
+        "n_skill": 336,
+        "profitable": 0.458,
+        "median_label_bets": 46.0,
+        "z_sd": 1.399
+      }
+    },
+    "5": {
+      "existing": {
+        "n": 13664,
+        "skill_z2": 0.0221,
+        "n_skill": 302,
+        "profitable": 0.4384,
+        "median_label_bets": 43.0,
+        "z_sd": 1.501
+      },
+      "new": {
+        "n": 17068,
+        "skill_z2": 0.0182,
+        "n_skill": 310,
+        "profitable": 0.4617,
+        "median_label_bets": 45.0,
+        "z_sd": 1.412
+      }
+    },
+    "10": {
+      "existing": {
+        "n": 11634,
+        "skill_z2": 0.0239,
+        "n_skill": 278,
+        "profitable": 0.4319,
+        "median_label_bets": 44.0,
+        "z_sd": 1.563
+      },
+      "new": {
+        "n": 15261,
+        "skill_z2": 0.0189,
+        "n_skill": 288,
+        "profitable": 0.4573,
+        "median_label_bets": 44.0,
+        "z_sd": 1.442
+      }
+    },
+    "20": {
+      "existing": {
+        "n": 8991,
+        "skill_z2": 0.0264,
+        "n_skill": 237,
+        "profitable": 0.4188,
+        "median_label_bets": 47.0,
+        "z_sd": 1.681
+      },
+      "new": {
+        "n": 12322,
+        "skill_z2": 0.0204,
+        "n_skill": 251,
+        "profitable": 0.4291,
+        "median_label_bets": 41.0,
+        "z_sd": 1.511
+      }
+    },
+    "50": {
+      "existing": {
+        "n": 5251,
+        "skill_z2": 0.0415,
+        "n_skill": 218,
+        "profitable": 0.3628,
+        "median_label_bets": 66.0,
+        "z_sd": 1.982
+      },
+      "new": {
+        "n": 5461,
+        "skill_z2": 0.0271,
+        "n_skill": 148,
+        "profitable": 0.3353,
+        "median_label_bets": 53.0,
+        "z_sd": 1.851
+      }
+    }
+  },
+  "attachment": {
+    "1": {
+      "new": {
+        "cp_in_graph": 0.627370417193426,
+        "market_in_graph": 0.39233038348082594
+      },
+      "existing": {
+        "cp_in_graph": 0.940735183795949,
+        "market_in_graph": 0.7760065016254063
+      }
+    },
+    "3": {
+      "new": {
+        "cp_in_graph": 0.631481378492112,
+        "market_in_graph": 0.3511855106315926
+      },
+      "existing": {
+        "cp_in_graph": 0.9148198504418763,
+        "market_in_graph": 0.7589394969408566
+      }
+    },
+    "5": {
+      "new": {
+        "cp_in_graph": 0.6370517928286853,
+        "market_in_graph": 0.32819310991328804
+      },
+      "existing": {
+        "cp_in_graph": 0.9023419203747073,
+        "market_in_graph": 0.7278542154566745
+      }
+    },
+    "10": {
+      "new": {
+        "cp_in_graph": 0.6396042199069524,
+        "market_in_graph": 0.2866522508354629
+      },
+      "existing": {
+        "cp_in_graph": 0.8837287261474988,
+        "market_in_graph": 0.6539367371497335
+      }
+    },
+    "20": {
+      "new": {
+        "cp_in_graph": 0.6271790293783477,
+        "market_in_graph": 0.23001541957474436
+      },
+      "existing": {
+        "cp_in_graph": 0.8637081525970415,
+        "market_in_graph": 0.5765932599265933
+      }
+    },
+    "50": {
+      "new": {
+        "cp_in_graph": 0.6578758469144845,
+        "market_in_graph": 0.21568210950375388
+      },
+      "existing": {
+        "cp_in_graph": 0.8402856598743097,
+        "market_in_graph": 0.5121462578556465
+      }
+    }
+  }
+}
