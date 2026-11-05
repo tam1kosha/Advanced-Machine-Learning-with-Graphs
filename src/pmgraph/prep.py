@@ -1,7 +1,7 @@
 """Cleaning: raw trades -> canonical fills for one time window.
 
 Canonical form (one row per trade):
-  ts, market_id, category, price   price of the market's reference token (outcome_idx 0)
+  ts, market_id, event_id, category, price   price of the market's reference token (outcome_idx 0)
   taker_long  taker is long the reference token after this fill
   w           1 if the reference token won, 0 if it lost, NULL if unresolved by sample end
   qty, usd    shares and dollar notional of the fill
@@ -70,6 +70,7 @@ def build_fills(cfg: dict, start: str, end: str, out: Path, con=None) -> dict:
           SELECT
             t.timestamp::TIMESTAMPTZ                      AS ts,
             p.mid                                         AS market_id,
+            t.event_id                                    AS event_id,
             t.category                                    AS category,
             CASE WHEN p.outcome_idx = 0 THEN t.price ELSE 1 - t.price END AS price,
             (t.taker_bought = (p.outcome_idx = 0))        AS taker_long,

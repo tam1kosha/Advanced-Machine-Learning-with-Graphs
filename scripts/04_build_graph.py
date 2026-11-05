@@ -10,6 +10,7 @@ import scipy.sparse as sp
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from pmgraph import ROOT, load_config  # noqa: E402
 from pmgraph.features import counterparty_graph, neighbour_features, wallet_features  # noqa: E402
+from pmgraph.labels import labels_file  # noqa: E402
 from pmgraph.prep import connect  # noqa: E402
 
 cfg = load_config()
@@ -29,7 +30,7 @@ N = neighbour_features(A, X, ["hist_z", "hist_raw_edge", "hist_profit_slog", "lo
                               "maker_share", "frac_longshot", "log_n_fills"])
 X = X.join(N)
 
-lab = pd.read_parquet(P / f"{split}_labels.parquet")
+lab = pd.read_parquet(labels_file(P, split, cfg["labels"].get("bet_unit", "market")))
 X["in_label"] = X.index.isin(lab.index)
 X.to_parquet(P / f"{split}_features.parquet")
 sp.save_npz(P / f"{split}_adj.npz", A)

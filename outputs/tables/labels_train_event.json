@@ -1,0 +1,55 @@
+{
+  "bet_unit": "event",
+  "labelled_wallets": 27082,
+  "type_counts": {
+    "unskilled_loser": 14992,
+    "lucky_winner": 12031,
+    "skilled_winner": 54,
+    "unlucky_skilled": 5
+  },
+  "type_share": {
+    "unskilled_loser": 0.5536,
+    "lucky_winner": 0.4442,
+    "skilled_winner": 0.002,
+    "unlucky_skilled": 0.0002
+  },
+  "share_profitable": 0.4462373532235433,
+  "share_skilled": 0.0021785687910789455,
+  "share_z_gt_2": 0.019459419540654308,
+  "median_bets": 44.0,
+  "median_markets_per_bet": 1.0403362483899397,
+  "z_mean": -0.29203350467149314,
+  "z_sd": 1.449143744791048,
+  "share_p_lt_05": 0.039398862713241264,
+  "by_n_bets": [
+    {
+      "n_bets": "30-49",
+      "n": 16431,
+      "p_lt_05": 0.03,
+      "z_sd": 1.137,
+      "skill_z2": 0.0113
+    },
+    {
+      "n_bets": "50-99",
+      "n": 7638,
+      "p_lt_05": 0.0391,
+      "z_sd": 1.3903,
+      "skill_z2": 0.019
+    },
+    {
+      "n_bets": "100-249",
+      "n": 2188,
+      "p_lt_05": 0.0736,
+      "z_sd": 2.1395,
+      "skill_z2": 0.0516
+    },
+    {
+      "n_bets": ">=250",
+      "n": 825,
+      "p_lt_05": 0.1382,
+      "z_sd": 3.3448,
+      "skill_z2": 0.1006
+    }
+  ],
+  "p_analytic_vs_mc_corr": 0.9164561896015576
+}

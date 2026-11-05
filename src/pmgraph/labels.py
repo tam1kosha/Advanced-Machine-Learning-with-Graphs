@@ -8,6 +8,17 @@ Per bet m (= a wallet's position in one market inside the label window), with fi
 Skill statistic T = mean_m d_m (every bet counted equally). Null: W_m ~ Bernoulli(pibar_m)
 independently, pibar_m = sum q pi / Q. One-sided p-value (analytic normal, optional Monte
 Carlo), Benjamini-Hochberg across wallets.
+
+Event-level bets (unit="event"). Sibling markets of one event (election sub-markets, nested
+"by date X" markets, spreads/totals of one game) are not independent. With unit="event" the
+wallet's market bets inside one event are averaged into one event bet, d_e = mean_{m in e} d_m,
+and T = mean_e d_e; events are independent. Within an event the null couples the sibling
+outcomes so that the wallet's payoffs are comonotone: one U_e ~ U(0,1) per event,
+W_m = 1[U_e < pibar_m] if long, 1[U_e > 1 - pibar_m] if short (all its bets win for small U_e).
+A comonotone sum has the largest variance of any dependence with these marginals, so the test
+stays valid (conservative) whatever the true dependence, e.g. mutually exclusive candidates.
+Exact null variance of d_e, with a_m = |A_m| / n_e and q_m = P(bet m pays):
+    Var = sum_{m,m'} a_m a_m' (min(q_m, q_m') - q_m q_m').
 """
 from __future__ import annotations
 
@@ -53,8 +64,6 @@ def bets(con, fills: Path, calib: pd.DataFrame, min_abs_dir: float = 0.1,
 
     closed_before: keep only markets that closed before this time (for leak-free history).
     """
-    bins = len(calib)
-    con.register("calib", calib[["b", "pi"]])
     where = "w IS NOT NULL"
     if closed_before:
         where += f" AND close_time < TIMESTAMPTZ '{closed_before}'"
@@ -62,14 +71,26 @@ def bets(con, fills: Path, calib: pd.DataFrame, min_abs_dir: float = 0.1,
         where += f" AND ts >= TIMESTAMPTZ '{start}'"
     if end:
         where += f" AND ts < TIMESTAMPTZ '{end}'"
-    return con.execute(f"""
-      WITH f AS (SELECT *, least(floor(price * {bins}), {bins - 1})::INT b FROM '{fills}' WHERE {where}),
-      s AS (
-        SELECT taker wallet, market_id, ts, CASE WHEN taker_long THEN 1 ELSE -1 END sgn, qty, price, w, b FROM f
+    sides = f"""
+        WITH f AS (SELECT * FROM '{fills}' WHERE {where})
+        SELECT taker wallet, market_id, event_id, ts, CASE WHEN taker_long THEN 1 ELSE -1 END sgn,
+               qty, price, w FROM f
         UNION ALL
-        SELECT maker,        market_id, ts, CASE WHEN taker_long THEN -1 ELSE 1 END,     qty, price, w, b FROM f),
+        SELECT maker,        market_id, event_id, ts, CASE WHEN taker_long THEN -1 ELSE 1 END,
+               qty, price, w FROM f"""
+    return bets_from_sides(con, sides, calib, min_abs_dir)
+
+
+def bets_from_sides(con, sides: str, calib: pd.DataFrame, min_abs_dir: float = 0.1) -> pd.DataFrame:
+    """Bets from a relation with columns wallet, market_id, event_id, ts, sgn (+1 long the reference
+    token), qty, price, w (resolved only). Filtering (windows, leak rules) is the caller's job."""
+    bins = len(calib)
+    con.register("calib", calib[["b", "pi"]])
+    return con.execute(f"""
+      WITH s AS (SELECT *, least(floor(price * {bins}), {bins - 1})::INT b FROM ({sides})),
       j AS (SELECT s.*, c.pi FROM s JOIN calib c USING (b))
       SELECT wallet, market_id,
+             any_value(event_id)                AS event_id,
              any_value(w)                       AS w,
              min(ts)                            AS first_ts,
              count(*)                           AS n_fills,
@@ -84,24 +105,44 @@ def bets(con, fills: Path, calib: pd.DataFrame, min_abs_dir: float = 0.1,
     """).fetchdf()
 
 
-def skill_test(b: pd.DataFrame, n_sim: int = 0, seed: int = 0) -> pd.DataFrame:
-    """Per-wallet skill statistic, analytic z-test and (optionally) Monte Carlo p-value."""
+UNITS = ("market", "event")
+
+
+def labels_file(processed: Path, split: str, unit: str = "market") -> Path:
+    """market-level labels keep the iteration-1 name; other units get a suffix."""
+    return processed / (f"{split}_labels.parquet" if unit == "market" else f"{split}_labels_{unit}.parquet")
+
+
+def skill_test(b: pd.DataFrame, n_sim: int = 0, seed: int = 0, unit: str = "market") -> pd.DataFrame:
+    """Per-wallet skill statistic, analytic z-test and (optionally) Monte Carlo p-value.
+
+    unit="market": every (wallet, market) bet is one independent observation (iteration-1 default).
+    unit="event":  bets are averaged within (wallet, event_id); see module docstring.
+    """
+    if unit not in UNITS:
+        raise ValueError(unit)
     b = b.copy()
     b["d"] = b["A"] * b["w"] - b["C"]
     b["d0"] = b["A"] * b["pibar"] - b["C"]
-    b["v0"] = b["A"] ** 2 * b["pibar"] * (1 - b["pibar"])
     b["raw_edge"] = b["A"] * b["w"] - b["B"]          # outcome minus price paid, uncalibrated
+    b["grp"] = b["market_id"] if unit == "market" else b["event_id"].fillna("m" + b["market_id"].astype(str))
+    # weight of each market bet in T: 1 / (#markets of its group * #groups of the wallet)
+    n_in = b.groupby(["wallet", "grp"])["d"].transform("size")
+    n_grp = b.groupby("wallet")["grp"].transform("nunique")
+    b["wt"] = 1.0 / (n_in * n_grp)
+    var_g = _group_null_var(b, n_in)
     g = b.groupby("wallet")
     out = pd.DataFrame({
-        "n_bets": g.size(),
-        "T": g["d"].mean(),
-        "mu0": g["d0"].mean(),
-        "sd0": np.sqrt(g["v0"].sum()) / g.size(),
-        "raw_edge": g["raw_edge"].mean(),
+        "n_bets": g["grp"].nunique(),
+        "n_markets": g.size(),
+        "T": (b["d"] * b["wt"]).groupby(b["wallet"]).sum(),
+        "mu0": (b["d0"] * b["wt"]).groupby(b["wallet"]).sum(),
+        "raw_edge": (b["raw_edge"] * b["wt"]).groupby(b["wallet"]).sum(),
         "profit": g["profit"].sum(),
         "volume_sh": g["Q"].sum(),
         "first_label_ts": g["first_ts"].min(),
     })
+    out["sd0"] = np.sqrt(var_g.groupby(level="wallet").sum()) / out["n_bets"]
     out["z"] = (out["T"] - out["mu0"]) / out["sd0"].clip(lower=1e-9)
     out["p"] = stats.norm.sf(out["z"])
     if n_sim:
@@ -109,12 +150,30 @@ def skill_test(b: pd.DataFrame, n_sim: int = 0, seed: int = 0) -> pd.DataFrame:
     return out
 
 
+def _group_null_var(b: pd.DataFrame, n_in: pd.Series) -> pd.Series:
+    """Null variance of each (wallet, group) mean bet under comonotone payoffs (module docstring)."""
+    q = np.where(b["A"] > 0, b["pibar"], 1 - b["pibar"])
+    s = pd.DataFrame({"wallet": b["wallet"].to_numpy(), "grp": b["grp"].to_numpy(), "q": q,
+                      "a": (np.abs(b["A"]) / n_in).to_numpy()}).sort_values(["wallet", "grp", "q"])
+    key = [s["wallet"], s["grp"]]
+    # sorted by q: sum_{m,m'} a a' min(q, q') = sum_m a_m q_m (a_m + 2 * sum_{m' after m} a_m')
+    after = s["a"].groupby(key).transform("sum") - s["a"].groupby(key).cumsum()
+    s["S"] = s["a"] * s["q"] * (s["a"] + 2 * after)
+    s["aq"] = s["a"] * s["q"]
+    g = s.groupby(["wallet", "grp"])
+    return (g["S"].sum() - g["aq"].sum() ** 2).clip(lower=0)
+
+
 def _mc_pvalues(b, out, n_sim, seed):
+    """One uniform per group and draw; within a group the wallet's payoffs are comonotone."""
     rng = np.random.default_rng(seed)
     p = pd.Series(np.nan, index=out.index)
     for wlt, grp in b.groupby("wallet"):
-        W = rng.random((n_sim, len(grp))) < grp["pibar"].to_numpy()
-        Tsim = (W * grp["A"].to_numpy() - grp["C"].to_numpy()).mean(1)
+        gi = pd.factorize(grp["grp"])[0]
+        U = rng.random((n_sim, gi.max() + 1))[:, gi]
+        pi, long = grp["pibar"].to_numpy(), grp["A"].to_numpy() > 0
+        W = np.where(long, U < pi, U > 1 - pi)
+        Tsim = (W * grp["A"].to_numpy() - grp["C"].to_numpy()) @ grp["wt"].to_numpy()
         p[wlt] = (1 + (Tsim >= out.at[wlt, "T"] - 1e-12).sum()) / (n_sim + 1)
     return p
 

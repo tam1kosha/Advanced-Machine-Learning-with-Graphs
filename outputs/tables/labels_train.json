@@ -1,4 +1,5 @@
 {
+  "bet_unit": "market",
   "labelled_wallets": 37129,
   "type_counts": {
     "unskilled_loser": 20299,
@@ -14,6 +15,41 @@
   },
   "share_profitable": 0.45306902959950446,
   "share_skilled": 0.0025317137547469634,
+  "share_z_gt_2": 0.01995744566242021,
   "median_bets": 44.0,
-  "p_analytic_vs_mc_corr": 0.9097022140014279
+  "median_markets_per_bet": 1.0,
+  "z_mean": -0.23046068030897235,
+  "z_sd": 1.3977169372315748,
+  "share_p_lt_05": 0.04215034070403189,
+  "by_n_bets": [
+    {
+      "n_bets": "30-49",
+      "n": 22909,
+      "p_lt_05": 0.0352,
+      "z_sd": 1.1025,
+      "skill_z2": 0.0131
+    },
+    {
+      "n_bets": "50-99",
+      "n": 10231,
+      "p_lt_05": 0.037,
+      "z_sd": 1.3263,
+      "skill_z2": 0.0175
+    },
+    {
+      "n_bets": "100-249",
+      "n": 2775,
+      "p_lt_05": 0.0634,
+      "z_sd": 2.0248,
+      "skill_z2": 0.0422
+    },
+    {
+      "n_bets": ">=250",
+      "n": 1214,
+      "p_lt_05": 0.168,
+      "z_sd": 3.2968,
+      "skill_z2": 0.1194
+    }
+  ],
+  "p_analytic_vs_mc_corr": 0.9086627013918057
 }

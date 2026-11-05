@@ -22,6 +22,7 @@ from sklearn.preprocessing import StandardScaler
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from pmgraph import ROOT, load_config  # noqa: E402
 from pmgraph.features import sym_norm  # noqa: E402
+from pmgraph.labels import labels_file  # noqa: E402
 from pmgraph.models import (label_propagation, lr_scores, matrix, own_cols,  # noqa: E402
                             spectral_embedding, train_sage, xgb_scores)
 
@@ -35,7 +36,7 @@ log = lambda *a: print(f"[{time.time()-t0:6.0f}s]", *a, flush=True)  # noqa: E73
 
 X = pd.read_parquet(P_ / f"{split}_features.parquet")
 A = sp.load_npz(P_ / f"{split}_adj.npz")
-lab = pd.read_parquet(P_ / f"{split}_labels.parquet")
+lab = pd.read_parquet(labels_file(P_, split, cfg["labels"].get("bet_unit", "market")))
 TARGETS = {"profitable": lab["profitable"].astype(int), "skill": (lab["z"] > 2).astype(int)}
 
 nodes = np.flatnonzero(X["in_label"].to_numpy())

@@ -21,6 +21,8 @@ labels:
   fdr_alpha: 0.10             # Benjamini–Hochberg level for the skill test
   n_sim: 2000                 # Monte Carlo draws per wallet for the null
   calib_bins: 100             # price bins for the favourite–longshot calibration
+  bet_unit: market            # market | event: one bet per (wallet, market) or per (wallet, event_id);
+                              # event = sibling markets averaged, comonotone null (labels.py docstring)
 
 cleaning:
   drop_self_trades: true      # maker == taker
