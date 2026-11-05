@@ -1,0 +1,62 @@
+{
+  "graph_wallets": {
+    "n_wallets": 633082,
+    "med_fills": 21.0,
+    "p99_fills": 607.0,
+    "max_fills": 989447
+  },
+  "label_wallets": {
+    "n_wallets": 862759,
+    "med_fills": 13.0,
+    "p99_fills": 390.0,
+    "max_fills": 916238
+  },
+  "label_wallets_with_>=1_bets": 862593,
+  "label_wallets_with_>=10_bets": 298990,
+  "label_wallets_with_>=30_bets": 63036,
+  "label_wallets_with_>=100_bets": 6514,
+  "label_wallets_with_>=250_bets": 2070,
+  "labelable_overlap": {
+    "labelable": 63036,
+    "in_graph": 25112
+  },
+  "top10_wallet_fill_share": 0.09481127519107069,
+  "last_price_abs_err": 0.05067823302440955,
+  "categories_graph": [
+    {
+      "category": "Politics",
+      "n": 14068536,
+      "usd_m": 2403.509740249392
+    },
+    {
+      "category": "Sports",
+      "n": 11563547,
+      "usd_m": 853.1262488201255
+    },
+    {
+      "category": "Crypto",
+      "n": 2128321,
+      "usd_m": 254.44943190858967
+    },
+    {
+      "category": "Finance",
+      "n": 921597,
+      "usd_m": 100.18156709638866
+    },
+    {
+      "category": "Culture",
+      "n": 1154235,
+      "usd_m": 88.34363960451502
+    },
+    {
+      "category": "Tech",
+      "n": 448693,
+      "usd_m": 24.06994350320336
+    },
+    {
+      "category": "Weather",
+      "n": 151451,
+      "usd_m": 12.676489947094113
+    }
+  ]
+}

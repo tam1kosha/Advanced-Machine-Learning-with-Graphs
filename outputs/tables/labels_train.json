@@ -1,0 +1,19 @@
+{
+  "labelled_wallets": 37129,
+  "type_counts": {
+    "unskilled_loser": 20299,
+    "lucky_winner": 16736,
+    "skilled_winner": 86,
+    "unlucky_skilled": 8
+  },
+  "type_share": {
+    "unskilled_loser": 0.5467,
+    "lucky_winner": 0.4508,
+    "skilled_winner": 0.0023,
+    "unlucky_skilled": 0.0002
+  },
+  "share_profitable": 0.45306902959950446,
+  "share_skilled": 0.0025317137547469634,
+  "median_bets": 44.0,
+  "p_analytic_vs_mc_corr": 0.9097022140014279
+}
