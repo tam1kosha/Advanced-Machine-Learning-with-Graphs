@@ -72,4 +72,6 @@ tests/                  simulated-wallet checks of the skill test
 
 ## First results (train cutoff 2025-01-01, transductive wallet split, 5 seeds)
 
-See `outputs/tables/exp1_train_summary.csv` and `NOTES.md`.
+GraphSAGE leads on the rare skill class (AUPRC 0.146 vs 0.116 history-only, 0.098 XGBoost; 5/5 seeds),
+XGBoost leads on profitability (AUROC 0.69). Gains are in active wallets, not yet new ones.
+Details, tables and next steps: `NOTES.md`; figure: `outputs/figures/exp1_train_detection.png`.

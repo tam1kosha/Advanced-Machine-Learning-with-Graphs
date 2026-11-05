@@ -6,3 +6,4 @@ __pycache__/
 .ipynb_checkpoints/
 outputs/*.log
 .DS_Store
+*.tgz

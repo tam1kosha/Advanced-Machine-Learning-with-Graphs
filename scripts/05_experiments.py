@@ -17,6 +17,7 @@ import pandas as pd
 import scipy.sparse as sp
 from sklearn.metrics import average_precision_score, roc_auc_score
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from pmgraph import ROOT, load_config  # noqa: E402
@@ -51,7 +52,13 @@ S = sym_norm(A)
 Prow = sp.diags(1 / np.maximum(np.asarray(A.sum(1)).ravel(), 1e-12)) @ A
 emb = None
 if "spectral_lr" in methods:
-    emb = spectral_embedding(S, 32)
+    ef = P_ / f"{split}_spectral32.npy"
+    if ef.exists():
+        emb = np.load(ef)
+    else:
+        emb = spectral_embedding(S, 32)
+        np.save(ef, emb)
+    emb = StandardScaler().fit_transform(emb).astype(np.float32)   # eigvecs are ~1/sqrt(N) in scale
     log("spectral embedding done")
 
 rows = []
@@ -92,7 +99,11 @@ for seed in cfg["eval"]["seeds"]:
                                if r["seed"] == seed and r["target"] == "skill" and r["bucket"] == "all"})
 
 R = pd.DataFrame(rows)
-R.to_csv(out_dir / f"exp1_{split}_raw.csv", index=False)
+raw_f = out_dir / f"exp1_{split}_raw.csv"
+if raw_f.exists():  # keep results of methods not re-run this time
+    old = pd.read_csv(raw_f)
+    R = pd.concat([old[~old.method.isin(R.method.unique())], R], ignore_index=True)
+R.to_csv(raw_f, index=False)
 agg = (R.groupby(["target", "bucket", "method"])
          .agg(n=("n", "first"), pos=("pos", "mean"), auroc=("auroc", "mean"), auroc_sd=("auroc", "std"),
               auprc=("auprc", "mean"), auprc_sd=("auprc", "std")).round(4).reset_index())
