@@ -11,8 +11,13 @@ Methods
   sage      sampled GraphSAGE, counterparty edges only (homogeneous)
   hgnn      sampled hetero GraphSAGE: counterparty + moved-first + wallet-market edges
 Targets: skill = label z > 2 (AUPRC), profitable = label profit > 0 (AUROC).
-Writes one CSV per (k, method) to outputs/tables/exp2_parts/ (re-runs overwrite; 10 aggregates).
-usage: python scripts/09_first_k_experiments.py [split] [methods,comma] [ks,comma]
+Split modes (4th argument, default configs first_k.split_mode):
+  random  iteration 2: 5 seeds x one 60/20/20 split -> outputs/tables/exp2_parts/ (10 aggregates)
+  cv      5-fold CV: fold f = test, fold f+1 = val, rest = train (same 60/20/20), so every wallet is
+          scored once -> outputs/tables/exp3_parts/ (11 pools the out-of-fold scores)
+Writes one CSV of per-split metrics per (k, method) (re-runs overwrite) and the test scores of every
+wallet to data/processed/{exp2,exp3}_preds/.
+usage: python scripts/09_first_k_experiments.py [split] [methods,comma] [ks,comma] [random|cv]
 """
 import sys
 import time
@@ -24,7 +29,7 @@ import pandas as pd
 import scipy.sparse as sp
 import torch
 from sklearn.metrics import average_precision_score, roc_auc_score
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import StratifiedKFold, train_test_split
 from sklearn.preprocessing import StandardScaler
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
@@ -37,9 +42,13 @@ split = sys.argv[1] if len(sys.argv) > 1 else "train"
 ALL = ["hist", "xgb_own", "xgb_nbr", "sage", "hgnn"]
 methods = sys.argv[2].split(",") if len(sys.argv) > 2 else ALL
 ks = [int(k) for k in sys.argv[3].split(",")] if len(sys.argv) > 3 else cfg["eval"]["k_buckets"]
+mode = sys.argv[4] if len(sys.argv) > 4 else cfg["first_k"].get("split_mode", "random")
+assert mode in ("random", "cv"), mode
+tag = {"random": "exp2", "cv": "exp3"}[mode]
 P = ROOT / cfg["data"]["processed_dir"]
-parts = ROOT / "outputs/tables/exp2_parts"
+parts, preds = ROOT / f"outputs/tables/{tag}_parts", P / f"{tag}_preds"
 parts.mkdir(parents=True, exist_ok=True)
+preds.mkdir(parents=True, exist_ok=True)
 hp = cfg["gnn"]
 t0 = time.time()
 log = lambda *a: print(f"[{time.time()-t0:6.0f}s]", *a, flush=True)  # noqa: E731
@@ -156,12 +165,18 @@ for k in ks:
     log(f"k={k}: n={n} (new {new.sum()}), query edges", {r: len(v[0]) for r, v in E.items()})
     strat = Y[:, 1] * 4 + Y[:, 0] * 2 + new
     splits = {}
-    for seed in cfg["eval"]["seeds"]:
-        tr, te = train_test_split(np.arange(n), test_size=0.2, random_state=seed, stratify=strat)
-        tr, va = train_test_split(tr, test_size=0.25, random_state=seed, stratify=strat[tr])
-        splits[seed] = (tr, va, te)
+    if mode == "random":
+        for seed in cfg["eval"]["seeds"]:
+            tr, te = train_test_split(np.arange(n), test_size=0.2, random_state=seed, stratify=strat)
+            tr, va = train_test_split(tr, test_size=0.25, random_state=seed, stratify=strat[tr])
+            splits[seed] = (tr, va, te)
+    else:                                  # "seed" = fold index (also seeds the GNN)
+        folds = [te for _, te in StratifiedKFold(5, shuffle=True, random_state=0).split(np.zeros(n), strat)]
+        for f in range(5):
+            va = folds[(f + 1) % 5]
+            splits[f] = (np.setdiff1d(np.arange(n), np.r_[folds[f], va]), va, folds[f])
     for m in methods:
-        rows = []
+        rows, pr_rows = [], []
         tm = time.time()
         if m in ("xgb_own", "xgb_nbr"):    # trees need no early stopping: fit on train + val
             Fm = Fq_raw if m == "xgb_own" else np.c_[Fq_raw, NBR.to_numpy(np.float32)]
@@ -176,6 +191,10 @@ for k in ks:
                 s = train_hetero(g, rels, Y, {"train": tr, "val": va}, seed, hp,
                                  log=lambda *a: log(f"k={k}", *a))
             rows += metrics_rows(s, Y, te, new, seed=seed, k=k, method=m)
+            pr_rows.append(pd.DataFrame({"seed": seed, "nid": nids[te], "new": new[te], "z": pk.z.to_numpy()[te],
+                                         "n_bets": pk.n_bets.to_numpy()[te], "skill": Y[te, 1], "profitable": Y[te, 0],
+                                         "s_skill": s[te, 1], "s_profitable": s[te, 0]}))
+        pd.concat(pr_rows).assign(k=k, method=m).to_parquet(preds / f"{split}_k{k}_{m}.parquet", index=False)
         R = pd.DataFrame(rows)
         R.to_csv(parts / f"{split}_k{k}_{m}.csv", index=False)
         sk = R[(R.target == "skill")].groupby("pop").auprc.mean().round(3).to_dict()

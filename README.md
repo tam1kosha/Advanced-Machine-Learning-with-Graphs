@@ -36,8 +36,10 @@ bash run_mvp.sh test       # cutoff 2025-07-01 (needs Jan–Dec 2025 trades, ~4.
 | 8 | `08_hetero_graph.py` | `{split}_hetero.pt` (PyG HeteroData, frozen at the cutoff), `{split}_fk_mf.parquet` | ~4 min |
 | 9 | `09_first_k_experiments.py` | `outputs/tables/exp2_parts/` (one CSV per k × method) | ~35 min (GNNs) |
 | 10 | `10_first_k_report.py` | `exp2_*_{raw,summary,paired}.csv`, `outputs/figures/exp2_*_detection.png` | 5 s |
+| 9 cv | `09_first_k_experiments.py ... cv` | 5-fold CV, every wallet scored once: `outputs/tables/exp3_parts/`, `data/processed/exp3_preds/` | ~50 min* |
+| 11 | `11_rank_report.py` | pooled AUPRC / precision@100 / Spearman with label z (+ bet-bucket stratified), bootstrap CIs: `exp3_*_{pooled,paired,buckets}.csv`, `outputs/figures/exp3_*_detection.png` | ~7 min |
 
-\*2-core / 7 GB machine (steps 7–10 timed on a 12-core Mac). DuckDB does the heavy lifting out-of-core;
+\*2-core / 7 GB machine (steps 7–10 timed on a 12-core Mac; 9 cv and 11 on a 10-core / 16 GB Mac). DuckDB does the heavy lifting out-of-core;
 memory and threads are set in `prep.connect()` (2 threads by default, `PMGRAPH_THREADS=n` overrides: more
 threads under the 5 GB cap spill heavily).
 
@@ -47,6 +49,9 @@ python scripts/03_labels.py train all                      # market- and event-l
 python scripts/07_first_k.py train && python scripts/08_hetero_graph.py train
 python scripts/09_first_k_experiments.py train hist,xgb_own,xgb_nbr,sage,hgnn 1,3,5,10,20,50
 python scripts/10_first_k_report.py train
+# iteration 3: same methods in 5-fold CV, pooled out-of-fold metrics with bootstrap CIs
+python scripts/09_first_k_experiments.py train hist,xgb_own,xgb_nbr,sage,hgnn 1,3,5,10,20,50 cv
+python scripts/11_rank_report.py train
 ```
 On macOS, xgboost and torch cannot share a process (two `libomp`, segfault); 09 runs XGBoost in a
 subprocess, and for 05 run `xgb_*` and `sage` in separate calls (results merge per method).

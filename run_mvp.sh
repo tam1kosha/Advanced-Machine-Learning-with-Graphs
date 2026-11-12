@@ -22,3 +22,6 @@ python scripts/07_first_k.py "$SPLIT"
 python scripts/08_hetero_graph.py "$SPLIT"
 python scripts/09_first_k_experiments.py "$SPLIT"
 python scripts/10_first_k_report.py "$SPLIT"
+# iteration 3: pooled 5-fold CV scores, precision@100 + Spearman with label z, bootstrap CIs (09 cv ~35 min)
+python scripts/09_first_k_experiments.py "$SPLIT" hist,xgb_own,xgb_nbr,sage,hgnn 1,3,5,10,20,50 cv
+python scripts/11_rank_report.py "$SPLIT"
