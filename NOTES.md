@@ -214,3 +214,73 @@ k ≤ 10 (criterion: mean paired diff > 0 and ≥ 4/5 wins vs each); at k ≤ 10
    hyper-parameter search (fan-out, depth, class weighting) before drawing a final null.
 5. Over-dispersion: random-effects model of z on activity / category to separate skill
    heterogeneity from within-wallet dependence across events.
+
+---
+
+# Iteration 3 — rare-class power, labels unchanged (12 Nov 2026)
+
+Problem: ~70 skilled new wallets per 20% test fold → per-seed AUPRC sd 0.005–0.03, as large as
+the effects being tested. Step 1 of the list above, the part that needs no label change:
+
+* `09 ... cv` (or `first_k.split_mode: cv`): 5-fold CV (fold f test, f+1 val, rest train: same
+  60/20/20 sizes as iteration 2) so every wallet is scored once; test scores of every wallet are now
+  saved to `data/processed/{exp2,exp3}_preds/`. Random mode (iteration 2) is unchanged and the default.
+* `11_rank_report.py`: pools the out-of-fold scores (within-fold percentile ranks) → all positives
+  (~5× one fold), and adds **precision@100** and **Spearman(score, label z)**, which uses every
+  wallet, not only the 2% positives. 95% wallet-bootstrap CIs; methods compared by paired bootstrap.
+  Claim check: graph model's paired CI > 0 vs both baselines on new wallets at every k ≤ 10.
+* `pmgraph/rank_eval.py` + `tests/test_rank_eval.py` (null: Spearman ≈ 0, P@100 ≈ base rate,
+  paired-CI coverage of a zero difference).
+* Synthetic smoke test (4k wallets, 50 positives per population): a scorer with a real signal had
+  AUPRC and P@100 differences with CIs covering 0, while the Spearman difference was clearly > 0.
+  So Spearman on z should be the most sensitive check of the graph claim.
+
+Caveat: z grows with √(bets) under real skill, so Spearman on z partly rewards predicting activity.
+11 therefore also reports **spearman_z_strat** (size-weighted within label bet buckets 30–49 / 50–99 /
+≥ 100, with CI) and per-bucket point estimates (`exp3_{split}_buckets.csv`); read skill from the
+stratified one (test: an activity-only score has overall Spearman > 0.1, stratified ≈ 0).
+Run: `bash run_mvp.sh` (last two lines).
+
+## Results (train split; 16 GB / 10-core Mac; 09 cv ≈ 50 min wall with 2–4 processes, 11 ≈ 7 min)
+
+Re-running 01–08 from a fresh download reproduced the iteration-1/2 inputs up to float noise (label z sd
+1.3977; 13,307,234 vs 13,307,223 moved-first pairs). Figure `outputs/figures/exp3_train_detection.png`;
+tables `outputs/tables/exp3_train_{pooled,paired,buckets}.csv`.
+
+Pooled skill AUPRC, **new** wallets (n 19.0k → 5.5k, positives ≈ 340 → 150), 95% bootstrap CI:
+
+| k | 1 | 3 | 5 | 10 | 20 | 50 |
+|---|---|---|---|---|---|---|
+| base rate | .018 | .019 | .018 | .019 | .020 | .027 |
+| history-only | .018 | .019 | .019 | .022 | .021 | .034 |
+| XGBoost own | .023 [.020, .027] | .026 | .028 | .034 | .039 | .049 |
+| XGBoost + nbr | .025 | .028 | .026 | .032 | .039 | .048 |
+| GraphSAGE | .024 | .027 | .026 | .031 | .040 | .061 |
+| hetero GraphSAGE | .025 [.021, .031] | .026 | .028 | .033 | .037 | .048 |
+
+Graph model − best baseline, new wallets, AUPRC (paired CI): hgnn +.002 [−.002, .007], −.000 [−.006, .005],
+.000 [−.005, .005], −.001 [−.018, .015] at k = 1, 3, 5, 10; sage and xgb_nbr the same within ±.003.
+Existing wallets: hgnn +.038 [.009, ·] at k=10 and +.041 [.010, ·] at k=20, sage +.048 [.012, ·] at k=20;
+CIs cover 0 at k ≤ 5. Precision@100: CIs ±0.05 (≈ 2 expected hits at base rate), not informative.
+
+Spearman(score, label z), new wallets: history-only .006 → .18 (k = 1 → 50); every learned model is
+**negative** at k ≤ 20 (−.03 to −.14; bet-bucket-stratified the same), positive only at k=50.
+Score deciles (xgb_own, k=10, new): P(z > 2) rises 0.5% → 3.5% bottom → top, but mean z *falls*
+0.20 → −0.31, sd(z) rises 0.99 → 1.60 and P(z < −2) rises 3.3% → 11%.
+
+**Reading.**
+1. The new-wallet null is now tight, not underpowered: at k ≤ 5 the graph adds at most ≈ 0.005–0.007
+   AUPRC (upper CI) over XGBoost. The §5 claim fails on every metric (`11` claim check: NOT MET).
+2. The learned models beat the base rate (≈ 1.3–1.5×) by finding wallets whose z is **dispersed**,
+   both tails, not wallets with high z: the z > 2 target rewards variance. Likely the over-dispersion
+   (within-wallet dependence, e.g. one view expressed in many markets) inflates |z| for some trading
+   styles, and the classifier learns those styles. So the binary target, not only power, is the
+   problem → the label-change half of step 1 (train/evaluate on z or edge with a dependence-robust
+   variance, e.g. clustered by day or topic) is now the priority. *Needs the group's OK.*
+3. Existing wallets: the GNN gain over history/XGBoost is significant at k = 10–20 (≈ +0.04 AUPRC).
+4. Only the pre-cutoff history z ranks wallets by z positively everywhere: skill signal lives in the
+   wallet's own resolved history, not in first-k features or the neighbourhood they attach to.
+
+Compute notes: on this Mac hgnn is the bottleneck (≈ 100 s per fold at k=1 with 2 threads, slower when
+4 processes share the CPU); with fewer processes raise `gnn.threads`. Jul–Dec 2025 trades are downloaded
+(4.5 GB; Oct–Dec alone 3.6 GB), so the test split's label window is ~2–3× the train one.
