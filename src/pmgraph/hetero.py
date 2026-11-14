@@ -281,17 +281,48 @@ class HeteroSAGE(nn.Module):
         return self.head(h["wallet"][: b["n_seeds"]])
 
 
-def train_hetero(g: Graph, rels: list[str], Y: np.ndarray, idx: dict, seed: int, hp: dict, log=print) -> np.ndarray:
-    """Multitask BCE on query seeds; early stopping on mean val AUPRC. Returns scores for all query nodes."""
+def train_hetero(g: Graph, rels: list[str], Y: np.ndarray, idx: dict, seed: int, hp: dict, log=print,
+                 objectives: list[str] | None = None) -> np.ndarray:
+    """Multitask BCE on query seeds; early stopping on mean val AUPRC. Returns scores for all query nodes.
+    objectives (iteration 4): "binary" (default) or "reg" per column of Y. A "reg" column is standardised
+    on the training rows and fit with a Huber loss, rows with a NaN target are skipped, and its
+    validation score is the Pearson correlation instead of the AUPRC.
+    Device: hp["device"], else CUDA when available, else CPU. Neighbour sampling stays on the CPU
+    (numpy), so on a GPU raise hp["batch"] / hp["hidden"] rather than expect a speed-up at the defaults."""
     from sklearn.metrics import average_precision_score
     rng = np.random.default_rng(seed)
     torch.manual_seed(seed)
     torch.set_num_threads(hp.get("threads", 2))
     dims = {t: v.shape[1] for t, v in g.x.items()}
-    model = HeteroSAGE(dims, rels, hp.get("hidden", 64), 2, Y.shape[1], hp.get("dropout", 0.2))
+    dev = torch.device(hp.get("device") or ("cuda" if torch.cuda.is_available() else "cpu"))
+    model = HeteroSAGE(dims, rels, hp.get("hidden", 64), 2, Y.shape[1], hp.get("dropout", 0.2)).to(dev)
     opt = torch.optim.AdamW(model.parameters(), lr=hp.get("lr", 3e-3), weight_decay=1e-4)
-    Yt = torch.from_numpy(Y.astype(np.float32))
-    pos = Yt[idx["train"]].mean(0).clamp(min=1e-3)
+    reg = [o == "reg" for o in (objectives or ["binary"] * Y.shape[1])]
+    Y = Y.astype(np.float32)
+    for j in np.flatnonzero(reg):
+        Y[:, j] = (Y[:, j] - np.nanmean(Y[idx["train"], j])) / np.nanstd(Y[idx["train"], j])
+    Yt = torch.from_numpy(Y)
+    pos = Yt[idx["train"]].mean(0).clamp(min=1e-3).to(dev)
+
+    def batch(seeds):
+        b = sample_batch(g, seeds, rels, fan, rng)
+        return {"x": {t: v.to(dev) for t, v in b["x"].items()}, "ei": {r: v.to(dev) for r, v in b["ei"].items()},
+                "ea": {r: v.to(dev) for r, v in b["ea"].items()}, "n_seeds": b["n_seeds"]}
+
+    def loss_fn(out, y):
+        if not any(reg):
+            return F.binary_cross_entropy_with_logits(out, y, pos_weight=(1 - pos) / pos)
+        tot = out.sum() * 0
+        for j, r in enumerate(reg):
+            ok = ~torch.isnan(y[:, j])
+            if ok.any():
+                tot = tot + (F.smooth_l1_loss(out[ok, j], y[ok, j]) if r else
+                             F.binary_cross_entropy_with_logits(out[ok, j], y[ok, j], pos_weight=(1 - pos[j]) / pos[j]))
+        return tot / len(reg)
+
+    def val_score(y, s):
+        ok = np.isfinite(y)
+        return np.corrcoef(y[ok], s[ok])[0, 1]
     fan, bs = tuple(hp.get("fanout", [10, 5])), hp.get("batch", 1024)
 
     def predict(nodes, reps):
@@ -301,7 +332,7 @@ def train_hetero(g: Graph, rels: list[str], Y: np.ndarray, idx: dict, seed: int,
             for _ in range(reps):
                 for i in range(0, len(nodes), 4096):
                     s = nodes[i:i + 4096]
-                    out[i:i + len(s)] += model(sample_batch(g, s, rels, fan, rng)).numpy()
+                    out[i:i + len(s)] += model(batch(s)).cpu().numpy()
         return out / reps
 
     best, best_state, bad = -1.0, None, 0
@@ -311,12 +342,12 @@ def train_hetero(g: Graph, rels: list[str], Y: np.ndarray, idx: dict, seed: int,
         for i in range(0, len(perm), bs):
             s = perm[i:i + bs]
             opt.zero_grad()
-            loss = F.binary_cross_entropy_with_logits(model(sample_batch(g, s, rels, fan, rng)), Yt[s],
-                                                      pos_weight=(1 - pos) / pos)
+            loss = loss_fn(model(batch(s)), Yt[s].to(dev))
             loss.backward()
             opt.step()
         sv = predict(idx["val"], 1)
-        score = np.mean([average_precision_score(Y[idx["val"], j], sv[:, j]) for j in range(Y.shape[1])])
+        score = np.mean([val_score(Y[idx["val"], j], sv[:, j]) if reg[j] else
+                         average_precision_score(Y[idx["val"], j], sv[:, j]) for j in range(Y.shape[1])])
         if score > best:
             best, bad = score, 0
             best_state = {k: v.clone() for k, v in model.state_dict().items()}
