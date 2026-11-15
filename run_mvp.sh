@@ -31,3 +31,5 @@ python scripts/12_label_diagnostics.py "$SPLIT"
 python scripts/13_target_bakeoff.py "$SPLIT"
 python scripts/09_first_k_experiments.py "$SPLIT" hist,xgb_own,xgb_nbr,sage,hgnn 1,3,5,10,20,50 cv edge
 python scripts/14_graph_on_edge.py "$SPLIT"
+# overview figures for README.md and docs/ (reads outputs/tables only)
+python scripts/16_overview_figures.py "$SPLIT"

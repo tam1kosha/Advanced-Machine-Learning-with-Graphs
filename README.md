@@ -1,7 +1,14 @@
 # Skilled or Lucky? Early trader typing on Polymarket trading graphs
 
-COMP 5222 group project (Mukhanov, Lin, Bayraktar). Original proposal: `proposal.pdf`.
-Lab notebook with every number: `NOTES.md`. This page is the map. Status: 15 Nov 2026.
+COMP 5222 group project (Mukhanov, Lin, Bayraktar). Status: 16 Nov 2026.
+
+| If you want to… | Read |
+|---|---|
+| understand the project and where it stands | this page |
+| see what happened, figure by figure | [`docs/RESULTS.md`](docs/RESULTS.md) |
+| set up, run things, pick up a task | [`docs/ONBOARDING.md`](docs/ONBOARDING.md) |
+| look up an exact number, caveat or run time | [`NOTES.md`](NOTES.md) (lab notebook, newest entry last) |
+| see what was promised | [`proposal.pdf`](proposal.pdf) |
 
 ## The project in one minute
 
@@ -17,6 +24,12 @@ the wallet's own trades?
    (correlation 0.22), if the model is trained on the right target.
 3. The graph adds nothing so far. Graph neural networks tie a plain gradient-boosted tree that sees
    only the wallet's own trades.
+
+![The three findings so far](outputs/figures/overview_train_results.png)
+
+*A: wallets sorted by their result on the earlier half of their bets, and what they did on the later
+half. B: the same model on the same inputs, trained on three different targets. C: each graph model
+minus XGBoost on the same wallets; zero means "no better than a model that ignores the graph".*
 
 **Not settled yet.** Points 2 and 3 were measured inside one six-month window. The out-of-time test
 and a second period are written and waiting for the GPU server (see the decision tree below).
@@ -36,8 +49,11 @@ and a second period are written and waiting for the GPU server (see the decision
 | new / existing wallet | no trades before the cutoff / has a history and a place in the graph |
 | label | what we predict: computed only from bets placed **after** the k observed fills |
 
-Why it is hard: with 30 bets, luck and skill look almost the same. Why a graph might help: a new
-wallet has no history, but its first trades connect it to counterparties and markets that do.
+![What a model sees and what it must predict](outputs/figures/overview_train_setup.png)
+
+Why it is hard: with 30 bets, luck and skill look almost the same, and wallets that look skilled are
+rare (panel B). Why a graph might help: a new wallet has no history, but its first trades connect it
+to counterparties and markets that do.
 
 ### What we compare
 
@@ -76,8 +92,7 @@ that do not use it.
 | Iteration 4b | Which target should models learn? | Regression on edge: correlation 0.22 from one fill; the z > 2 classifier: −0.11 | new headline metric: ranking by later edge |
 | Iteration 4c | Does the graph help on the new target? | No: every graph model within ±0.02 of XGBoost, new and existing wallets | **deviation 2: the likely ending is a careful null for the graph** |
 
-Figures: `outputs/figures/exp4_train_label_diag.png` (what the label measures) and
-`outputs/figures/exp4_train_graph.png` (graph models vs baselines).
+Every step with its figure and how to read it: [`docs/RESULTS.md`](docs/RESULTS.md).
 
 ## Where we go from here
 
@@ -172,6 +187,7 @@ bash run_mvp.sh test       # cutoff 2025-07-01 (needs Jan–Dec 2025 trades, ~4.
 | 9 edge | `09_first_k_experiments.py ... cv edge` | all methods fit on the edge target (centred z of the even-week half of the label bets), GNNs with a regression head: `data/processed/exp4_preds/` | ~50 min* |
 | 14 | `14_graph_on_edge.py` | graph models vs baselines on the held-out (odd-week) half, paired bootstrap, claim check: `exp4_*_graph{,_paired}.csv`, `outputs/figures/exp4_*_graph.png` | ~3 min |
 | 15 | `15_out_of_time.py` | fit on one split, score a later one (XGBoost): `exp5_*_oot.csv`. Needs steps 1–7 for both splits | not run yet |
+| 16 | `16_overview_figures.py` | the two overview figures on this page, drawn from `outputs/tables/` only (no `data/` needed): `outputs/figures/overview_*_{setup,results}.png` | 5 s |
 
 \*2-core / 7 GB machine (steps 7–10 timed on a 12-core Mac; 9 cv and 11–13 on a 10-core / 16 GB Mac). DuckDB does the heavy lifting out-of-core;
 memory and threads are set in `prep.connect()` (2 threads by default, `PMGRAPH_THREADS=n` overrides: more
@@ -223,7 +239,10 @@ src/pmgraph/hetero.py     frozen wallet-market graph, query-node sampler, hetero
 src/pmgraph/tabular.py    torch-free XGBoost worker (subprocess)
 src/pmgraph/rank_eval.py  pooled ranking metrics, bootstrap CIs (iteration 3)
 src/pmgraph/label_diag.py split halves, persistence, edge metrics (iteration 4)
+src/pmgraph/plotstyle.py  one name and one colour per method, for every new figure
 scripts/                  numbered pipeline steps (table above)
+docs/RESULTS.md           the story figure by figure
+docs/ONBOARDING.md        setup check, repo map, rules, open tasks
 run_mvp.sh, run_server.sh laptop pipeline / GPU-server stages
 tests/                    simulated nulls and planted effects for every statistical procedure
 ```

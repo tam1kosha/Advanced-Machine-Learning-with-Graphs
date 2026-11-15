@@ -480,3 +480,13 @@ A teammate will run the heavy jobs on a server with 8 x RTX 4090. Added for that
 What the server run answers: (1) does the edge signal of result 5 survive out of time; (2) does the
 tie between graph models and XGBoost repeat on the second period (test split, cv) and under larger /
 slower GNN settings. Report every grid setting: the CV folds that would rank them are the test folds.
+
+## Repo refresh (16 Nov 2026) — no new experiment
+
+Nothing was trained and no number changed. Added for readers and for the group:
+* `scripts/16_overview_figures.py` + `pmgraph/plotstyle.py`: two overview figures drawn from the committed
+  tables only (`overview_train_setup.png`: the task and how rare skill is; `overview_train_results.png`:
+  persistence, target bake-off, graph minus XGBoost). Sources: `prepare_stats.json`, `labels_train.json`,
+  `eda_train.json`, `exp4_train_{persistence,targets,graph,graph_paired}.csv`.
+* `docs/RESULTS.md` (every figure in order, how to read it, what it changed) and `docs/ONBOARDING.md`
+  (setup check without data, repo map, rules, open tasks). README links both and shows the two figures.
