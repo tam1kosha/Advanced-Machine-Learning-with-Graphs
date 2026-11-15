@@ -67,21 +67,27 @@ def prepare(con, N: int, K: int, min_bets: int, graph_fills: Path) -> None:
     con.execute("CREATE OR REPLACE TEMP TABLE gm AS SELECT DISTINCT nid, market_id FROM gs")
 
 
-def population(con, N: int, j: int, min_bets: int, unit: str, calib: pd.DataFrame) -> pd.DataFrame:
-    """Label after the j-th post-cutoff fill (see module docstring) + leakage asserts.
-    Returns one row per labelled wallet: label columns, t_j (time of the j-th fill), new."""
+def label_bets(con, j: int, calib: pd.DataFrame) -> pd.DataFrame:
+    """Bets that make up the label after the j-th post-cutoff fill (wallet = nid).
+    Creates TEMP TABLEs om (observed markets) and tj (time of the j-th fill)."""
     con.execute(f"""
       CREATE OR REPLACE TEMP TABLE om AS
       SELECT DISTINCT nid, market_id FROM (SELECT nid, market_id FROM obs WHERE rn <= {j}
                                            UNION ALL SELECT nid, market_id FROM gm)""")
     con.execute(f"""CREATE OR REPLACE TEMP TABLE tj AS
                     SELECT nid, max(ts) t_j FROM obs WHERE rn <= {j} GROUP BY 1 HAVING count(*) = {j}""")
-    b = bets_from_sides(con, """
+    return bets_from_sides(con, """
       SELECT ls.nid wallet, ls.market_id, ls.event_id, ls.ts, CASE WHEN ls.long_ THEN 1 ELSE -1 END sgn,
              ls.qty, ls.price, ls.w
       FROM ls JOIN tj USING (nid)
       ANTI JOIN om ON om.nid = ls.nid AND om.market_id = ls.market_id
       WHERE ls.ts > tj.t_j AND ls.w IS NOT NULL""", calib)
+
+
+def population(con, N: int, j: int, min_bets: int, unit: str, calib: pd.DataFrame) -> pd.DataFrame:
+    """Label after the j-th post-cutoff fill (see module docstring) + leakage asserts.
+    Returns one row per labelled wallet: label columns, t_j (time of the j-th fill), new."""
+    b = label_bets(con, j, calib)
     lab = skill_test(b, unit=unit)
     lab = lab[lab["n_bets"] >= min_bets].copy()
     lab.index.name = "nid"

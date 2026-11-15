@@ -1,7 +1,9 @@
 # CLAUDE.md — guidance for Claude Code in this repo
 
 Project: "Skilled or Lucky?" — early trader typing on Polymarket trading graphs (HKUST COMP 5222).
-Read `proposal.pdf` (goals) and `NOTES.md` (current results + ordered next steps) before starting.
+Read `README.md` (project map, decision tree, gates), `docs/RESULTS.md` (what each figure showed) and the
+latest entry of `NOTES.md` (numbers, ordered next steps) before starting. `proposal.pdf` has the original goals;
+`docs/ONBOARDING.md` has the open tasks.
 
 ## Run
 ```bash
@@ -10,6 +12,9 @@ python -m pytest -q tests
 bash run_mvp.sh train          # download (~3 GB) -> prepare -> eda -> labels -> graph -> experiments -> plot
 python scripts/05_experiments.py train hist,xgb_own      # subset of methods; results merge into exp1_*_raw.csv
 python scripts/09_first_k_experiments.py train sage 1,3  # iteration 2: methods x k; parts in outputs/tables/exp2_parts/
+python scripts/09_first_k_experiments.py train xgb_own,hgnn 1,3 cv edge   # iteration 4: 5-fold CV on the edge target
+python scripts/16_overview_figures.py train              # overview figures from outputs/tables only (no data/)
+bash run_server.sh                                       # GPU-server stages (both splits, out-of-time, GNN grid)
 ```
 DuckDB runs with 2 threads by default (`PMGRAPH_THREADS`); more threads under the 5 GB cap spill tens of GB.
 On macOS xgboost and torch segfault in one process: keep XGBoost in `pmgraph.tabular` (subprocess).
@@ -32,4 +37,6 @@ library code is in `src/pmgraph/`. Settings in `configs/mvp.yaml`.
 - New experiments: new numbered script + rows in a CSV under `outputs/tables/`, figure under `outputs/figures/`,
   and a short dated entry in `NOTES.md` (what was run, numbers, reading).
 - Keep `tests/` passing; add a test for any new statistical procedure (simulate the null).
+- Figures: use `pmgraph.plotstyle` (method names and colours). When the story changes, update the README
+  tables and add a section to `docs/RESULTS.md`. Do not rewrite the outputs of earlier experiments.
 - Concise code, no notebooks for core logic (notebooks/ is for exploration only).
