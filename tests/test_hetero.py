@@ -5,7 +5,7 @@ from pathlib import Path
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
-from pmgraph.hetero import CSR, Graph, sample_batch  # noqa: E402
+from pmgraph.hetero import CSR, Graph, sample_batch, train_hetero  # noqa: E402
 
 
 def _toy(seed=0):
@@ -44,3 +44,31 @@ def test_query_nodes_only_receive():
         if d_t == "wallet" and s_t == "wallet":
             assert ei.shape[1] > 0
     assert b["x"]["wallet"].shape[0] > n_s and "market" in b["x"]
+
+
+def _reg_graph(seed, signal):
+    """Query wallets whose target is the mean first feature of their counterparties (+ noise), or pure noise."""
+    rng = np.random.default_rng(seed)
+    nw, nq, deg = 300, 600, 4
+    xw = rng.normal(size=(nw, 3)).astype(np.float32)
+    src = rng.integers(0, nw, nq * deg)
+    dst = np.repeat(np.arange(nq), deg)
+    f = rng.integers(0, nw, (2, 1500))
+    g = Graph(x={"wallet": xw}, frozen={"cp": CSR.build(f[1], f[0], np.ones(1500), nw)},
+              xq=rng.normal(size=(nq, 3)).astype(np.float32), query={"cp": CSR.build(dst, src, np.ones(nq * deg), nq)})
+    y = signal * xw[src, 0].reshape(nq, deg).mean(1) + 0.3 * rng.normal(size=nq)
+    y[rng.random(nq) < 0.1] = np.nan                   # wallets without a target are skipped, not fatal
+    return g, y[:, None]
+
+
+def test_regression_head_learns_neighbour_signal_and_nothing_under_null():
+    hp = dict(hidden=16, fanout=[4, 2], batch=128, epochs=25, patience=25, lr=0.01, eval_reps=3, threads=1)
+    idx = {"train": np.arange(0, 360), "val": np.arange(360, 480)}
+    te = np.arange(480, 600)
+    r = {}
+    for name, signal in [("signal", 1.0), ("null", 0.0)]:
+        g, y = _reg_graph(5, signal)
+        s = train_hetero(g, ["cp"], y, idx, 0, hp, log=lambda *a: None, objectives=["reg"])
+        ok = np.isfinite(y[te, 0])
+        r[name] = np.corrcoef(s[te, 0][ok], y[te, 0][ok])[0, 1]
+    assert r["signal"] > 0.5 and abs(r["null"]) < 0.3, r

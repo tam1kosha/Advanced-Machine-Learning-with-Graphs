@@ -17,8 +17,17 @@ Split modes (4th argument, default configs first_k.split_mode):
           scored once -> outputs/tables/exp3_parts/ (11 pools the out-of-fold scores)
 Writes one CSV of per-split metrics per (k, method) (re-runs overwrite) and the test scores of every
 wallet to data/processed/{exp2,exp3}_preds/.
-usage: python scripts/09_first_k_experiments.py [split] [methods,comma] [ks,comma] [random|cv]
+Target (5th argument, iteration 4): `label` (default, the two binary targets above) or `edge`: one
+regression target, the centred z of the wallet's label bets in markets closing in even weeks (half A
+of the `week` split of 12; wallets with < 10 such bets are not trained on). cv mode only; only the
+scores are written, to data/processed/exp4_preds/, and 14 judges them on the odd-week half.
+GNN settings: configs gnn, overridden by the JSON in env PMGRAPH_GNN (e.g. '{"hidden": 128, "fanout": [20, 10]}');
+env PMGRAPH_TAG=name writes the scores to {exp}_preds_name/ instead, so several settings can run side by
+side (one process per GPU: CUDA_VISIBLE_DEVICES). The device is CUDA when available (pmgraph.hetero).
+usage: python scripts/09_first_k_experiments.py [split] [methods,comma] [ks,comma] [random|cv] [label|edge]
 """
+import json
+import os
 import sys
 import time
 
@@ -35,6 +44,7 @@ from sklearn.preprocessing import StandardScaler
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from pmgraph import ROOT, load_config  # noqa: E402
 from pmgraph.hetero import CSR, HELD_ATTRS, Graph, frozen_csrs, held_edges_pd, train_hetero  # noqa: E402
+from pmgraph.label_diag import variance_function  # noqa: E402
 from pmgraph.tabular import run_in_subprocess  # noqa: E402  (XGBoost cannot share a process with torch on macOS)
 
 cfg = load_config()
@@ -44,12 +54,16 @@ methods = sys.argv[2].split(",") if len(sys.argv) > 2 else ALL
 ks = [int(k) for k in sys.argv[3].split(",")] if len(sys.argv) > 3 else cfg["eval"]["k_buckets"]
 mode = sys.argv[4] if len(sys.argv) > 4 else cfg["first_k"].get("split_mode", "random")
 assert mode in ("random", "cv"), mode
-tag = {"random": "exp2", "cv": "exp3"}[mode]
+target = sys.argv[5] if len(sys.argv) > 5 else "label"
+assert target in ("label", "edge") and (target == "label" or mode == "cv"), (mode, target)
+tag = {"random": "exp2", "cv": "exp3"}[mode] if target == "label" else "exp4"
 P = ROOT / cfg["data"]["processed_dir"]
-parts, preds = ROOT / f"outputs/tables/{tag}_parts", P / f"{tag}_preds"
-parts.mkdir(parents=True, exist_ok=True)
+run_tag = os.environ.get("PMGRAPH_TAG", "")
+parts, preds = ROOT / f"outputs/tables/{tag}_parts", P / (f"{tag}_preds" + (f"_{run_tag}" if run_tag else ""))
+if target == "label":
+    parts.mkdir(parents=True, exist_ok=True)
 preds.mkdir(parents=True, exist_ok=True)
-hp = cfg["gnn"]
+hp = {**cfg["gnn"], **json.loads(os.environ.get("PMGRAPH_GNN", "{}"))}
 t0 = time.time()
 log = lambda *a: print(f"[{time.time()-t0:6.0f}s]", *a, flush=True)  # noqa: E731
 TARGETS = ["profitable", "skill"]
@@ -83,6 +97,17 @@ Pop = pd.read_parquet(P / f"{split}_fk_pop.parquet")
 Feat = pd.read_parquet(P / f"{split}_fk_feat.parquet")
 obs = pd.read_parquet(P / f"{split}_fk_obs.parquet")
 QMF = pd.read_parquet(P / f"{split}_fk_mf.parquet")
+HALF = pd.read_parquet(P / f"{split}_fk_halves.parquet").query("scheme == 'week'") if target == "edge" else None
+
+
+def edge_target(k: int, nids: np.ndarray) -> np.ndarray:
+    """Centred z of half A, (x - mu) / sqrt(tau2 + phi s^2); NaN for wallets with < 10 bets in half A."""
+    H = HALF[HALF.k == k].set_index("nid").reindex(nids)
+    ok = (H["n0"] >= 10).to_numpy()
+    assert ok.sum() > 100, f"no split halves for k={k}: run scripts/12_label_diagnostics.py {split} first"
+    x, s = H["x0"].to_numpy(), H["s0"].to_numpy()
+    v = variance_function(x[ok], s[ok])
+    return np.where(ok, (x - v["mu"]) / np.sqrt(v["tau2"] + v["phi"] * s ** 2), np.nan)[:, None]
 
 
 # ---------------------------------------------------------------- query graph for one k
@@ -164,6 +189,7 @@ for k in ks:
               query={r: CSR.build(d, s, a, n) for r, (d, s, a) in E.items()})
     log(f"k={k}: n={n} (new {new.sum()}), query edges", {r: len(v[0]) for r, v in E.items()})
     strat = Y[:, 1] * 4 + Y[:, 0] * 2 + new
+    Yt, obj = (Y, None) if target == "label" else (edge_target(k, nids), ["reg"])     # what the models are fit on
     splits = {}
     if mode == "random":
         for seed in cfg["eval"]["seeds"]:
@@ -180,21 +206,28 @@ for k in ks:
         tm = time.time()
         if m in ("xgb_own", "xgb_nbr"):    # trees need no early stopping: fit on train + val
             Fm = Fq_raw if m == "xgb_own" else np.c_[Fq_raw, NBR.to_numpy(np.float32)]
-            xs = run_in_subprocess(Fm, Y, {sd: (np.r_[tr, va], te) for sd, (tr, va, te) in splits.items()})
+            xs = run_in_subprocess(Fm, Yt, {sd: (np.r_[tr, va], te) for sd, (tr, va, te) in splits.items()}, objectives=obj)
         for seed, (tr, va, te) in splits.items():
             if m == "hist":
                 s = np.stack([fk["hist_profit_slog"].fillna(0).to_numpy(), fk["hist_z"].fillna(0).to_numpy()], 1)
+                s = s if target == "label" else s[:, 1:]
             elif m in ("xgb_own", "xgb_nbr"):
                 s = xs[seed]
             else:
                 rels = ["cp"] if m == "sage" else ["cp", "mf", "rev_mf", "rev_held", "held"]
-                s = train_hetero(g, rels, Y, {"train": tr, "val": va}, seed, hp,
-                                 log=lambda *a: log(f"k={k}", *a))
+                s = train_hetero(g, rels, Yt, {"train": tr, "val": va}, seed, hp,
+                                 log=lambda *a: log(f"k={k}", *a), objectives=obj)
+            if target == "edge":
+                pr_rows.append(pd.DataFrame({"seed": seed, "nid": nids[te], "new": new[te], "s_edge": s[te, 0]}))
+                continue
             rows += metrics_rows(s, Y, te, new, seed=seed, k=k, method=m)
             pr_rows.append(pd.DataFrame({"seed": seed, "nid": nids[te], "new": new[te], "z": pk.z.to_numpy()[te],
                                          "n_bets": pk.n_bets.to_numpy()[te], "skill": Y[te, 1], "profitable": Y[te, 0],
                                          "s_skill": s[te, 1], "s_profitable": s[te, 0]}))
         pd.concat(pr_rows).assign(k=k, method=m).to_parquet(preds / f"{split}_k{k}_{m}.parquet", index=False)
+        if target == "edge":
+            log(f"k={k} {m:8s} {time.time()-tm:5.0f}s  edge scores saved")
+            continue
         R = pd.DataFrame(rows)
         R.to_csv(parts / f"{split}_k{k}_{m}.csv", index=False)
         sk = R[(R.target == "skill")].groupby("pop").auprc.mean().round(3).to_dict()

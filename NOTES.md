@@ -284,3 +284,199 @@ Score deciles (xgb_own, k=10, new): P(z > 2) rises 0.5% → 3.5% bottom → top,
 Compute notes: on this Mac hgnn is the bottleneck (≈ 100 s per fold at k=1 with 2 threads, slower when
 4 processes share the CPU); with fewer processes raise `gnn.threads`. Jul–Dec 2025 trades are downloaded
 (4.5 GB; Oct–Dec alone 3.6 GB), so the test split's label window is ~2–3× the train one.
+
+---
+
+# Iteration 4 — what the skill label measures (14 Nov 2026)
+
+Question from iteration 3: the z > 2 target rewards dispersed z, so what should replace it? No GNN was
+trained; labels and all exp1–3 outputs are unchanged. Train split, 16 GB / 10-core Mac.
+
+* `12_label_diagnostics.py` (≈ 10 min) + `pmgraph/label_diag.py`: edge per fill by role / price band,
+  split halves of every wallet's label bets, persistence, variance function, saved exp3 scores
+  re-scored against realised edge.
+* `13_target_bakeoff.py` (≈ 4 min, XGBoost only): candidate targets built from one half of the label
+  bets, judged on the other half of held-out wallets. `tabular.py` gained a regression objective and
+  sample weights (classifier path unchanged); `firstk.label_bets` was split out of `population`.
+* `tests/test_label_diag.py` (8 tests, simulated nulls and planted effects): independent bets → no
+  shared variance and flat persistence; planted edge sd recovered; dependence inside a week shows in
+  the market split and not in the week / time splits; a centred null gives the blind score nothing.
+
+Notation: x = T − mu0 (excess edge per bet, in cents below), s = sd0, z = x / s. Tables:
+`outputs/tables/exp4_train_*.csv`; figure `outputs/figures/exp4_train_label_diag.png`.
+
+## Results
+
+**1. The over-dispersion is persistent wallet edge, not dependence between a wallet's bets.**
+Covariance across wallets of the edges of two halves of the label (cents², 95% wallet-bootstrap CI), k=1:
+
+| split of the label bets | new (n ≈ 19.0k) | existing (n ≈ 16.0k) |
+|---|---|---|
+| random market | 18.8 [17.2, 20.5] | 14.1 [12.7, 15.4] |
+| random event | 18.3 [16.8, 20.1] | 14.1 [12.7, 15.6] |
+| alternating close weeks | 18.5 [16.9, 20.0] | 12.8 [11.4, 14.3] |
+| earlier vs later closes | 16.7 [15.3, 18.3] | 11.5 [10.1, 12.9] |
+
+The halves share an edge sd of ≈ 4 cents per bet however they are cut, and what is left inside a half
+is the null variance (ratio 0.95–1.07). Dependence between sibling markets or inside a week is at
+most ~10% of the shared part. Half-to-half correlation (time split): 0.25 new / 0.22 existing at k=1,
+0.47 / 0.36 at k=50; for wallets with ≥ 100 bets 0.52. Spearman–Brown reliability of the whole label
+≈ 0.40 at k=1. So the edge label is a real, moderately reliable wallet trait. This replaces the
+"within-wallet dependence" explanation of iterations 2–3. (The Gaussian fit x ~ N(mu, tau² + phi s²)
+prefers phi ≈ 2 with tau ≈ 1c, but that model is wrong for these data: see 2. Do not read its phi as
+dependence.)
+
+**2. The persistence is one-sided: losing repeats, winning barely does.** Wallets sorted by the z of
+the earlier half of their label bets; outcome on the later half (k=1, new / existing):
+
+| decile of earlier z | mean later edge | P(later z < −2) | P(later z > 2) |
+|---|---|---|---|
+| bottom (z ≈ −2.5) | −7.6c / −6.3c | 30% / 28% | 0.7% / 1.1% |
+| 2nd | −2.9c / −2.4c | 8% / 8% | 1.1% / 0.8% |
+| 5th–9th | −1.6c … −0.1c | 3–5% | 0.6–1.8% |
+| top (z ≈ +1.6) | −0.2c / −0.4c | 3.9% / 4.0% | 3.9% / 6.5% |
+| all wallets | −1.4c / −1.1c on the whole label (mean z −0.25 / −0.22) | 7.3% / 6.9% | 1.4% / 1.8% |
+
+The null is not centred (average labelled wallet: −1.3c per bet, and z drifts down with √bets), the
+left tail is 4–5× the right one, and nearly all the shared variance of result 1 sits in the losers.
+A small group of repeat winners exists (top decile: about 3× the base rate of z > 2) but its mean later
+edge is not above zero.
+
+**3. Role and price.** Per fill, takers lose 0.23c (SE 0.06, market clusters) and makers gain it:
+the role gap is small (weather −0.94c, sports −0.32c, crypto 0.0c for takers). The wallet-level gap
+by maker share seen in the first-k features is therefore who the wallets are, not the spread. By buy
+price the label window has a band effect the pre-cutoff calibration misses: buying at 0.3–0.4 made
++4.9c (SE 1.5), buying at 0.6–0.7 lost 5.6c (SE 1.3), both roles alike. Wallets whose first fill is
+above 0.99 (20% of new wallets at k=1) later earn +0.6c per bet (raw, uncalibrated: +0.5c) against
+−1.2 to −2.8c for first fills below 0.97: a small steady premium for holding near-certain outcomes.
+
+**4. Models trained on z > 2 rank new wallets backwards.** Saved exp3 scores against realised
+edge (inverse-variance weighted): top minus bottom score decile, cents per bet, new wallets:
+
+| k | 1 | 3 | 5 | 10 | 20 | 50 |
+|---|---|---|---|---|---|---|
+| history-only | +0.1 | +0.5 | +0.5 | +0.2 | +1.0 | +2.9 |
+| XGBoost own | −1.2 | −1.5 | −1.4 | −1.3 | −0.8 | +0.5 |
+| GraphSAGE | −1.3 | −1.4 | −1.4 | −1.5 | −1.1 | +1.0 |
+| hetero GraphSAGE | −1.1 | −1.7 | −1.5 | −1.6 | −1.0 | +0.6 |
+
+All CIs of the learned models exclude 0 at k ≤ 20 (e.g. hgnn k=10: −1.6 [−1.9, −1.4]). Their weighted
+correlation with later-half edge (−0.08 to −0.11) is what a score that knows only the wallet's noise
+scale gets (`blind`: −0.12). Existing wallets: history-only +4.2 to +7.5c; XGBoost +0.7 to +1.2c and
+the GNNs +0.2 to +0.8c at k ≤ 20. So the iteration-3 GNN gain for existing wallets is a gain in
+right-tail precision only (later-half z > 2 AUPRC at k=10: hgnn 0.119, history 0.108, XGBoost 0.087,
+CIs overlap); on ranking by edge the GNNs trained on z > 2 are below XGBoost and far below history.
+Reference for the right tail: the wallet's own earlier-half z reaches AUPRC 0.08 / 0.11 / 0.22 (new,
+k = 1 / 10 / 50, base 0.014 / 0.014 / 0.020); first-k models reach 0.02–0.045.
+
+**5. Target bake-off (XGBoost on first-k features; trained on even-close-week bets, judged on
+odd-week realised edge of held-out wallets; 5 CV folds of 09).** Weighted correlation with held-out edge:
+
+| target | new k=1 | new k=10 | new k=50 | existing k=1 | existing k=10 | existing k=50 |
+|---|---|---|---|---|---|---|
+| z > 2, whole label (iter. 1–3) | −0.11 | −0.13 | +0.02 | +0.09 | +0.08 | +0.21 |
+| z > 2, training half | −0.15 | −0.15 | −0.01 | +0.06 | +0.05 | +0.15 |
+| regression on z | +0.21 | +0.28 | +0.30 | +0.27 | +0.32 | +0.39 |
+| regression on edge, weights 1/(tau² + phi s²) | +0.22 | +0.28 | +0.32 | +0.28 | +0.34 | +0.42 |
+| regression on empirical-Bayes edge | +0.21 | +0.26 | +0.32 | +0.27 | +0.30 | +0.41 |
+| regression on centred z | +0.22 | +0.28 | +0.33 | +0.28 | +0.33 | +0.42 |
+| history-only (no training) | +0.01 | +0.07 | +0.17 | +0.19 | +0.23 | +0.31 |
+
+CI half-widths ≈ 0.015–0.03. Top minus bottom decile for the weighted edge regression: +3.3 / +4.5 /
++7.7c (new) and +4.9 / +6.1 / +9.7c (existing), against −1.7 / −1.6 / +0.3c and +0.9 / +0.9 / +2.6c
+for the z > 2 classifier. The four regression targets are indistinguishable; all beat the classifier
+(paired difference, new, k=1: +0.36 [0.34, 0.39]) and sit above history-only with CIs that do not overlap.
+Without sure-shot wallets (≥ half of the observed fills above 0.90; 22–28% of new wallets at
+k ≤ 10): new +0.16 / +0.22 / +0.31, existing +0.29 / +0.35 / +0.41, so the signal is not only that
+one style. For the rare class nothing changes: held-out-half z > 2 AUPRC of every target stays at
+0.013–0.038 for new wallets; the classifiers are, if anything, slightly ahead there.
+
+## Reading
+
+1. The label problem is the threshold, not the statistic. The edge behind z is a persistent trait;
+   z > 2 keeps its noisiest 2% and throws away the well-populated, strongly persistent losing side.
+2. "≤ 10 fills carry almost no skill signal" (iteration 2) was the target. Trained on edge, XGBoost
+   ranks **new wallets from one fill** with correlation 0.22 to held-out edge. What it finds is how a
+   wallet trades (price level, category, size) and hence who will lose, not who is informed.
+3. The proposal's four types should be read through this: "unskilled loser" is detectable early and
+   persistent; "skilled winner" persists only for a small group and no first-k model finds it.
+4. Up to here the graph claim had only been tested on z > 2; the section below tests it on edge.
+
+Recommendation for the group (label change, needs agreement): train on a continuous target (centred z
+or precision-weighted edge), report the held-out-half edge metrics (weighted correlation, top minus
+bottom decile) as the main result and keep z > 2 AUPRC as the rare-class metric. Decide whether the
+sure-shot premium counts as skill; report with and without those wallets.
+
+Caveats. (a) Everything is inside one six-month window. The alternating-week split keeps test-week
+outcomes out of training, but a style that happened to pay in this window (the 0.3–0.4 / 0.6–0.7
+band effect) would look persistent here: the out-of-time test decides. (b) CIs are wallet bootstraps
+and ignore that wallets share markets, so they are too narrow. (c) Same XGBoost settings for every
+target, no tuning. (d) A half needs ≥ 10 bets, so targets come from 15–25 bets for most wallets.
+(e) The plan's simulated "noise ceiling" was dropped: the Gaussian model it needs does not reproduce
+the 2% base rate; the earlier-half z and the blind score are the empirical replacements.
+
+## Graph claim on the edge target (same day)
+
+`09 ... cv edge` + `14_graph_on_edge.py`: all five methods fit on the centred z of the even-week half
+of the label bets (GNNs: regression head with a Huber loss in `train_hetero`, early stopping on the
+validation correlation; XGBoost: regression), judged on the odd-week realised edge of the held-out
+wallets. 5 CV folds, pooled, 500 wallet bootstraps. Wall ≈ 50 min (2–3 processes; hgnn 9–25 min per k).
+Tables `exp4_train_graph{,_paired}.csv`, figure `outputs/figures/exp4_train_graph.png`.
+
+Weighted correlation with held-out edge, **new** wallets (CI half-width ≈ 0.015):
+
+| k | 1 | 3 | 5 | 10 | 20 | 50 |
+|---|---|---|---|---|---|---|
+| history-only | .009 | .069 | .069 | .070 | .108 | .172 |
+| XGBoost own | .216 | .242 | .255 | .283 | .292 | .328 |
+| XGBoost + nbr | .220 | .239 | .257 | .288 | .298 | .339 |
+| GraphSAGE | .202 | .239 | .261 | .282 | .291 | .340 |
+| hetero GraphSAGE | .211 | .248 | .265 | .279 | .295 | .342 |
+
+Graph model − XGBoost own, new wallets (paired 95% CI): hgnn −.005 [−.012, .003], +.006 [−.003, .015],
++.010 [.001, .019], −.004 [−.015, .007] at k = 1, 3, 5, 10; sage −.014 [−.022, −.006], −.004, +.006,
+−.001; xgb_nbr +.004, −.003, +.002, +.005 (CIs cover 0 unless shown). Existing wallets: XGBoost own
+.278 → .419 (k = 1 → 50), every graph model within −.016 … +.012 of it; the only CIs excluding 0 are
+hgnn −.016 at k=5 and xgb_nbr +.012 at k=1. Top minus bottom decile: 2.9–4.9c for every trained
+model on new wallets at k ≤ 10 (history-only ≤ 0.6c).
+
+**Claim check (proposal §5, edge target): NOT MET.** One paired CI of twelve is above 0 for new
+wallets at k ≤ 10 (hgnn, k=5, +.010) and one is below (sage, k=1).
+
+**Reading.**
+1. This is the first test of the graph claim on a target the models can learn (0.2–0.3 against
+   0.01–0.07 for history-only), and the null is tight: for new wallets at k ≤ 10 a graph model adds
+   at most ≈ 0.02 correlation over XGBoost on the wallet's own first-k features.
+2. The GNN advantage for existing wallets (iterations 1–3) does not survive the change of target:
+   trees and GNNs are level, with the GNNs slightly behind.
+3. Counterparty, market and moved-first neighbourhoods carry no information about a wallet's edge
+   beyond its own trading style, at least as mean-aggregated 2-hop GraphSAGE inputs, and with
+   61–78% of new wallets' first fills in markets that have no node.
+4. Caveats as above (one window, wallet bootstrap, untuned GNNs: fan-out 10/5, hidden 64).
+
+## Next steps (ordered)
+
+1. **Decide the label with the group** using results 1–5 and the graph table above.
+2. **Out-of-time test** (fit on train, score the 2025-07-01 split): the main threat to result 5.
+3. **Give the graph its best chance before calling the null final:** nodes for post-cutoff markets
+   (information as of each wallet's k-th fill), then one GNN hyper-parameter pass on the edge target.
+4. Split the edge into a style part (price band × category × period mean) and a residual, and repeat
+   12–14 on the residual: is anything beyond style predictable early, and does the graph help there?
+5. Markout (price move shortly after a fill) as a dense auxiliary target for the informed tail.
+6. Proposal deliverables still missing: Leiden + ARI/NMI, fees, wash-trade filter, macro-F1.
+
+## Server handoff (15 Nov 2026) — code written, not run
+
+A teammate will run the heavy jobs on a server with 8 x RTX 4090. Added for that, tested on CPU only:
+* `train_hetero` moves the model and batches to CUDA when available (checked on a non-CPU device
+  locally; sampling stays on the CPU, so the GPU pays off through larger `batch` / `hidden`, and
+  through 8 processes at once, not at the default settings).
+* `09`: GNN settings from env `PMGRAPH_GNN` (JSON), tagged outputs with `PMGRAPH_TAG`; `14` takes the tag.
+* `15_out_of_time.py`: XGBoost fit on one split, scored on a later one (edge regression, z > 2
+  classifier, history-only), 5 seeds, judged on the later split's realised edge. Only an in-sample
+  plumbing check has been run; **there are no out-of-time numbers yet.**
+* `run_server.sh`: stages `data prep diag edge oot` (+ optional `grid`), one GPU per process.
+
+What the server run answers: (1) does the edge signal of result 5 survive out of time; (2) does the
+tie between graph models and XGBoost repeat on the second period (test split, cv) and under larger /
+slower GNN settings. Report every grid setting: the CV folds that would rank them are the test folds.
