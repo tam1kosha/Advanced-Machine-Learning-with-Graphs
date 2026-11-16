@@ -210,6 +210,11 @@ python scripts/14_graph_on_edge.py train
 ```
 ### GPU server
 
+Fresh-clone setup, CUDA preflight/smoke test, pilot, restart behaviour and model/resource artifacts:
+[`docs/SERVER.md`](docs/SERVER.md). Run `bash run_server.sh check` and `bash run_server.sh smoke`
+before downloading data. GPU stages fail if CUDA is unavailable; `CUDA_VISIBLE_DEVICES` allocations
+are preserved. New graph runs use `PMGRAPH_TAG=server` by default so historical graph reports stay intact.
+
 `run_server.sh` runs everything that is too heavy for a laptop, in stages (`data prep diag edge oot`,
 optional `grid`): both splits, the edge-target comparison of graph models with one k per GPU, the
 out-of-time test (`15_out_of_time.py`: fit on train, score test) and, with `grid`, four GNN settings.

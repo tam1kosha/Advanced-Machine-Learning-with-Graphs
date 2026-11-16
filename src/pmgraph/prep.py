@@ -25,12 +25,17 @@ from . import ROOT
 def trade_files(raw_dir: Path, start: str, end: str) -> list[str]:
     """Day-partition files with start <= day < end."""
     d, e = date.fromisoformat(start), date.fromisoformat(end)
-    out = []
+    out, missing = [], []
     while d < e:
         f = raw_dir / f"trades/year={d.year}/month={d.month:02d}/day={d.day:02d}/data.parquet"
         if f.exists():
             out.append(str(f))
+        else:
+            missing.append(d.isoformat())
         d += timedelta(days=1)
+    if missing:
+        raise FileNotFoundError(f"missing {len(missing)} daily trade partitions in [{start}, {end}): "
+                                f"{', '.join(missing[:5])}; finish scripts/download.py before preparing data")
     return out
 
 

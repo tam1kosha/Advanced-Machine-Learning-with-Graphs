@@ -490,3 +490,45 @@ Nothing was trained and no number changed. Added for readers and for the group:
   `eda_train.json`, `exp4_train_{persistence,targets,graph,graph_paired}.csv`.
 * `docs/RESULTS.md` (every figure in order, how to read it, what it changed) and `docs/ONBOARDING.md`
   (setup check without data, repo map, rules, open tasks). README links both and shows the two figures.
+
+## Server interface audit (16 Nov 2026) — no new full-data result
+
+Reviewed the fresh-clone path for the eight-4090 server and added `docs/SERVER.md`.
+Changes preserve the task, graph architecture and historical result tables:
+
+* `run_server.sh`: dependency/data/GPU preflight before work; `check` and data-free `smoke` stages;
+  respects allocated CUDA ids/UUIDs and validates NGPU; no silent CPU fallback for GPU stages;
+  configurable interpreter, k values, splits and methods; tagged graph outputs (`server` by default).
+* `server_check.py`: actual CUDA operation/backward check, tiny homogeneous/heterogeneous GNN
+  classification/regression fits on selected devices, checkpoint reload and separate XGBoost worker;
+  package/hardware/config manifests, Parquet/DuckDB storage check and stage prerequisite checks.
+* `train_hetero`: saves best-validation model weights and fit metadata (parameters, epochs, time,
+  process peak RSS, peak allocated/reserved CUDA bytes). `09` saves preprocessing scalers and completed
+  method manifests; PMGRAPH_RESUME skips matching completed k x method jobs. Incomplete methods restart
+  their five folds. Checkpoints are not mid-epoch optimizer/RNG snapshots.
+* Inference batches now follow the training batch unless `eval_batch` is set, replacing the hardcoded
+  4096; this changes neighbour-sampling sequences, so do not expect old scores to reproduce bit-for-bit.
+  Handles empty graph relations and fully isolated query batches, constant validation predictions,
+  degenerate regression targets and nonfinite losses explicitly. Data preparation rejects missing
+  daily trade partitions instead of silently shortening a requested window.
+* `14` refuses missing k/method/fold/wallet predictions, and does not count a pilot subset as the full
+  graph claim. Existing baseline result CSVs/figures were not regenerated.
+
+Validation: original statistical/sampler tests, new routing/failure/resume/empty-neighbour tests,
+real `09 cv edge` -> saved weights/predictions -> resume -> `14` integration on a tiny prepared
+fixture. CPU smoke (both GNNs, binary/regression, checkpoint reload, XGBoost worker) passes. This Mac
+needed its existing bundled OpenMP library on DYLD_LIBRARY_PATH for the XGBoost subprocess; no
+system library was installed. Linux dependencies/native libraries and actual CUDA kernels are still
+checked on the server by `check`/`smoke`. No remote GPU or full downloaded-data run was performed.
+
+Scientific caveats found during review, not silently redefined here: `hours_to_close` derives from
+realised close_time; first-k label construction bounds fill times but does not require every label
+market to resolve before label_end. Hence script 15's statement that all training labels are known
+before the scoring period is not enforced. Resolve as-of timing/label availability before a strict
+out-of-time claim. The frozen graph's poor new-market coverage and unequal GNN/tree fit-set sizes
+also remain. Hidden 64 / two layers is a reasonable baseline; use the declared width-128/fanout grid
+and a self-only MLP control before attributing a null result to graph information rather than capacity.
+
+Final local validation: `python -m pytest -q tests` — 30 passed; Python error/undefined-name lint,
+`bash -n run_server.sh`, and `git diff --check` pass. The isolated-query regression test also covers
+an entire heterogeneous batch with no usable wallet/market neighbours. No server/GPU result is implied.

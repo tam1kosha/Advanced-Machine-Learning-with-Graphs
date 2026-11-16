@@ -80,6 +80,9 @@ table with outputs and times is in the [README](../README.md#pipeline). Heavy jo
 settings, out-of-time test) are staged in `run_server.sh` for the GPU server; only `outputs/tables`
 and `outputs/figures` come back from there.
 
+See [`SERVER.md`](SERVER.md) for the fresh-server installation, CUDA smoke test, one-GPU pilot,
+resource records, saved model weights, and restart controls. Keep checkpoints on persistent server storage.
+
 ## 5. Rules that must not break
 
 These keep the comparison honest. A result that breaks one of them is not a result.

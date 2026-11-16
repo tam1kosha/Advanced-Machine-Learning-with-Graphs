@@ -24,10 +24,13 @@ scores are written, to data/processed/exp4_preds/, and 14 judges them on the odd
 GNN settings: configs gnn, overridden by the JSON in env PMGRAPH_GNN (e.g. '{"hidden": 128, "fanout": [20, 10]}');
 env PMGRAPH_TAG=name writes the scores to {exp}_preds_name/ instead, so several settings can run side by
 side (one process per GPU: CUDA_VISIBLE_DEVICES). The device is CUDA when available (pmgraph.hetero).
+Best GNN checkpoints and preprocessing are saved under data/processed/checkpoints/. PMGRAPH_RESUME=1
+skips completed k x method jobs whose code, configuration and input signatures still match.
 usage: python scripts/09_first_k_experiments.py [split] [methods,comma] [ks,comma] [random|cv] [label|edge]
 """
 import json
 import os
+import re
 import sys
 import time
 
@@ -46,11 +49,14 @@ from pmgraph import ROOT, load_config  # noqa: E402
 from pmgraph.hetero import CSR, HELD_ATTRS, Graph, frozen_csrs, held_edges_pd, train_hetero  # noqa: E402
 from pmgraph.label_diag import variance_function  # noqa: E402
 from pmgraph.tabular import run_in_subprocess  # noqa: E402  (XGBoost cannot share a process with torch on macOS)
+from pmgraph.runinfo import completed_job, finish_job, job_signature  # noqa: E402
 
 cfg = load_config()
 split = sys.argv[1] if len(sys.argv) > 1 else "train"
 ALL = ["hist", "xgb_own", "xgb_nbr", "sage", "hgnn"]
 methods = sys.argv[2].split(",") if len(sys.argv) > 2 else ALL
+if not methods or set(methods) - set(ALL):
+    raise ValueError(f"methods must be selected from {ALL}, got {methods}")
 ks = [int(k) for k in sys.argv[3].split(",")] if len(sys.argv) > 3 else cfg["eval"]["k_buckets"]
 mode = sys.argv[4] if len(sys.argv) > 4 else cfg["first_k"].get("split_mode", "random")
 assert mode in ("random", "cv"), mode
@@ -59,11 +65,23 @@ assert target in ("label", "edge") and (target == "label" or mode == "cv"), (mod
 tag = {"random": "exp2", "cv": "exp3"}[mode] if target == "label" else "exp4"
 P = ROOT / cfg["data"]["processed_dir"]
 run_tag = os.environ.get("PMGRAPH_TAG", "")
+if run_tag and not re.fullmatch(r"[A-Za-z0-9_-]+", run_tag):
+    raise ValueError("PMGRAPH_TAG may contain letters, numbers, underscores and hyphens only")
 parts, preds = ROOT / f"outputs/tables/{tag}_parts", P / (f"{tag}_preds" + (f"_{run_tag}" if run_tag else ""))
 if target == "label":
     parts.mkdir(parents=True, exist_ok=True)
 preds.mkdir(parents=True, exist_ok=True)
 hp = {**cfg["gnn"], **json.loads(os.environ.get("PMGRAPH_GNN", "{}"))}
+if os.environ.get("PMGRAPH_REQUIRE_CUDA") == "1" and not torch.cuda.is_available():
+    raise RuntimeError("CUDA required by server launcher but unavailable to this worker")
+checkpoints = P / "checkpoints" / (tag + (f"_{run_tag}" if run_tag else ""))
+checkpoints.mkdir(parents=True, exist_ok=True)
+inputs = [P / f"{split}_{s}" for s in ["hetero.pt", "fk_pop.parquet", "fk_feat.parquet",
+                                                       "fk_obs.parquet", "fk_mf.parquet"]]
+if target == "edge":
+    inputs.append(P / f"{split}_fk_halves.parquet")
+signature = job_signature(dict(config=cfg, hp=hp, split=split, mode=mode, target=target),
+                          [Path(__file__), *sorted((ROOT / "src/pmgraph").glob("*.py"))], inputs)
 t0 = time.time()
 log = lambda *a: print(f"[{time.time()-t0:6.0f}s]", *a, flush=True)  # noqa: E731
 TARGETS = ["profitable", "skill"]
@@ -87,10 +105,18 @@ def wallet_matrix(df: pd.DataFrame, is_new: np.ndarray) -> np.ndarray:
 xsc = StandardScaler().fit(wallet_matrix(Xraw, np.zeros(N)))
 Xf = xsc.transform(wallet_matrix(Xraw, np.zeros(N))).astype(np.float32)
 Mraw = data["market"].x.numpy()
-Xm = StandardScaler().fit_transform(Mraw).astype(np.float32)
+msc = StandardScaler().fit(Mraw)
+Xm = msc.transform(Mraw).astype(np.float32)
 midx = pd.Series(np.arange(len(Mraw)), index=data["market"].market_id.numpy())
 fz, scalers = frozen_csrs(data)
 del data
+# The state dict alone cannot reproduce predictions: retain feature order and all fitted scalers.
+prep_path = checkpoints / f"{split}_k{'-'.join(map(str, ks))}_preprocessing.pt"
+tmp_prep = prep_path.with_suffix(".pt.tmp")
+torch.save(dict(wallet_columns=oc, wallet_mean=xsc.mean_, wallet_scale=xsc.scale_,
+                market_mean=msc.mean_, market_scale=msc.scale_, edge_scalers=scalers,
+                graph_path=str(inputs[0]), signature=signature), tmp_prep)
+tmp_prep.replace(prep_path)
 log("frozen graph", {r: len(c.src) for r, c in fz.items()})
 
 Pop = pd.read_parquet(P / f"{split}_fk_pop.parquet")
@@ -153,7 +179,6 @@ def nbr_aggregates(E: dict, n: int, o: pd.DataFrame, nids: np.ndarray) -> pd.Dat
         for j, c in enumerate(names):
             cols[f"nbr_{r}_{c}"] = agg[:, j]
         cols[f"deg_{r}"] = np.log1p(deg)
-    qi = pd.Series(np.arange(n), index=nids)
     g = o.assign(cp_in=o.cp < N, mk_in=o.market_id.isin(midx.index)).groupby("nid")[["cp_in", "mk_in"]].mean()
     cols["share_cp_in_graph"] = g["cp_in"].reindex(nids).fillna(0).to_numpy()
     cols["share_mk_in_graph"] = g["mk_in"].reindex(nids).fillna(0).to_numpy()
@@ -174,6 +199,8 @@ def metrics_rows(s, Y, te, new, **kw):
 
 # ---------------------------------------------------------------- main loop
 for k in ks:
+    if k not in cfg["eval"]["k_buckets"]:
+        raise ValueError(f"k={k} is not in the prepared k_buckets")
     pk = Pop[Pop.k == k].reset_index(drop=True)
     nids = pk.nid.to_numpy()
     n = len(pk)
@@ -202,7 +229,13 @@ for k in ks:
             va = folds[(f + 1) % 5]
             splits[f] = (np.setdiff1d(np.arange(n), np.r_[folds[f], va]), va, folds[f])
     for m in methods:
+        pred_path = preds / f"{split}_k{k}_{m}.parquet"
+        method_signature = f"{signature}:{k}:{m}"
+        if os.environ.get("PMGRAPH_RESUME") == "1" and completed_job(pred_path, method_signature):
+            log(f"k={k} {m}: completed job matches code, settings and inputs; skipped")
+            continue
         rows, pr_rows = [], []
+        model_paths = []
         tm = time.time()
         if m in ("xgb_own", "xgb_nbr"):    # trees need no early stopping: fit on train + val
             Fm = Fq_raw if m == "xgb_own" else np.c_[Fq_raw, NBR.to_numpy(np.float32)]
@@ -215,8 +248,12 @@ for k in ks:
                 s = xs[seed]
             else:
                 rels = ["cp"] if m == "sage" else ["cp", "mf", "rev_mf", "rev_held", "held"]
+                model_path = checkpoints / f"{split}_k{k}_{m}_fold{seed}.pt"
                 s = train_hetero(g, rels, Yt, {"train": tr, "val": va}, seed, hp,
-                                 log=lambda *a: log(f"k={k}", *a), objectives=obj)
+                                 log=lambda *a: log(f"k={k}", *a), objectives=obj, checkpoint_path=model_path,
+                                 metadata=dict(split=split, k=k, method=m, mode=mode, target=target,
+                                               preprocessing=str(prep_path), signature=method_signature))
+                model_paths.extend([model_path, prep_path])
             if target == "edge":
                 pr_rows.append(pd.DataFrame({"seed": seed, "nid": nids[te], "new": new[te], "s_edge": s[te, 0]}))
                 continue
@@ -224,12 +261,16 @@ for k in ks:
             pr_rows.append(pd.DataFrame({"seed": seed, "nid": nids[te], "new": new[te], "z": pk.z.to_numpy()[te],
                                          "n_bets": pk.n_bets.to_numpy()[te], "skill": Y[te, 1], "profitable": Y[te, 0],
                                          "s_skill": s[te, 1], "s_profitable": s[te, 0]}))
-        pd.concat(pr_rows).assign(k=k, method=m).to_parquet(preds / f"{split}_k{k}_{m}.parquet", index=False)
+        tmp_pred = pred_path.with_suffix(".parquet.tmp")
+        pd.concat(pr_rows).assign(k=k, method=m).to_parquet(tmp_pred, index=False)
+        tmp_pred.replace(pred_path)
         if target == "edge":
+            finish_job(pred_path, method_signature, model_paths)
             log(f"k={k} {m:8s} {time.time()-tm:5.0f}s  edge scores saved")
             continue
         R = pd.DataFrame(rows)
         R.to_csv(parts / f"{split}_k{k}_{m}.csv", index=False)
+        finish_job(pred_path, method_signature, model_paths)
         sk = R[(R.target == "skill")].groupby("pop").auprc.mean().round(3).to_dict()
         pr = R[(R.target == "profitable")].groupby("pop").auroc.mean().round(3).to_dict()
         log(f"k={k} {m:8s} {time.time()-tm:5.0f}s  skill AUPRC {sk}  profit AUROC {pr}")
