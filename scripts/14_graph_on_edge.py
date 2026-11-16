@@ -14,6 +14,7 @@ and the outputs get the suffix _<tag>.
 usage: python scripts/14_graph_on_edge.py [split] [n_boot] [tag]
 """
 import sys
+import os
 from pathlib import Path
 
 import matplotlib
@@ -35,6 +36,16 @@ sfx = f"_{sys.argv[3]}" if len(sys.argv) > 3 else ""
 files = sorted((P / f"exp4_preds{sfx}").glob(f"{split}_k*_*.parquet"))
 assert files, "no edge-target scores: run scripts/09_first_k_experiments.py <split> <methods> <ks> cv edge"
 D = pd.concat([pd.read_parquet(f) for f in files], ignore_index=True)
+expected_ks = {int(k) for k in os.environ.get("KS", ",".join(map(str, cfg["eval"]["k_buckets"]))).replace(",", " ").split()}
+expected_methods = set(os.environ.get("METHODS", ",".join(sorted(D.method.unique()))).split(","))
+population = pd.read_parquet(P / f"{split}_fk_pop.parquet", columns=["nid", "k"])
+for k in expected_ks:
+    expected_ids = set(population[population.k == k].nid)
+    for method in expected_methods:
+        part = D[(D.k == k) & (D.method == method)]
+        if set(part.seed) != set(range(5)) or part.nid.duplicated().any() or set(part.nid) != expected_ids:
+            raise ValueError(f"incomplete CV predictions for k={k}, method={method}: need 5 folds, each wallet once")
+D = D[D.k.isin(expected_ks) & D.method.isin(expected_methods)]
 H = pd.read_parquet(P / f"{split}_fk_halves.parquet").query("scheme == 'week'")
 BASE, GRAPH = ["hist", "xgb_own"], ["xgb_nbr", "sage", "hgnn"]
 ORDER = [m for m in BASE + GRAPH if m in set(D.method)]
@@ -85,8 +96,9 @@ if len(Q):
     for m in [m for m in GRAPH if m in set(c.method)]:
         cm = c[c.method == m]
         wins = cm.groupby("k")["lo"].min() > 0            # above xgb_own and the better baseline
+        complete = set(wins.index) == {k for k in cfg["eval"]["k_buckets"] if k <= 10} and set(BASE) <= set(ORDER)
         print(f"claim check {m}: beats both baselines on new wallets at k = {list(wins.index[wins])} of {list(wins.index)}"
-              f" -> {'MET' if wins.all() else 'NOT MET'}")
+              f" -> {('MET' if wins.all() else 'NOT MET') if complete else 'INCOMPLETE (pilot/subset only)'}")
 
 fig, ax = plt.subplots(1, 2, figsize=(11, 4.2), sharey=True)
 COL = {"hist": "grey", "xgb_own": "#4c72b0", "xgb_nbr": "#8172b3", "sage": "#dd8452", "hgnn": "#55a868"}

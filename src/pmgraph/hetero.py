@@ -19,6 +19,12 @@ GraphSAGE) in numpy; no pyg-lib / torch-sparse needed. Memory: frozen CSR arrays
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import json
+import os
+from pathlib import Path
+import resource
+import sys
+import time
 
 import numpy as np
 import pandas as pd
@@ -136,7 +142,10 @@ class CSR:
         counts = np.bincount(dst, minlength=n_dst)
         indptr = np.zeros(n_dst + 1, np.int64)
         np.cumsum(counts, out=indptr[1:])
-        return CSR(indptr, src[o].astype(np.int64), np.asarray(attr, np.float32).reshape(len(dst), -1)[o])
+        a = np.asarray(attr, np.float32)
+        # reshape(0, -1) cannot infer the attribute dimension for an empty relation.
+        a = a[:, None] if a.ndim == 1 else a
+        return CSR(indptr, src[o].astype(np.int64), a[o])
 
     def rows(self, v: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         """Edge positions of all in-edges of nodes v, and the index into v of each edge."""
@@ -157,7 +166,8 @@ def frozen_csrs(data, scalers: dict | None = None) -> tuple[dict[str, CSR], dict
     for r, st in raw.items():
         ei, ea = st.edge_index.numpy(), st.edge_attr.numpy()
         if r not in scalers:
-            scalers[r] = (ea.mean(0), ea.std(0) + 1e-6)
+            scalers[r] = ((ea.mean(0), ea.std(0) + 1e-6) if len(ea) else
+                          (np.zeros(REL_DIMS[r]), np.ones(REL_DIMS[r])))
         ea = (ea - scalers[r][0]) / scalers[r][1]
         s_t, d_t = RELS[r]
         out[r] = CSR.build(ei[1], ei[0], ea, n[d_t])
@@ -216,7 +226,9 @@ def sample_batch(g: Graph, seeds: np.ndarray, rels: list[str], fanout: tuple[int
     nodes = {t: np.unique(np.concatenate([h1[t]] + hop2[t])) for t in h1}
     n_s = len(seeds)
     x = {"wallet": torch.from_numpy(np.concatenate([g.xq[seeds], g.x["wallet"][nodes["wallet"]]]))}
-    if "market" in g.x and len(nodes["market"]):
+    # HeteroConv still receives empty relations in isolated batches; keep an empty market tensor
+    # so its source projection/message function has a valid input rather than None.
+    if "market" in g.x:
         x["market"] = torch.from_numpy(g.x["market"][nodes["market"]])
     loc = {t: (lambda ids, t=t, off=(n_s if t == "wallet" else 0): off + np.searchsorted(nodes[t], ids))
            for t in nodes}
@@ -282,7 +294,8 @@ class HeteroSAGE(nn.Module):
 
 
 def train_hetero(g: Graph, rels: list[str], Y: np.ndarray, idx: dict, seed: int, hp: dict, log=print,
-                 objectives: list[str] | None = None) -> np.ndarray:
+                 objectives: list[str] | None = None, checkpoint_path: str | Path | None = None,
+                 metadata: dict | None = None) -> np.ndarray:
     """Multitask BCE on query seeds; early stopping on mean val AUPRC. Returns scores for all query nodes.
     objectives (iteration 4): "binary" (default) or "reg" per column of Y. A "reg" column is standardised
     on the training rows and fit with a Huber loss, rows with a NaN target are skipped, and its
@@ -295,12 +308,26 @@ def train_hetero(g: Graph, rels: list[str], Y: np.ndarray, idx: dict, seed: int,
     torch.set_num_threads(hp.get("threads", 2))
     dims = {t: v.shape[1] for t, v in g.x.items()}
     dev = torch.device(hp.get("device") or ("cuda" if torch.cuda.is_available() else "cpu"))
+    if os.environ.get("PMGRAPH_REQUIRE_CUDA") == "1" and dev.type != "cuda":
+        raise RuntimeError("CUDA was required but is unavailable (or device was set to CPU). Check the torch build/driver.")
+    if dev.type == "cuda":
+        torch.cuda.synchronize(dev)
+        torch.cuda.reset_peak_memory_stats(dev)
+    started = time.perf_counter()
     model = HeteroSAGE(dims, rels, hp.get("hidden", 64), 2, Y.shape[1], hp.get("dropout", 0.2)).to(dev)
+    n_params = sum(p.numel() for p in model.parameters())
+    log(f"    device={dev} parameters={n_params:,} seed={seed} settings={hp}")
     opt = torch.optim.AdamW(model.parameters(), lr=hp.get("lr", 3e-3), weight_decay=1e-4)
     reg = [o == "reg" for o in (objectives or ["binary"] * Y.shape[1])]
     Y = Y.astype(np.float32)
+    target_mean, target_std = np.zeros(Y.shape[1]), np.ones(Y.shape[1])
     for j in np.flatnonzero(reg):
-        Y[:, j] = (Y[:, j] - np.nanmean(Y[idx["train"], j])) / np.nanstd(Y[idx["train"], j])
+        values = Y[idx["train"], j]
+        values = values[np.isfinite(values)]
+        if len(values) < 2 or values.std() < 1e-8:
+            raise ValueError(f"target {j}: regression needs at least two finite, nonconstant training values")
+        target_mean[j], target_std[j] = values.mean(), values.std()
+        Y[:, j] = (Y[:, j] - target_mean[j]) / target_std[j]
     Yt = torch.from_numpy(Y)
     pos = Yt[idx["train"]].mean(0).clamp(min=1e-3).to(dev)
 
@@ -322,27 +349,36 @@ def train_hetero(g: Graph, rels: list[str], Y: np.ndarray, idx: dict, seed: int,
 
     def val_score(y, s):
         ok = np.isfinite(y)
-        return np.corrcoef(y[ok], s[ok])[0, 1]
+        if ok.sum() < 2:
+            raise ValueError("regression validation fold needs at least two finite targets")
+        return float(np.corrcoef(y[ok], s[ok])[0, 1]) if y[ok].std() > 0 and s[ok].std() > 0 else 0.0
     fan, bs = tuple(hp.get("fanout", [10, 5])), hp.get("batch", 1024)
+    eval_bs = hp.get("eval_batch", bs)
+    if any(int(v) <= 0 for v in [bs, eval_bs, *fan, hp.get("epochs", 40), hp.get("eval_reps", 3)]):
+        raise ValueError("batch sizes, fanout, epochs and eval_reps must be positive")
 
     def predict(nodes, reps):
         model.eval()
         out = np.zeros((len(nodes), Y.shape[1]), np.float32)
         with torch.no_grad():
             for _ in range(reps):
-                for i in range(0, len(nodes), 4096):
-                    s = nodes[i:i + 4096]
+                for i in range(0, len(nodes), eval_bs):
+                    s = nodes[i:i + eval_bs]
                     out[i:i + len(s)] += model(batch(s)).cpu().numpy()
         return out / reps
 
-    best, best_state, bad = -1.0, None, 0
+    best, best_state, bad, best_epoch = -np.inf, None, 0, 0
     for ep in range(hp.get("epochs", 40)):
         model.train()
         perm = rng.permutation(idx["train"])
         for i in range(0, len(perm), bs):
             s = perm[i:i + bs]
+            if not np.isfinite(Y[s]).any():
+                continue
             opt.zero_grad()
             loss = loss_fn(model(batch(s)), Yt[s].to(dev))
+            if not torch.isfinite(loss):
+                raise FloatingPointError(f"nonfinite loss at epoch {ep + 1}, seed {seed}")
             loss.backward()
             opt.step()
         sv = predict(idx["val"], 1)
@@ -350,6 +386,7 @@ def train_hetero(g: Graph, rels: list[str], Y: np.ndarray, idx: dict, seed: int,
                          average_precision_score(Y[idx["val"], j], sv[:, j]) for j in range(Y.shape[1])])
         if score > best:
             best, bad = score, 0
+            best_epoch = ep + 1
             best_state = {k: v.clone() for k, v in model.state_dict().items()}
         else:
             bad += 1
@@ -357,5 +394,30 @@ def train_hetero(g: Graph, rels: list[str], Y: np.ndarray, idx: dict, seed: int,
             log(f"    {'+'.join(rels)} seed{seed} ep{ep+1} loss {loss.item():.4f} val-AP {score:.4f}")
         if bad >= hp.get("patience", 8):
             break
+    if best_state is None:
+        raise RuntimeError("no finite validation score was produced; inspect targets and graph inputs")
     model.load_state_dict(best_state)
-    return predict(np.arange(len(g.xq)), hp.get("eval_reps", 3))
+    scores = predict(np.arange(len(g.xq)), hp.get("eval_reps", 3))
+    if dev.type == "cuda":
+        torch.cuda.synchronize(dev)
+    rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    stats = dict(seed=seed, device=str(dev), parameters=n_params, epochs=ep + 1, best_epoch=best_epoch,
+                 best_val_score=float(best), elapsed_seconds=time.perf_counter() - started,
+                 process_peak_rss_bytes=int(rss if sys.platform == "darwin" else rss * 1024),
+                 peak_cuda_allocated_bytes=torch.cuda.max_memory_allocated(dev) if dev.type == "cuda" else 0,
+                 peak_cuda_reserved_bytes=torch.cuda.max_memory_reserved(dev) if dev.type == "cuda" else 0,
+                 device_name=torch.cuda.get_device_name(dev) if dev.type == "cuda" else "CPU",
+                 torch_version=str(torch.__version__), settings=hp, metadata=metadata or {})
+    if checkpoint_path is not None:
+        path = Path(checkpoint_path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        bundle = dict(state_dict={k: v.detach().cpu() for k, v in best_state.items()}, in_dims=dims,
+                      rels=rels, hidden=hp.get("hidden", 64), n_layers=2, n_out=Y.shape[1],
+                      dropout=hp.get("dropout", 0.2), objectives=objectives or ["binary"] * Y.shape[1],
+                      target_mean=target_mean.tolist(), target_std=target_std.tolist(), training=stats)
+        tmp = path.with_suffix(".pt.tmp")
+        torch.save(bundle, tmp)
+        tmp.replace(path)
+        path.with_suffix(".json").write_text(json.dumps(stats, indent=2) + "\n")
+    log(f"    completed: {json.dumps(stats)}")
+    return scores
