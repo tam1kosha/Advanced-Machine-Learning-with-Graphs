@@ -11,6 +11,7 @@
 #   edge  09 cv edge for train and test, one k per GPU, then 14: graph models vs XGBoost on the edge target
 #   oot   15: fit on train, score test (XGBoost): the out-of-time test
 #   grid  09 cv edge on train under 4 GNN settings, tagged; 14 per tag
+#   asof  Gate C: 17 (as-of market nodes) + 09 cv edge with asof_markets, tag asof; 14; train and test
 # GPU jobs: one process per GPU (CUDA_VISIBLE_DEVICES), each loads the frozen graph (~3 GB RAM for train,
 # more for test). NGPU overrides the detected GPU count. Logs: outputs/logs/. Small outputs (outputs/tables,
 # outputs/figures) are what to commit back; data/ stays on the server.
@@ -72,6 +73,12 @@ widefan  {"hidden": 128, "fanout": [20, 10], "batch": 2048, "epochs": 60, "patie
 slow     {"lr": 0.001, "epochs": 80, "patience": 12}
 GRID
       for tag in wide fan widefan slow; do python scripts/14_graph_on_edge.py train 500 "$tag" > "outputs/logs/14_train_$tag.log" 2>&1; done ;;
+    asof)  # Gate C (iteration 5); train was run on a laptop, this repeats it on the second period too
+      for S in train test; do python scripts/17_asof_markets.py "$S" 1,3,5,10 30 > "outputs/logs/17_$S.log" 2>&1; done
+      for S in train test; do for k in 1 3 5 10; do
+        echo "PMGRAPH_TAG=asof PMGRAPH_GNN='{\"asof_markets\": true}' python scripts/09_first_k_experiments.py $S $METHODS $k cv edge > outputs/logs/09_edge_asof_${S}_k$k.log 2>&1"
+      done; done | pool
+      for S in train test; do python scripts/14_graph_on_edge.py "$S" 500 asof > "outputs/logs/14_${S}_asof.log" 2>&1; done ;;
     *) echo "unknown stage: $stage" >&2; exit 2 ;;
   esac
 done

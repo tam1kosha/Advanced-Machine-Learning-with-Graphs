@@ -1,0 +1,38 @@
+{
+  "max_traders": 30,
+  "minutes": 1.4,
+  "by_k": {
+    "1": {
+      "instances": 15119,
+      "instances_new_wallets": 11536,
+      "new_fills_in_frozen_markets": 0.392,
+      "mean_traders": 28.4,
+      "share_no_trader": 0.004,
+      "median_log_fills_before_tk": 6.8
+    },
+    "3": {
+      "instances": 36975,
+      "instances_new_wallets": 28373,
+      "new_fills_in_frozen_markets": 0.351,
+      "mean_traders": 28.7,
+      "share_no_trader": 0.002,
+      "median_log_fills_before_tk": 6.94
+    },
+    "5": {
+      "instances": 58119,
+      "instances_new_wallets": 43816,
+      "new_fills_in_frozen_markets": 0.328,
+      "mean_traders": 28.8,
+      "share_no_trader": 0.002,
+      "median_log_fills_before_tk": 7.1
+    },
+    "10": {
+      "instances": 106556,
+      "instances_new_wallets": 78124,
+      "new_fills_in_frozen_markets": 0.287,
+      "mean_traders": 29.0,
+      "share_no_trader": 0.001,
+      "median_log_fills_before_tk": 7.26
+    }
+  }
+}

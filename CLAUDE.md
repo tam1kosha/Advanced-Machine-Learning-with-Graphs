@@ -14,6 +14,8 @@ python scripts/05_experiments.py train hist,xgb_own      # subset of methods; re
 python scripts/09_first_k_experiments.py train sage 1,3  # iteration 2: methods x k; parts in outputs/tables/exp2_parts/
 python scripts/09_first_k_experiments.py train xgb_own,hgnn 1,3 cv edge   # iteration 4: 5-fold CV on the edge target
 python scripts/16_overview_figures.py train              # overview figures from outputs/tables only (no data/)
+python scripts/17_asof_markets.py train && PMGRAPH_TAG=asof PMGRAPH_GNN='{"asof_markets": true}' \
+  python scripts/09_first_k_experiments.py train hgnn 1 cv edge  # iteration 5, Gate C; 18_gate_report.py compares tags
 bash run_server.sh                                       # GPU-server stages (both splits, out-of-time, GNN grid)
 ```
 DuckDB runs with 2 threads by default (`PMGRAPH_THREADS`); more threads under the 5 GB cap spill tens of GB.

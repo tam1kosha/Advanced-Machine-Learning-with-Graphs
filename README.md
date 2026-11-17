@@ -102,7 +102,7 @@ Three questions, in order. Each one is a small win on its own, and each decides 
 |---|---|---|
 | Q1 | Is there something real to predict? | **Yes** (iteration 4a) |
 | Q2 | Can it be predicted early, without a graph? | **Yes inside one period.** Out-of-time test pending (Gate A) |
-| Q3 | Does the graph add anything? | **No so far.** Second period and larger settings pending (Gate B) |
+| Q3 | Does the graph add anything? | **No.** Gates B (4 GNN settings) and C (as-of market nodes) fail on the train period (iteration 5) |
 
 ```mermaid
 flowchart TD
@@ -119,13 +119,14 @@ flowchart TD
     AB --> E1["Ending 1: the graph claim holds on the edge target"]
 ```
 
-**We are at Gate A and Gate B.** Both run on the server with one command (`bash run_server.sh`).
+**Gates B and C are decided (fail, iteration 5): we are on Ending 2, pending Gate A.** Gate A is XGBoost only and
+runs on a laptop (`15_out_of_time.py train test` after preparing the test split).
 
 | Gate | Run | Pass rule (fixed now, before the run) | If it fails |
 |---|---|---|---|
 | A | `15_out_of_time.py train test` | new wallets, every k ≤ 10: edge-regression correlation has a 95% CI above 0 and above history-only | style/period deviation: next step 4 in `NOTES.md` |
-| B | `run_server.sh edge`, then `grid` | proposal rule on the edge metric: a graph model beats both baselines on new wallets at every k ≤ 10 (paired CI > 0), in **both** periods. Report every setting, not the best one | Gate C or Ending 2 |
-| C | not written yet | same rule as B | Ending 2 |
+| B | `run_server.sh edge`, then `grid` | proposal rule on the edge metric: a graph model beats both baselines on new wallets at every k ≤ 10 (paired CI > 0), in **both** periods. Report every setting, not the best one | Gate C or Ending 2 — **failed on the train period** (0 of 10 setting × model combinations; hetero GNN within ±0.01 of XGBoost), so it cannot pass in both |
+| C | `17_asof_markets.py`, then `09 … cv edge` with `PMGRAPH_GNN='{"asof_markets": true}'` (`run_server.sh asof`) | same rule as B | Ending 2 — **failed on the train period** (every first fill now has a market node; hetero GNN +0.003…+0.008 over XGBoost, CIs cover 0) |
 
 No compute needed, can happen any time:
 
