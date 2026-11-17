@@ -30,6 +30,9 @@ from scipy import stats
 from sklearn.isotonic import IsotonicRegression
 
 TYPES = ["skilled_winner", "lucky_winner", "unlucky_skilled", "unskilled_loser"]
+# Net direction is a dimensionless ratio in [-1, 1]. Treat machine-roundoff around an inclusive
+# cutoff as equality; a mathematically 0.1 position must not disappear when aggregate order changes.
+DIRECTION_ATOL = 1e-12
 
 
 def fit_calibration(con, fills: Path, cutoff: str, bins: int = 100) -> pd.DataFrame:
@@ -83,7 +86,10 @@ def bets(con, fills: Path, calib: pd.DataFrame, min_abs_dir: float = 0.1,
 
 def bets_from_sides(con, sides: str, calib: pd.DataFrame, min_abs_dir: float = 0.1) -> pd.DataFrame:
     """Bets from a relation with columns wallet, market_id, event_id, ts, sgn (+1 long the reference
-    token), qty, price, w (resolved only). Filtering (windows, leak rules) is the caller's job."""
+    token), qty, price, w (resolved only). Filtering (windows, leak rules) is the caller's job.
+    Compensated sums reduce order-dependent roundoff. The inclusive net-direction cutoff allows
+    DIRECTION_ATOL on the ratio; label consistency checks retain their original strict tolerance.
+    """
     bins = len(calib)
     con.register("calib", calib[["b", "pi"]])
     return con.execute(f"""
@@ -94,14 +100,14 @@ def bets_from_sides(con, sides: str, calib: pd.DataFrame, min_abs_dir: float = 0
              any_value(w)                       AS w,
              min(ts)                            AS first_ts,
              count(*)                           AS n_fills,
-             sum(qty)                           AS Q,
-             sum(sgn * qty) / sum(qty)          AS A,
-             sum(sgn * qty * pi) / sum(qty)     AS C,
-             sum(qty * pi) / sum(qty)           AS pibar,
-             sum(sgn * qty * price) / sum(qty)  AS B,
-             sum(sgn * qty * (w - price))       AS profit
+             fsum(qty)                           AS Q,
+             fsum(sgn * qty) / fsum(qty)          AS A,
+             fsum(sgn * qty * pi) / fsum(qty)     AS C,
+             fsum(qty * pi) / fsum(qty)           AS pibar,
+             fsum(sgn * qty * price) / fsum(qty)  AS B,
+             fsum(sgn * qty * (w - price))       AS profit
       FROM j GROUP BY 1, 2
-      HAVING abs(sum(sgn * qty)) / sum(qty) >= {min_abs_dir}
+      HAVING abs(fsum(sgn * qty)) / fsum(qty) >= {min_abs_dir - DIRECTION_ATOL}
     """).fetchdf()
 
 

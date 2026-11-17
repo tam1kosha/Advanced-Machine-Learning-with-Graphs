@@ -112,6 +112,39 @@ def population(con, N: int, j: int, min_bets: int, unit: str, calib: pd.DataFram
     return pop
 
 
+def check_population_labels(rebuilt: pd.DataFrame, saved: pd.DataFrame, k: int, report_path: Path) -> None:
+    """Keep step 12's original T tolerance, also checking bet counts and emitting useful failures.
+
+    Frames are indexed by integer wallet id. A report is only written on failure; no labels are
+    replaced and missing/nonfinite values never compare equal. Diagnostics are small wallet rows,
+    not the full fill dataset.
+    """
+    if not saved.index.is_unique or not rebuilt.index.is_unique:
+        raise ValueError("label consistency needs unique wallet ids")
+    actual = rebuilt.reindex(saved.index)
+    a, s = actual["T"].to_numpy(), saved["T"].to_numpy()
+    same_t = np.isfinite(a) & np.isfinite(s) & np.isclose(a, s, atol=1e-9, rtol=1e-5)
+    same_n = actual["n_bets"].eq(saved["n_bets"]).to_numpy()
+    bad = ~same_t | ~same_n
+    if not bad.any():
+        return
+    report = pd.DataFrame({"T_saved": saved["T"], "T_rebuilt": actual["T"],
+                           "n_bets_saved": saved["n_bets"], "n_bets_rebuilt": actual["n_bets"]})
+    report["abs_delta_T"] = (report["T_rebuilt"] - report["T_saved"]).abs()
+    report["missing_rebuilt"] = ~saved.index.isin(rebuilt.index)
+    report = report.loc[bad].sort_values("abs_delta_T", ascending=False, na_position="first")
+    report.index.name = "nid"
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report.to_csv(report_path)
+    max_delta = report["abs_delta_T"].max()
+    raise AssertionError(
+        f"k={k}: label bets do not reproduce fk_pop: {len(report)}/{len(saved)} wallets differ; "
+        f"missing={int(report.missing_rebuilt.sum())}, bet_count_mismatches={int((~same_n).sum())}, "
+        f"max_abs_delta_T={max_delta:.6g}. Details: {report_path}. "
+        "Rebuild the split's preparation artifacts with the current code; do not skip this check."
+    )
+
+
 def first_k_features(con, k: int, calib: pd.DataFrame, wallets: np.ndarray) -> pd.DataFrame:
     """Wallet features on observed(w, k), as of the k-th fill. Needs TEMP TABLEs obs, gs."""
     con.register("fk_w", pd.DataFrame({"nid": np.asarray(wallets)}))

@@ -532,3 +532,33 @@ and a self-only MLP control before attributing a null result to graph informatio
 Final local validation: `python -m pytest -q tests` — 30 passed; Python error/undefined-name lint,
 `bash -n run_server.sh`, and `git diff --check` pass. The isolated-query regression test also covers
 an entire heterogeneous batch with no usable wallet/market neighbours. No server/GPU result is implied.
+
+## First-k label reconstruction fix (17 Nov 2026)
+
+Server logs: train diagnostics (12) and the train target bake-off (13) completed; test diagnostics
+failed at k=1 when reconstructed T did not match fk_pop. The main GNN stage was not reached.
+No full server data are available locally, so the log alone does not identify the discrepant bets.
+
+Reproduced a concrete numerical cause locally with the actual bet/first-k functions: long quantities
+0.1 + 0.2 + 0.8 and short quantities 0.3 + 0.6 have net/gross direction 0.1 mathematically. Ordinary
+floating-point SUM with two fill orders kept this bet in one calculation and dropped it in another.
+A first-k fixture then contained 31 versus 30 label bets and different T values, matching the failed
+consistency check. Both new regression tests failed before the fix.
+
+`bets_from_sides` now uses compensated FSUM aggregates and a 1e-12 comparison tolerance on the bounded
+net-direction ratio. This preserves the intended inclusive 0.1 eligibility rule at machine precision;
+a genuinely below-threshold bet (tested at ~5e-11 below it) remains excluded. This affects all callers,
+so regenerate labels/features/first-k/graph artifacts together from existing raw data, rather than
+reusing old populations with the new aggregation. Historical committed results were not regenerated.
+
+The diagnostic check keeps its original T comparison tolerance (atol 1e-9, rtol 1e-5), also verifies
+bet counts, rejects missing/nonfinite values, and writes per-wallet saved/rebuilt values to
+outputs/tables/exp4_<split>_label_mismatch_k<k>.csv on failure. The message includes mismatch counts
+and maximum absolute delta. It does not replace saved labels or skip an inconsistency.
+
+Validation: `python -m pytest -q tests` — 38 passed; error/undefined-name lint and diff checks pass.
+New tests cover all 120 fill permutations at the threshold, true below-threshold exclusion, first-k
+label reconstruction, wallet reordering, roundoff, count/value/missing-wallet mismatches and NaN/inf.
+Existing PyTorch/Pandas dependency deprecation warnings remain. See docs/SERVER.md for recovery.
+The full server run remains the confirmation that this was the original failure's cause; if it still
+fails, retain the assertion and inspect the new mismatch report for additional data/artifact issues.
