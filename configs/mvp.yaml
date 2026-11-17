@@ -47,6 +47,7 @@ gnn:                          # sampled (Hetero)GraphSAGE for the first-k experi
   hidden: 64
   fanout: [10, 5]             # in-neighbours sampled per relation at hop 1 / hop 2 (with replacement)
   batch: 1024
+  # eval_batch defaults to batch; override in PMGRAPH_GNN to reduce inference VRAM.
   epochs: 40
   patience: 6                 # epochs without val-AUPRC gain
   lr: 0.003
