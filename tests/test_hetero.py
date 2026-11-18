@@ -72,3 +72,23 @@ def test_regression_head_learns_neighbour_signal_and_nothing_under_null():
         ok = np.isfinite(y[te, 0])
         r[name] = np.corrcoef(s[te, 0][ok], y[te, 0][ok])[0, 1]
     assert r["signal"] > 0.5 and abs(r["null"]) < 0.3, r
+
+
+def test_held_edges_pd_matches_sql_with_missing_close_time():
+    """Query (pandas) and frozen (DuckDB) position attrs agree, incl. NULL / negative hours_to_close."""
+    import duckdb
+    import pandas as pd
+
+    from pmgraph.hetero import HELD_ATTRS, held_edges, held_edges_pd
+
+    o = pd.DataFrame({"nid": [0, 0, 0, 1, 1, 2], "market_id": [5, 5, 6, 5, 6, 6],
+                      "long_": [True, False, True, True, False, True],
+                      "qty": [1.0, 0.5, 2.0, 3.0, 1.0, 4.0], "price": [0.4, 0.6, 0.2, 0.5, 0.7, 0.3],
+                      "usd": [0.4, 0.3, 0.4, 1.5, 0.7, 1.2], "is_maker": [0, 1, 0, 0, 1, 1],
+                      "hours_to_close": [10.0, np.nan, np.nan, -3.0, 2.0, np.nan]})
+    con = duckdb.connect()
+    con.register("o_view", o)
+    sql = held_edges(con, "o_view").sort_values(["nid", "market_id"]).reset_index(drop=True)
+    pdf = held_edges_pd(o).sort_values(["nid", "market_id"]).reset_index(drop=True)
+    assert np.isfinite(pdf[HELD_ATTRS].to_numpy()).all()
+    np.testing.assert_allclose(pdf[HELD_ATTRS].to_numpy(float), sql[HELD_ATTRS].to_numpy(float), rtol=1e-9)

@@ -2,6 +2,7 @@
 
 This folder contains a committed snapshot of the server logs shared with the group. Start with
 the [learning-rate comparison](gnn/learning_rate_comparison.md) for the latest GNN experiments.
+The next server run is described step by step in [`docs/SERVER_RERUN.md`](../../docs/SERVER_RERUN.md).
 
 ## Latest GNN-only trials
 
