@@ -1,0 +1,49 @@
+START train k=1 sage device=0; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/train_k1_sage.log
+START train k=1 hgnn device=1; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/train_k1_hgnn.log
+START train k=3 sage device=2; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/train_k3_sage.log
+START train k=3 hgnn device=3; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/train_k3_hgnn.log
+START train k=5 sage device=4; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/train_k5_sage.log
+START train k=5 hgnn device=5; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/train_k5_hgnn.log
+START train k=10 sage device=6; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/train_k10_sage.log
+START train k=10 hgnn device=7; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/train_k10_hgnn.log
+DONE train k=10 sage; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/train_k10_sage.log
+START train k=20 sage device=6; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/train_k20_sage.log
+DONE train k=1 sage; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/train_k1_sage.log
+START train k=20 hgnn device=0; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/train_k20_hgnn.log
+DONE train k=3 sage; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/train_k3_sage.log
+START train k=50 sage device=2; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/train_k50_sage.log
+DONE train k=5 sage; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/train_k5_sage.log
+START train k=50 hgnn device=4; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/train_k50_hgnn.log
+DONE train k=50 sage; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/train_k50_sage.log
+START test k=1 sage device=2; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/test_k1_sage.log
+DONE train k=20 sage; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/train_k20_sage.log
+START test k=1 hgnn device=6; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/test_k1_hgnn.log
+DONE train k=1 hgnn; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/train_k1_hgnn.log
+START test k=3 sage device=1; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/test_k3_sage.log
+DONE train k=50 hgnn; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/train_k50_hgnn.log
+START test k=3 hgnn device=4; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/test_k3_hgnn.log
+DONE train k=10 hgnn; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/train_k10_hgnn.log
+START test k=5 sage device=7; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/test_k5_sage.log
+DONE test k=1 sage; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/test_k1_sage.log
+START test k=5 hgnn device=2; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/test_k5_hgnn.log
+DONE train k=3 hgnn; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/train_k3_hgnn.log
+START test k=10 sage device=3; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/test_k10_sage.log
+DONE train k=20 hgnn; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/train_k20_hgnn.log
+START test k=10 hgnn device=0; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/test_k10_hgnn.log
+DONE train k=5 hgnn; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/train_k5_hgnn.log
+START test k=20 sage device=5; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/test_k20_sage.log
+DONE test k=3 sage; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/test_k3_sage.log
+START test k=20 hgnn device=1; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/test_k20_hgnn.log
+FAILED test k=20 hgnn; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/test_k20_hgnn.log
+START test k=50 sage device=1; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/test_k50_sage.log
+DONE test k=5 sage; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/test_k5_sage.log
+START test k=50 hgnn device=7; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/test_k50_hgnn.log
+FAILED test k=50 hgnn; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/test_k50_hgnn.log
+DONE test k=10 sage; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/test_k10_sage.log
+DONE test k=20 sage; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/test_k20_sage.log
+DONE test k=50 sage; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/test_k50_sage.log
+DONE test k=1 hgnn; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/test_k1_hgnn.log
+DONE test k=3 hgnn; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/test_k3_hgnn.log
+DONE test k=10 hgnn; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/test_k10_hgnn.log
+DONE test k=5 hgnn; log=/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/test_k5_hgnn.log
+Some jobs failed. Inspect /home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial001/jobs.json and the per-job logs; no test report generated.
