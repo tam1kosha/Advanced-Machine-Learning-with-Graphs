@@ -17,20 +17,20 @@ export OPENBLAS_NUM_THREADS=${OPENBLAS_NUM_THREADS:-2}
 STAGES=("$@")
 if [ "${#STAGES[@]}" -eq 0 ]; then STAGES=(data prep diag edge oot); fi
 if [ "${1:-}" = "--help" ]; then
-  echo 'Usage: bash run_server.sh [check|smoke|data|prep|diag|edge|oot|grid ...]'
+  echo 'Usage: bash run_server.sh [check|smoke|data|prep|diag|edge|oot|grid|asof ...]'
   echo 'Settings: PYTHON, CUDA_VISIBLE_DEVICES, NGPU, KS (space-separated), SPLITS, METHODS, PMGRAPH_TAG, PMGRAPH_GNN'
   echo 'PMGRAPH_RESUME=1 skips matching completed methods; PMGRAPH_ALLOW_CPU=1 enables CPU debugging.'
   exit 0
 fi
 for stage in "${STAGES[@]}"; do
-  case "$stage" in check|smoke|data|prep|diag|edge|oot|grid) ;; *) echo "Unknown stage: $stage" >&2; exit 2 ;; esac
+  case "$stage" in check|smoke|data|prep|diag|edge|oot|grid|asof) ;; *) echo "Unknown stage: $stage" >&2; exit 2 ;; esac
 done
 "$PYTHON" scripts/server_check.py --stages "${STAGES[@]}"
 mkdir -p outputs/logs
 GPU_TOKENS=()
 for stage in "${STAGES[@]}"; do
   case "$stage" in
-    edge|grid)
+    edge|grid|asof)
       tokens=$("$PYTHON" scripts/server_check.py --gpu-tokens)
       read -r -a GPU_TOKENS <<< "$tokens"
       [ "${#GPU_TOKENS[@]}" -gt 0 ] || { echo 'No worker devices' >&2; exit 1; }
@@ -110,6 +110,17 @@ slow     {"lr": 0.001, "epochs": 80, "patience": 12}
 GRID
       for tag in wide fan widefan slow; do
         "$PYTHON" scripts/14_graph_on_edge.py train 500 "${PMGRAPH_TAG}_$tag" > "outputs/logs/14_train_${PMGRAPH_TAG}_$tag.log" 2>&1
+      done ;;
+    asof)  # Gate C (iteration 5): 17 builds as-of market nodes, then 09 cv edge with them; Gate C needs KS="1 3 5 10"
+      for S in $SPLITS; do
+        "$PYTHON" scripts/17_asof_markets.py "$S" "${KS// /,}" 30 > "outputs/logs/17_$S.log" 2>&1
+      done
+      for S in $SPLITS; do for k in $KS; do
+        job "outputs/logs/09_edge_${PMGRAPH_TAG}_asof_${S}_k$k.log" env "PMGRAPH_TAG=${PMGRAPH_TAG}_asof" \
+          'PMGRAPH_GNN={"asof_markets": true}' "$PYTHON" scripts/09_first_k_experiments.py "$S" "$METHODS" "$k" cv edge
+      done; done | pool
+      for S in $SPLITS; do
+        "$PYTHON" scripts/14_graph_on_edge.py "$S" 500 "${PMGRAPH_TAG}_asof" > "outputs/logs/14_${S}_${PMGRAPH_TAG}_asof.log" 2>&1
       done ;;
   esac
 done

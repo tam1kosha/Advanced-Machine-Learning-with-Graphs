@@ -24,6 +24,8 @@ regression target, the centred z of the wallet's label bets in markets closing i
 of the `week` split of 12; wallets with < 10 such bets are not trained on). cv mode only; only the
 scores are written, to data/processed/exp4_preds/, and 14 judges them on the odd-week half.
 GNN settings: configs gnn, overridden by the JSON in env PMGRAPH_GNN (e.g. '{"hidden": 128, "fanout": [20, 10]}');
+"asof_markets": true (iteration 5, Gate C; needs 17) adds as-of nodes for markets without a frozen node, for
+every method that uses the graph (xgb_nbr, sage, hgnn);
 env PMGRAPH_TAG=name writes the scores to {exp}_preds_name/ instead, so several settings can run side by
 side (one process per GPU: CUDA_VISIBLE_DEVICES). The device is CUDA when available (pmgraph.hetero).
 Best GNN checkpoints and preprocessing are saved under data/processed/checkpoints/. PMGRAPH_RESUME=1
@@ -89,6 +91,8 @@ inputs = [P / f"{split}_{s}" for s in ["hetero.pt", "fk_pop.parquet", "fk_feat.p
                                                        "fk_obs.parquet", "fk_mf.parquet"]]
 if target == "edge":
     inputs.append(P / f"{split}_fk_halves.parquet")
+if hp.get("asof_markets", False):
+    inputs += [P / f"{split}_fk_asof_mkt.parquet", P / f"{split}_fk_asof_mkt_edges.parquet"]
 signature = job_signature(dict(config=cfg, hp=hp, split=split, mode=mode, target=target, seeds=seeds, split_seed=split_seed),
                           [Path(__file__), *sorted((ROOT / "src/pmgraph").glob("*.py"))], inputs)
 t0 = time.time()
@@ -122,6 +126,7 @@ if not np.isfinite(Mraw).all():
     raise ValueError("frozen market features contain infinity; inspect the prepared market data")
 if missing_market:
     log(f"imputed {missing_market} missing market feature values to zero before scaling")
+mcols = list(data["market"].cols) if "cols" in data["market"] else None  # names, needed by Gate C only
 msc = StandardScaler().fit(Mraw)
 Xm = msc.transform(Mraw).astype(np.float32)
 midx = pd.Series(np.arange(len(Mraw)), index=data["market"].market_id.numpy())
@@ -141,6 +146,33 @@ Feat = pd.read_parquet(P / f"{split}_fk_feat.parquet")
 obs = pd.read_parquet(P / f"{split}_fk_obs.parquet")
 QMF = pd.read_parquet(P / f"{split}_fk_mf.parquet")
 HALF = pd.read_parquet(P / f"{split}_fk_halves.parquet").query("scheme == 'week'") if target == "edge" else None
+ASOF = hp.get("asof_markets", False)        # Gate C (17): as-of nodes for markets without a frozen node
+if ASOF:
+    AM = pd.read_parquet(P / f"{split}_fk_asof_mkt.parquet")
+    AME = pd.read_parquet(P / f"{split}_fk_asof_mkt_edges.parquet")
+    log("as-of market nodes", len(AM), "edges", len(AME))
+
+
+def asof_graph(k: int):
+    """Market features, frozen `held` CSR and (nid, market_id) -> node index, extended with k's as-of nodes."""
+    if not ASOF:
+        return Mraw, Xm, fz, None
+    assert mcols is not None, "asof_markets needs market column names in the hetero graph (08)"
+    am = AM[AM.k == k].reset_index(drop=True)
+    idx = len(Mraw) + np.arange(len(am))
+    imap = pd.Series(idx, index=pd.MultiIndex.from_arrays([am.nid, am.market_id]))
+    e = AME[AME.iid.isin(am.iid)]
+    dst = pd.Series(idx, index=am.iid).loc[e.iid].to_numpy()
+    a = (e[HELD_ATTRS].to_numpy(np.float32) - scalers["held"][0]) / scalers["held"][1]
+    h = fz["held"]
+    old_dst = np.repeat(np.arange(len(Mraw)), np.diff(h.indptr))
+    fzk = dict(fz)
+    fzk["held"] = CSR.build(np.r_[old_dst, dst], np.r_[h.src, e.src.to_numpy(np.int64)], np.r_[h.attr, a],
+                            len(Mraw) + len(am))
+    Ma = am[mcols].to_numpy(np.float32)
+    Ma[np.isnan(Ma)] = 0                    # same missing-value rule as the frozen market features
+    Mk = np.r_[Mraw, Ma]
+    return Mk, msc.transform(Mk).astype(np.float32), fzk, imap
 
 
 def edge_target(k: int, nids: np.ndarray, fit_idx=None) -> np.ndarray:
@@ -152,8 +184,9 @@ def edge_target(k: int, nids: np.ndarray, fit_idx=None) -> np.ndarray:
 
 
 # ---------------------------------------------------------------- query graph for one k
-def query_edges(k: int, nids: np.ndarray, t_k: pd.Series) -> dict:
-    """Relation -> (dst query idx, src frozen id, standardised attr) for the wallets `nids` at k."""
+def query_edges(k: int, nids: np.ndarray, t_k: pd.Series, imap=None) -> dict:
+    """Relation -> (dst query idx, src frozen id, standardised attr) for the wallets `nids` at k.
+    imap: (nid, market_id) -> as-of market node (Gate C) for markets without a frozen node."""
     qi = pd.Series(np.arange(len(nids)), index=nids)
     o = obs[(obs.rn <= k) & obs.nid.isin(nids)]
     E = {}
@@ -161,6 +194,13 @@ def query_edges(k: int, nids: np.ndarray, t_k: pd.Series) -> dict:
     E["cp"] = [(c.index.get_level_values(0), c.index.get_level_values(1), np.log1p(c.to_numpy())[:, None])]
     h = held_edges_pd(o[o.market_id.isin(midx.index)])
     E["rev_held"] = [(h.nid, midx.loc[h.market_id].to_numpy(), h[HELD_ATTRS].to_numpy())]
+    if imap is not None:
+        h2 = held_edges_pd(o[~o.market_id.isin(midx.index)])
+        h2 = h2[pd.MultiIndex.from_arrays([h2.nid, h2.market_id]).isin(imap.index)]
+        src2 = imap.loc[pd.MultiIndex.from_arrays([h2.nid, h2.market_id])].to_numpy()
+        d0, s0, a0 = E["rev_held"][0]
+        E["rev_held"] = [(np.r_[np.asarray(d0), h2.nid.to_numpy()], np.r_[s0, src2],
+                          np.r_[a0, h2[HELD_ATTRS].to_numpy()])]
     m = QMF[(QMF.rn <= k) & QMF.nid.isin(nids)]
     m = m[(m["dir"] == "lead") | (m.t_other <= t_k.reindex(m.nid).to_numpy())]
     for r, d in [("mf", "lead"), ("rev_mf", "follow")]:
@@ -181,11 +221,11 @@ def query_edges(k: int, nids: np.ndarray, t_k: pd.Series) -> dict:
     return out
 
 
-def nbr_aggregates(E: dict, n: int, o: pd.DataFrame, nids: np.ndarray) -> pd.DataFrame:
+def nbr_aggregates(E: dict, n: int, o: pd.DataFrame, nids: np.ndarray, Mk: np.ndarray) -> pd.DataFrame:
     """Unweighted means of frozen neighbours' features per relation, degrees, attachment shares."""
     cols = {}
     for r, V, names in [("cp", Xraw[NB].fillna(0).to_numpy(), NB), ("mf", Xraw[["hist_z"]].fillna(0).to_numpy(), ["hist_z"]),
-                        ("rev_mf", Xraw[["hist_z"]].fillna(0).to_numpy(), ["hist_z"]), ("rev_held", Mraw, None)]:
+                        ("rev_mf", Xraw[["hist_z"]].fillna(0).to_numpy(), ["hist_z"]), ("rev_held", Mk, None)]:
         dst, src, _ = E[r]
         S = sp.csr_matrix((np.ones(len(dst), np.float32), (dst, src)), shape=(n, V.shape[0]))
         deg = np.asarray(S.sum(1)).ravel()
@@ -224,10 +264,11 @@ for k in ks:
     fk = Feat[Feat.k == k].set_index("nid").reindex(nids)
     Fq_raw = wallet_matrix(fk, new)
     Fq = xsc.transform(Fq_raw).astype(np.float32)
-    E = query_edges(k, nids, pk.set_index("nid")["t_k"])
+    Mk, Xmk, fzk, imap = asof_graph(k)
+    E = query_edges(k, nids, pk.set_index("nid")["t_k"], imap)
     o = obs[(obs.rn <= k) & obs.nid.isin(nids)]
-    NBR = nbr_aggregates(E, n, o, nids) if "xgb_nbr" in methods else None
-    g = Graph(x={"wallet": Xf, "market": Xm}, frozen=fz, xq=Fq,
+    NBR = nbr_aggregates(E, n, o, nids, Mk) if "xgb_nbr" in methods else None
+    g = Graph(x={"wallet": Xf, "market": Xmk}, frozen=fzk, xq=Fq,
               query={r: CSR.build(d, s, a, n) for r, (d, s, a) in E.items()})
     log(f"k={k}: n={n} (new {new.sum()}), query edges", {r: len(v[0]) for r, v in E.items()})
     strat = Y[:, 1] * 4 + Y[:, 0] * 2 + new

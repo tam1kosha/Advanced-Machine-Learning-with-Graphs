@@ -82,7 +82,7 @@ def main() -> None:
         raise RuntimeError("pmgraph needs Python 3.10–3.12; use a Python 3.11 virtual environment")
     import torch
     cpu = os.environ.get("PMGRAPH_ALLOW_CPU") == "1"
-    need_gpu = bool(set(args.stages) & {"check", "edge", "grid", "smoke"}) or args.smoke or args.gpu_tokens
+    need_gpu = bool(set(args.stages) & {"check", "edge", "grid", "asof", "smoke"}) or args.smoke or args.gpu_tokens
     if need_gpu and not cpu and not torch.cuda.is_available():
         raise RuntimeError("CUDA is unavailable. Install a CUDA-enabled torch build matching the driver; "
                            "PMGRAPH_ALLOW_CPU=1 is an explicit CPU-only debugging override")
@@ -113,7 +113,7 @@ def main() -> None:
         raise ValueError("PMGRAPH_TAG must contain only letters, numbers, underscores and hyphens")
     hp = {**cfg["gnn"], **json.loads(os.environ.get("PMGRAPH_GNN", "{}"))}
     allowed = {"hidden", "fanout", "batch", "eval_batch", "epochs", "patience", "lr", "eval_reps",
-               "threads", "dropout", "device", "gpu_scale", "weight_decay", "grad_clip"}
+               "threads", "dropout", "device", "gpu_scale", "weight_decay", "grad_clip", "asof_markets"}
     if set(hp) - allowed:
         raise ValueError(f"unknown GNN settings: {set(hp) - allowed}")
     if len(hp["fanout"]) != 2 or any(int(v) <= 0 for v in [*hp["fanout"], hp["hidden"], hp["batch"],
@@ -135,17 +135,17 @@ def main() -> None:
                 sp = cfg["splits"][split]
                 trade_files(raw, sp["graph_start"], sp["label_end"])
             needed = [raw / n for n in ["predictions.parquet", "markets.parquet"]]
-        if stage in ("diag", "edge", "grid", "oot") and "prep" not in seen:
+        if stage in ("diag", "edge", "grid", "asof", "oot") and "prep" not in seen:
             check_splits = ["train", "test"] if stage == "oot" else (["train"] if stage == "grid" else splits)
             suffixes = ["fk_pop.parquet", "fk_feat.parquet"]
             if stage == "diag":
                 suffixes += ["features.parquet", "calibration.parquet"]
                 needed += [ROOT / cfg["data"]["interim_dir"] / f"{s}_{p}_fills.parquet"
                            for s in check_splits for p in ("graph", "label")]
-            if stage in ("edge", "grid"):
+            if stage in ("edge", "grid", "asof"):
                 suffixes += ["hetero.pt", "fk_obs.parquet", "fk_mf.parquet"]
             needed += [ROOT / cfg["data"]["processed_dir"] / f"{s}_{p}" for s in check_splits for p in suffixes]
-        if stage in ("edge", "grid") and "diag" not in seen:
+        if stage in ("edge", "grid", "asof") and "diag" not in seen:
             needed += [ROOT / cfg["data"]["processed_dir"] / f"{s}_fk_halves.parquet"
                        for s in (["train"] if stage == "grid" else splits)]
         missing = [str(p.relative_to(ROOT)) for p in needed if not p.is_file()]

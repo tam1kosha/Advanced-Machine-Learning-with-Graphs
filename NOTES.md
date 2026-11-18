@@ -533,6 +533,103 @@ Final local validation: `python -m pytest -q tests` — 30 passed; Python error/
 `bash -n run_server.sh`, and `git diff --check` pass. The isolated-query regression test also covers
 an entire heterogeneous batch with no usable wallet/market neighbours. No server/GPU result is implied.
 
+---
+
+# Iteration 5 — the graph's best chance: Gates B and C (16–17 Nov 2026)
+
+Question: are the two remaining excuses for the graph null real? (1) **untuned GNNs** (one fixed
+setting) and (2) **new wallets barely reach the market graph** (61–78% of their first-k fills are in
+markets with no pre-cutoff trade, hence no node). Both were pre-registered in the README (Gate B: the
+4 settings of `run_server.sh grid`; Gate C: post-cutoff market nodes), pass rule fixed before the
+run: a graph model beats both baselines on new wallets at every k ≤ 10 (paired 95% CI of the weighted
+edge correlation > 0). Edge target and judging exactly as iteration 4 (`09 … cv edge` → `14`).
+**Train period only** (README asks for both; see reading 4). k ∈ {1, 3, 5, 10}: the rule's range.
+12-core Mac, 48 GB, CPU only.
+
+## What was run
+
+| step | what | wall |
+|---|---|---|
+| inputs | `12_label_diagnostics.py train 1,3,5,10` → split halves; matches the committed exp4 reliability table exactly (0 difference on all 192 rows); committed exp4 tables restored afterwards | 1.5 min |
+| repro | `09 … cv edge` at default settings, tag `repro`; `14` matches iteration 4 (mean \|Δ\| 0.003, max 0.012, same verdict) | 14–19 min / k |
+| Gate B | tags `wide` (hidden 128, batch 2048), `fan` (fan-out 20/10), `widefan` (both + 60 epochs, patience 10), `slow` (lr 1e-3, 80 epochs, patience 12); hist, xgb_own, sage, hgnn | 3.2 h for B (5 processes × 2 threads); widefan 1.3–2 h per k |
+| Gate C | `17_asof_markets.py` (new) + `09` with `{"asof_markets": true}`, tag `asof`; all five methods | 1.4 min + 20–26 min / k |
+| report | `18_gate_report.py` (new) → `outputs/tables/exp5_train_gates.csv`, `outputs/figures/exp5_train_gates.png` | seconds |
+
+**Gate C construction** (`pmgraph/asof_markets.py`, tests `tests/test_asof_markets.py`). For every
+(query wallet q, k, market m of its first k fills without a frozen node): a private market node built
+only from fills with ts < t_k(q): the frozen market feature columns as of t_k (category, log volume /
+fills / takers, age, last price, closed-before-t_k and outcome if so, time to expiry) and in-edges from
+the ≤ 30 pre-cutoff wallets that entered m most recently before t_k (position attrs as of t_k). Like the
+query wallet it only receives messages. Asserted: every fill used is before t_k. 216,769 nodes
+(k = 1 / 3 / 5 / 10: 15k / 37k / 58k / 107k), 28–29 traders each, median ≈ 1,000 fills before t_k;
+with them **every** first-k fill of a new wallet has a market node (before: 29–39%). `xgb_nbr` gets
+the same markets through its market aggregates.
+
+## Results
+
+Weighted edge correlation with held-out edge, new wallets: XGBoost own .216 / .246 / .256 / .281
+(k = 1 / 3 / 5 / 10). Graph model minus XGBoost own, **new** wallets (paired 95% CI):
+
+| setting | model | k = 1 | 3 | 5 | 10 |
+|---|---|---|---|---|---|
+| default (repro) | hetero | −.000 [−.008, .008] | +.002 [−.007, .010] | +.008 [−.001, .018] | +.006 [−.003, .016] |
+| | SAGE | −.015 [−.024, −.006] | −.007 [−.015, .001] | +.002 [−.006, .011] | +.001 [−.007, .010] |
+| | XGB + nbr | +.004 [−.002, .010] | −.007 [−.014, −.001] | +.005 [−.002, .013] | +.004 [−.003, .011] |
+| wide | hetero | −.001 [−.009, .009] | +.001 [−.008, .008] | +.003 [−.005, .012] | +.006 [−.002, .015] |
+| | SAGE | −.019 [−.027, −.011] | −.007 [−.015, .001] | −.009 [−.018, .001] | +.003 [−.006, .011] |
+| fan | hetero | −.002 [−.010, .006] | −.003 [−.012, .006] | **+.010 [.002, .019]** | +.007 [−.002, .018] |
+| | SAGE | −.013 [−.021, −.005] | −.010 [−.019, −.003] | +.002 [−.006, .010] | +.002 [−.007, .010] |
+| widefan | hetero | +.000 [−.008, .010] | −.006 [−.015, .002] | +.004 [−.004, .013] | +.006 [−.003, .015] |
+| | SAGE | −.015 [−.023, −.007] | −.005 [−.014, .002] | −.003 [−.012, .006] | −.001 [−.010, .008] |
+| slow | hetero | −.002 [−.010, .007] | −.002 [−.011, .007] | **+.010 [.002, .020]** | +.009 [−.000, .019] |
+| | SAGE | −.016 [−.025, −.007] | −.009 [−.018, −.002] | +.005 [−.003, .014] | +.002 [−.007, .011] |
+| **as-of markets (Gate C)** | hetero | +.003 [−.006, .010] | +.005 [−.005, .013] | +.008 [−.000, .016] | +.008 [−.003, .018] |
+| | XGB + nbr | +.003 [−.003, .010] | −.005 [−.012, .002] | −.002 [−.009, .006] | +.006 [−.001, .014] |
+
+(SAGE under Gate C is identical to default: it uses counterparty edges only.) Existing wallets: every
+graph model in every setting is within −.014 … +.011 of XGBoost; the only CIs above 0 are XGB + nbr at
+k = 3 (+.009 / +.011). Full table: `exp5_train_gates.csv`.
+
+**Pass rule: 0 of 14 (setting × graph model) combinations pass.** The hetero GNN clears 0 at k = 5
+only (`fan`, `slow`; as in iteration 4), never at k = 1 or 3; SAGE is *below* XGBoost at k = 1 in
+every setting.
+
+## Reading
+
+1. **Tuning is not the missing piece.** Doubling width, doubling the sampled neighbourhood, both with
+   longer training, or a slower learning rate move the hetero GNN by ≤ ±0.005 and never past
+   XGBoost at k ≤ 3. Upper CI bounds put the largest possible gain at ≈ +0.02 correlation (on a
+   baseline of 0.22–0.28).
+2. **Market coverage is not the missing piece.** Giving every first fill a market node, with that
+   market's state and its 30 latest pre-cutoff traders as of the wallet's k-th fill, changes the
+   hetero GNN by +0.000 … +0.003 against its own default run and XGB + nbr by ≤ ±0.004. What the
+   market's crowd looked like when the wallet arrived says nothing about the wallet's edge beyond its
+   own trading style.
+3. The k = 5 passes (hetero, 2 of 5 settings, the same k as in iteration 4) are the size of effect
+   expected by chance among ≈ 40 interval checks per setting family; with the pass rule needing
+   every k they do not change the verdict.
+4. The README's Gate B rule needs a pass **in both periods**; it fails in the first, so B is decided
+   (fail) without the second period. Gate C fails by the same rule. On the decision tree this is
+   **Ending 2**: early trades predict edge (mostly who keeps losing); the network adds nothing,
+   now tested at 5 GNN settings and with full market coverage. What is *not* settled is Gate A
+   (does the early edge signal survive out of time?), which is the positive half of the story.
+
+## Next steps (ordered)
+
+1. **Gate A, out of time** (`15_out_of_time.py train test`). XGBoost only, so it runs on a laptop:
+   download Jul–Dec 2025 (`download.py --trades 2025-07 2025-12`), `01 … 08` + `12` for `test`, then 15.
+   This decides whether the main positive result holds.
+2. **Label decision (group)**: continuous edge as the headline target, z > 2 AUPRC as the rare-class
+   metric; sure-shot wallets counted or not (iteration 4).
+3. **Proposal deliverables still open** (all CPU, cheap): Leiden + ARI/NMI against the types,
+   wash-trade community filter, fees in profit, macro-F1 over the four types.
+4. **Style vs residual** (iteration-4 step 4): remove price-band × category × period means from the
+   edge; is anything beyond style predictable early, and does the graph help there? Last place the
+   graph could still matter.
+5. Optional, for completeness on the server: repeat Gate C on the second period
+   (`run_server.sh asof`). TGN / DyGFormer / pretraining only if something above changes the picture.
+
 ## First-k label reconstruction fix (17 Nov 2026)
 
 Server logs: train diagnostics (12) and the train target bake-off (13) completed; test diagnostics

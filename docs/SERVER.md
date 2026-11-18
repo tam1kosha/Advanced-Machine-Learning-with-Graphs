@@ -62,6 +62,9 @@ NGPU=8 bash run_server.sh edge oot
 
 # Optional: four predeclared GNN settings on the earlier period.
 NGPU=8 bash run_server.sh grid
+
+# Optional: Gate C (as-of market nodes, iteration 5) on both periods; train was already run on a laptop.
+KS="1 3 5 10" NGPU=8 bash run_server.sh asof
 ```
 
 Alternatively, `bash run_server.sh` runs `data prep diag edge oot` in order, with all visible GPUs.

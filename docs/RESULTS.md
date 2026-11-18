@@ -146,6 +146,27 @@ written but not run yet: the out-of-time test (does B survive in the next half-y
 period with larger GNN settings (does C stay a tie?). See the
 [decision tree](../README.md#where-we-go-from-here).
 
+## 6. The graph's best chance (iteration 5)
+
+![Gates B and C](../outputs/figures/exp5_train_gates.png)
+
+Two excuses remained for the graph null: the GNNs were never tuned, and most of a new wallet's first
+trades are in markets that did not exist before the cutoff, so the market half of the graph never
+reached it. Both were tested with the pass rule fixed in the README beforehand.
+
+**How to read it.** Each bar is one graph model in one setting minus XGBoost on the wallet's own
+trades, on the same wallets, with a 95% interval; above zero means the graph helped. Purple = hetero
+GraphSAGE, green = GraphSAGE, orange = XGBoost + neighbour averages; square markers = with the new
+as-of market nodes (Gate C), round = the four GNN settings and the default (Gate B).
+
+**What it showed.** Nothing clears zero at every k ≤ 10, in any setting. Larger, wider or slower GNNs
+move the result by under ±0.005; giving every first trade a market node (built only from what was
+known at that moment) moves it by under +0.003. The pass rule fails 14 out of 14 times.
+
+**What it changed.** Gates B and C are decided: the project is on Ending 2 (early trades predict
+who keeps losing; the network adds nothing). The one open question is Gate A, whether the early
+signal holds in the next half-year.
+
 ## Re-drawing the figures
 
 | Figure | Script | Needs `data/`? |
@@ -156,3 +177,4 @@ period with larger GNN settings (does C stay a tie?). See the
 | `eda_*.png`, `labels_*.png` | `scripts/02_eda.py`, `scripts/03_labels.py` | yes |
 | `exp3_*_detection.png` | `scripts/11_rank_report.py` | yes (saved scores) |
 | `exp4_*_label_diag.png`, `exp4_*_graph.png` | `scripts/12_label_diagnostics.py`, `scripts/14_graph_on_edge.py` | yes |
+| `exp5_*_gates.png` | `scripts/18_gate_report.py` | no, reads `outputs/tables/exp4_*_graph*_<tag>.csv` |
