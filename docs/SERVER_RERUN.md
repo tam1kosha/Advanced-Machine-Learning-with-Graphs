@@ -24,9 +24,7 @@ Consequences:
 ```bash
 cd ~/projects/Advanced-Machine-Learning-with-Graphs
 git fetch origin
-git checkout main && git pull origin main      # after PR #7 is merged
-# before the merge, use the PR branch instead:
-# git checkout claude/gpu-processing-results-7c8279 && git pull
+git checkout main && git pull origin main      # PRs #5 (iteration 5) and #7 (this fix) are merged
 source .venv/bin/activate
 grep -n "fillna(0).clip" src/pmgraph/hetero.py
 python -m pytest -q tests/test_hetero.py
@@ -95,48 +93,62 @@ bash run_server.sh oot
 
 Check: `outputs/logs/15_train_to_test.log` ends without a `Traceback`.
 
-## Step 5: optional capacity trials, because the GPUs are almost idle
+## Step 5: Gate C on the later period (≈ 30–60 minutes)
+
+Iteration 5 (PR #5) gave every first-k market a private "as-of" node, built from fills before
+the wallet's k-th fill. On the earlier period this did not help: the result moved by +0.000 to +0.003.
+The later period has not been run yet. The as-of query edges use the fixed code, so they are safe now.
+
+```bash
+SPLITS=test KS="1 3 5 10" PMGRAPH_TAG=server2 NGPU=8 bash run_server.sh asof
+```
+
+Check:
+* `outputs/logs/17_test.log` ends without a `Traceback`;
+* `outputs/logs/14_test_server2_asof.log` exists.
+
+## Step 6: optional, a bigger GNN, because the GPUs are almost idle
 
 Your observation is right: the 2.4 GB came from a small model, not from a hardware limit.
 * hgnn has 339 k parameters and sage has 70 k.
 * Peak PyTorch memory was 1.2 GB (hgnn) and 0.16 GB (sage), about 5% of a 24 GB card.
 * Neighbour sampling runs on the CPU, so the GPU waits for most of each epoch.
 
-A bigger model is a fair "best chance" check for the graph before we call the null result final.
-It is not a promise of better scores: so far XGBoost ties or beats the GNNs.
-
-Run these three predeclared settings, one tag each, all on the train stage only. Report all of them,
-not just the best.
+Iteration 5's Gate B already tried hidden up to 128, fanout up to 20/10 and batch up to 2048 on
+the earlier period. No setting beat XGBoost. So a bigger model has low expected value; it is only a
+check that goes past what was already tried. Run both settings, train stage only, and report both:
 
 ```bash
 COMMON="--stage train --gpus 0 1 2 3 4 5 6 7 --dropout 0.2 --weight-decay 0.0001 --grad-clip 1.0 --epochs 80 --patience 10"
-python scripts/17_gnn_only.py --tag trial004 $COMMON --hidden 256 --lr 0.001  --fanout 10 5  --batch 1024 --eval-batch 1024 2>&1 | tee -a outputs/logs/gnn_trial004.log
-python scripts/17_gnn_only.py --tag trial005 $COMMON --hidden 128 --lr 0.001  --fanout 25 10 --batch 1024 --eval-batch 1024 2>&1 | tee -a outputs/logs/gnn_trial005.log
-python scripts/17_gnn_only.py --tag trial006 $COMMON --hidden 256 --lr 0.002  --fanout 15 10 --batch 4096 --eval-batch 4096 2>&1 | tee -a outputs/logs/gnn_trial006.log
+python scripts/17_gnn_only.py --tag trial004 $COMMON --hidden 256 --lr 0.001 --fanout 10 5  --batch 1024 --eval-batch 1024 2>&1 | tee -a outputs/logs/gnn_trial004.log
+python scripts/17_gnn_only.py --tag trial005 $COMMON --hidden 256 --lr 0.002 --fanout 15 10 --batch 4096 --eval-batch 4096 2>&1 | tee -a outputs/logs/gnn_trial005.log
 ```
 
-* Larger fanout makes CPU sampling slower and uses more RAM. Watch `free -g` during trial005.
-* If RAM gets tight, add `--workers 4`.
-* Larger batch means fewer optimizer steps per epoch, which is why trial006 also raises lr.
+* Larger fanout makes CPU sampling slower and uses more RAM. Watch `free -g`; if RAM gets tight, add `--workers 4`.
+* Larger batch means fewer optimizer steps per epoch, which is why trial005 also raises lr.
 
-**Choosing a setting.** Compare trials 003–006 using `wcorr_edge` for new wallets in
+**Choosing a setting.** Compare trials 003–005 using `wcorr_edge` for new wallets in
 `outputs/tables/exp6_<tag>_val_metrics.csv`. Then run the test stage **once**, on the chosen tag only:
 
 ```bash
 python scripts/17_gnn_only.py --tag <chosen> --stage test
 ```
 
-## Step 6: send the results back
+## Step 7: send the results back
 
 Logs and tables are git-ignored, so add them explicitly. Do not add `data/`.
 
 ```bash
 git checkout -b server-results-$(date +%Y%m%d)
-git add -f outputs/logs/gnn/pilot_nanfix outputs/logs/gnn/trial00[3-6] outputs/logs/gnn_*.log \
-  outputs/logs/09_edge_server2_* outputs/logs/14_test_server2.log outputs/logs/15_train_to_test.log \
-  outputs/tables/exp6_trial00* outputs/tables/*server2* outputs/tables/exp5_* 2>/dev/null
+# adds each file that exists; a skipped step just has nothing to add
+for f in outputs/logs/gnn/pilot_nanfix outputs/logs/gnn/trial00[3-5] outputs/logs/gnn_*.log \
+  outputs/logs/09_edge_server2_* outputs/logs/14_test_server2*.log outputs/logs/15_train_to_test.log \
+  outputs/logs/17_test.log outputs/tables/asof_test_markets.json \
+  outputs/tables/exp6_trial00* outputs/tables/*server2* outputs/tables/exp5_*; do
+  [ -e "$f" ] && git add -f "$f"
+done
 git status --short          # check: only logs and CSV tables, nothing under data/
-git commit -m "Server results after NaN fix: trial003-006, later-period graph test, out-of-time"
+git commit -m "Server results after NaN fix: trial003-005, later-period graph test and Gate C, out-of-time"
 git push -u origin HEAD
 ```
 
