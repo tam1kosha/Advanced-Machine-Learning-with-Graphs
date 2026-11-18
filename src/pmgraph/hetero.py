@@ -83,9 +83,10 @@ def held_edges(con, sides_table: str, where: str = "") -> pd.DataFrame:
 
 
 def held_edges_pd(o: pd.DataFrame) -> pd.DataFrame:
-    """Same aggregation as HELD_SQL, in pandas, for the (small) query-fill table."""
+    """Same aggregation as HELD_SQL, in pandas, for the (small) query-fill table.
+    DuckDB's greatest(NULL, 0) is 0, so a missing close_time counts as 0 hours here too (not NaN)."""
     o = o.assign(sq=np.where(o.long_, o.qty, -o.qty), pq=o.price * o.qty,
-                 lh=np.log1p(o.hours_to_close.clip(lower=0)))
+                 lh=np.log1p(o.hours_to_close.fillna(0).clip(lower=0)))
     g = o.groupby(["nid", "market_id"])
     e = pd.DataFrame({"net_dir": g.sq.sum() / g.qty.sum(), "log_usd": np.log1p(g.usd.sum()),
                       "vwap_price": g.pq.sum() / g.qty.sum(), "log_h_to_close": g.lh.mean(),

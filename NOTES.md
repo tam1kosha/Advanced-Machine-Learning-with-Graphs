@@ -598,3 +598,24 @@ missing-market inputs, nonfinite-gradient detection, job failure propagation and
 The prior CV/report integration test still passes. Error/undefined-name lint and diff checks pass.
 CUDA scheduling reuses allocation ids/UUIDs and checks kernels, but no remote GPU/full-data tuning
 run has been performed locally. Existing dependency deprecation warnings remain.
+
+## Server logs reviewed + hetero NaN fix (18 Nov 2026)
+
+Read the committed server snapshot in `outputs/logs/` (no new run here).
+* **Graph claim, later period (`14_test_server_early.log`, k = 1–10 only):** on new wallets XGBoost own
+  scores .256/.281/.296/.318. hgnn − XGBoost is −.009, −.009, −.010, −.015 and sage − XGBoost is
+  −.013, −.010, −.010, −.015, with every paired CI below 0. xgb_nbr ties XGBoost. The verdict is NOT MET,
+  and here the GNNs are measurably worse. The earlier-period server rerun (`14_train_server.log`)
+  reproduces exp4 within ≈ .003.
+* **Target comparison, later period (`13_test.log`):** the continuous targets reach .26–.39 on new wallets.
+  The z > 2 classifiers are negative up to k = 10, and history-only is ≈ 0 at k = 1. The earlier-period
+  ranking holds. `12_test.log` now completes, so the 17 Nov label fix held.
+* **exp6 trials 001/002:** lr 0.001 vs 0.0005 differ by < .004 (validation corr., selection-biased), and
+  hgnn beats sage in 9/10 settings. No val/test report was produced because hgnn test k = 20/50 failed.
+
+**Cause of those failures and of the old "nonfinite loss at epoch 3":** `held_edges_pd` computed
+`log1p(hours_to_close.clip(0))`. Pandas `clip` keeps NaN for markets without close_time, so query
+rev_held column 3 (`log_h_to_close`) became NaN. The frozen path's DuckDB `greatest(NULL, 0)` returns 0.
+The fix adds `fillna(0)` so the two paths agree. New test `test_held_edges_pd_matches_sql_with_missing_close_time`
+fails before the fix. 46 tests pass. Next on the server, with a new trial tag: hgnn test k = 20/50,
+`14` for the later period at k = 20/50, and `15` out-of-time (still no numbers).
