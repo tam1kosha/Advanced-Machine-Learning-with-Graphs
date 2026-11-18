@@ -7,6 +7,8 @@ and the neural network go to the GPU. Eight cards do not provide one combined VR
 For the dedicated two-GNN training/tuning entry point (no baseline training), see
 [`GNN_ONLY.md`](GNN_ONLY.md). The interface below is the original full CV comparison pipeline.
 
+**Next run (18 Nov 2026):** follow the step-by-step [`SERVER_RERUN.md`](SERVER_RERUN.md) after the NaN fix.
+
 ## Fresh Linux installation
 
 Clone the branch containing this server audit, then enter the repository. Use Python 3.11:
