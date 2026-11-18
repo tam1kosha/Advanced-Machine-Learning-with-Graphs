@@ -30,7 +30,7 @@ import pandas as pd  # noqa: E402
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from pmgraph import ROOT, load_config  # noqa: E402
 from pmgraph.features import sides_sql  # noqa: E402
-from pmgraph.firstk import int_sides, label_bets, prepare, register_ids  # noqa: E402
+from pmgraph.firstk import check_population_labels, int_sides, label_bets, prepare, register_ids  # noqa: E402
 from pmgraph.label_diag import (EDGE_METRICS, SCHEMES, blind_score, boot_edge, half_table,  # noqa: E402
                                 persistence, split_half, variance_function)
 from pmgraph.labels import skill_test  # noqa: E402
@@ -103,8 +103,8 @@ for k in ks_half:
     pk = Pop[Pop.k == k].set_index("nid")
     b = label_bets(con, k, calib)
     b = b[b["wallet"].isin(pk.index)].merge(close, on="market_id", how="left")
-    chk = skill_test(b, unit=unit)["T"].reindex(pk.index)
-    assert np.allclose(chk, pk["T"], atol=1e-9), f"k={k}: label bets do not reproduce fk_pop"
+    rebuilt = skill_test(b, unit=unit)
+    check_population_labels(rebuilt, pk, k, T / f"exp4_{split}_label_mismatch_k{k}.csv")
     log(f"B k={k}: {len(b)} label bets of {len(pk)} wallets reproduce fk_pop")
     for scheme in SCHEMES:
         H = half_table(b, scheme, unit=unit).join(pk[["new", "n_bets"]])

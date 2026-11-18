@@ -4,6 +4,9 @@ The interface runs independent first-k experiments on allocated GPUs. It does no
 across eight cards. Each process keeps its own historical graph in host RAM; only sampled batches
 and the neural network go to the GPU. Eight cards do not provide one combined VRAM pool.
 
+For the dedicated two-GNN training/tuning entry point (no baseline training), see
+[`GNN_ONLY.md`](GNN_ONLY.md). The interface below is the original full CV comparison pipeline.
+
 ## Fresh Linux installation
 
 Clone the branch containing this server audit, then enter the repository. Use Python 3.11:
@@ -81,6 +84,37 @@ Each worker sees exactly one of those cards as `cuda:0`. GPU UUID allocations wo
 override `device` with a physical index in `PMGRAPH_GNN`.
 
 ## Options and outputs
+
+### Recovering from `label bets do not reproduce fk_pop`
+
+Step 12 checks that reconstructed bets give the same wallet labels saved by step 07. Keep this
+check enabled. A numerical bug was reproduced locally: a true net-direction ratio of 0.1 could
+round just above or below the inclusive 0.1 threshold when DuckDB summed the same fills in a
+different order. That changed bet membership (31 versus 30 bets in the regression fixture) and T.
+The fix uses compensated sums and a 1e-12 tolerance on the direction ratio, not on the label check.
+The server log alone does not establish that this was its only discrepancy.
+
+After updating the server with this fix, rebuild the preparation artifacts before diagnostics;
+old labels can still reflect the unstable threshold. With the existing raw downloads, inside tmux:
+
+```bash
+source .venv/bin/activate
+set -o pipefail
+NGPU=8 PMGRAPH_TAG=server_boundary_fix bash run_server.sh prep diag edge \
+  2>&1 | tee -a outputs/logs/server_boundary_fix.log
+```
+
+This reuses raw downloads and rebuilds both periods' labels, features, first-k populations and graph
+attachments consistently. It then runs diagnostics and the full baseline/GNN comparison. Do not
+rebuild while other jobs are reading the same processed files. Existing trained artifacts under
+other tags stay separate; preparation/diagnostic tables retain their established filenames.
+
+If consistency still fails, the check now writes
+`outputs/tables/exp4_test_label_mismatch_k1.csv` (or the corresponding split/k). It contains wallet ids,
+saved/rebuilt T, bet counts, missing-wallet flags and absolute differences; the error also reports
+the mismatch count and maximum difference. Use this to distinguish stale/misaligned artifacts,
+membership changes or other data issues rather than relaxing/removing the assertion. The full
+server dataset is needed to confirm the original failure is resolved.
 
 | Setting | Default | Use |
 |---|---|---|

@@ -113,7 +113,7 @@ def main() -> None:
         raise ValueError("PMGRAPH_TAG must contain only letters, numbers, underscores and hyphens")
     hp = {**cfg["gnn"], **json.loads(os.environ.get("PMGRAPH_GNN", "{}"))}
     allowed = {"hidden", "fanout", "batch", "eval_batch", "epochs", "patience", "lr", "eval_reps",
-               "threads", "dropout", "device", "gpu_scale"}
+               "threads", "dropout", "device", "gpu_scale", "weight_decay", "grad_clip"}
     if set(hp) - allowed:
         raise ValueError(f"unknown GNN settings: {set(hp) - allowed}")
     if len(hp["fanout"]) != 2 or any(int(v) <= 0 for v in [*hp["fanout"], hp["hidden"], hp["batch"],
@@ -121,6 +121,8 @@ def main() -> None:
         raise ValueError("GNN sizes/counts must be positive; fanout must have two entries")
     if not 0 <= hp.get("dropout", 0.2) < 1 or hp["lr"] <= 0:
         raise ValueError("invalid dropout or learning rate")
+    if hp.get("weight_decay", 1e-4) < 0 or hp.get("grad_clip", 0) < 0:
+        raise ValueError("weight_decay and grad_clip must be nonnegative")
     if need_gpu and not cpu and hp.get("device") not in (None, "cuda", "cuda:0"):
         raise ValueError("GPU workers must use device=cuda:0 (or automatic); each sees one allocated GPU")
     seen = set()
