@@ -1,0 +1,11 @@
+[    24s] frozen graph {'held': 10772660, 'rev_held': 10772660, 'cp': 27465906, 'mf': 11261137, 'rev_mf': 11261137}
+[    45s] k=50: n=43242 (new 32804), query edges {'cp': 8486273, 'rev_held': 1624796, 'mf': 3375514, 'rev_mf': 3174762}
+[    45s] fixed holdout split_seed=0: train=25944 val=8649 test=8649
+Traceback (most recent call last):
+  File "/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/scripts/09_first_k_experiments.py", line 279, in <module>
+    s = train_hetero(g, rels, Yt, {"train": tr, "val": va}, seed, hp,
+  File "/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/src/pmgraph/hetero.py", line 323, in train_hetero
+    require_finite(g.query[relation].attr, f"query.{relation}.edge_attr")
+  File "/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/src/pmgraph/hetero.py", line 197, in require_finite
+    raise ValueError(f"{name}: nonfinite input at index {tuple(map(int, where))}; inspect the prepared features/edges")
+ValueError: query.rev_held.edge_attr: nonfinite input at index (1387827, 3); inspect the prepared features/edges

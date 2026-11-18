@@ -15,6 +15,8 @@ Split modes (4th argument, default configs first_k.split_mode):
   random  iteration 2: 5 seeds x one 60/20/20 split -> outputs/tables/exp2_parts/ (10 aggregates)
   cv      5-fold CV: fold f = test, fold f+1 = val, rest = train (same 60/20/20), so every wallet is
           scored once -> outputs/tables/exp3_parts/ (11 pools the out-of-fold scores)
+  holdout GNN-only experiment 6 (script 17): fixed 60/20/20 wallet partition, repeated initialization
+          seeds, separate validation/test predictions; half-A normalization fits training wallets only.
 Writes one CSV of per-split metrics per (k, method) (re-runs overwrite) and the test scores of every
 wallet to data/processed/{exp2,exp3}_preds/.
 Target (5th argument, iteration 4): `label` (default, the two binary targets above) or `edge`: one
@@ -28,7 +30,7 @@ env PMGRAPH_TAG=name writes the scores to {exp}_preds_name/ instead, so several 
 side (one process per GPU: CUDA_VISIBLE_DEVICES). The device is CUDA when available (pmgraph.hetero).
 Best GNN checkpoints and preprocessing are saved under data/processed/checkpoints/. PMGRAPH_RESUME=1
 skips completed k x method jobs whose code, configuration and input signatures still match.
-usage: python scripts/09_first_k_experiments.py [split] [methods,comma] [ks,comma] [random|cv] [label|edge]
+usage: python scripts/09_first_k_experiments.py [split] [methods,comma] [ks,comma] [random|cv|holdout] [label|edge]
 """
 import json
 import os
@@ -49,9 +51,9 @@ from sklearn.preprocessing import StandardScaler
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from pmgraph import ROOT, load_config  # noqa: E402
 from pmgraph.hetero import CSR, HELD_ATTRS, Graph, frozen_csrs, held_edges_pd, train_hetero  # noqa: E402
-from pmgraph.label_diag import variance_function  # noqa: E402
 from pmgraph.tabular import run_in_subprocess  # noqa: E402  (XGBoost cannot share a process with torch on macOS)
 from pmgraph.runinfo import completed_job, finish_job, job_signature  # noqa: E402
+from pmgraph.gnn_only import centered_edge_target, wallet_holdout  # noqa: E402
 
 cfg = load_config()
 split = sys.argv[1] if len(sys.argv) > 1 else "train"
@@ -61,10 +63,13 @@ if not methods or set(methods) - set(ALL):
     raise ValueError(f"methods must be selected from {ALL}, got {methods}")
 ks = [int(k) for k in sys.argv[3].split(",")] if len(sys.argv) > 3 else cfg["eval"]["k_buckets"]
 mode = sys.argv[4] if len(sys.argv) > 4 else cfg["first_k"].get("split_mode", "random")
-assert mode in ("random", "cv"), mode
+assert mode in ("random", "cv", "holdout"), mode
 target = sys.argv[5] if len(sys.argv) > 5 else "label"
-assert target in ("label", "edge") and (target == "label" or mode == "cv"), (mode, target)
-tag = {"random": "exp2", "cv": "exp3"}[mode] if target == "label" else "exp4"
+assert target in ("label", "edge") and (target == "label" or mode in ("cv", "holdout")), (mode, target)
+assert mode != "holdout" or target == "edge", "holdout is the GNN-only edge protocol"
+if mode == "holdout" and set(methods) - {"sage", "hgnn"}:
+    raise ValueError("holdout mode is restricted to sage/hgnn; use script 17 for training/evaluation")
+tag = {"random": "exp2", "cv": "exp3"}[mode] if target == "label" else ("exp6" if mode == "holdout" else "exp4")
 P = ROOT / cfg["data"]["processed_dir"]
 run_tag = os.environ.get("PMGRAPH_TAG", "")
 if run_tag and not re.fullmatch(r"[A-Za-z0-9_-]+", run_tag):
@@ -74,6 +79,10 @@ if target == "label":
     parts.mkdir(parents=True, exist_ok=True)
 preds.mkdir(parents=True, exist_ok=True)
 hp = {**cfg["gnn"], **json.loads(os.environ.get("PMGRAPH_GNN", "{}"))}
+seeds = json.loads(os.environ.get("PMGRAPH_SEEDS", json.dumps(cfg["eval"]["seeds"])))
+split_seed = int(os.environ.get("PMGRAPH_SPLIT_SEED", "0"))
+if not seeds or len(set(seeds)) != len(seeds) or any(type(s) is not int or s < 0 for s in seeds):
+    raise ValueError("PMGRAPH_SEEDS must be a JSON array of unique nonnegative integers")
 if os.environ.get("PMGRAPH_REQUIRE_CUDA") == "1" and not torch.cuda.is_available():
     raise RuntimeError("CUDA required by server launcher but unavailable to this worker")
 checkpoints = P / "checkpoints" / (tag + (f"_{run_tag}" if run_tag else ""))
@@ -84,7 +93,7 @@ if target == "edge":
     inputs.append(P / f"{split}_fk_halves.parquet")
 if hp.get("asof_markets", False):
     inputs += [P / f"{split}_fk_asof_mkt.parquet", P / f"{split}_fk_asof_mkt_edges.parquet"]
-signature = job_signature(dict(config=cfg, hp=hp, split=split, mode=mode, target=target),
+signature = job_signature(dict(config=cfg, hp=hp, split=split, mode=mode, target=target, seeds=seeds, split_seed=split_seed),
                           [Path(__file__), *sorted((ROOT / "src/pmgraph").glob("*.py"))], inputs)
 t0 = time.time()
 log = lambda *a: print(f"[{time.time()-t0:6.0f}s]", *a, flush=True)  # noqa: E731
@@ -108,7 +117,15 @@ def wallet_matrix(df: pd.DataFrame, is_new: np.ndarray) -> np.ndarray:
 
 xsc = StandardScaler().fit(wallet_matrix(Xraw, np.zeros(N)))
 Xf = xsc.transform(wallet_matrix(Xraw, np.zeros(N))).astype(np.float32)
-Mraw = data["market"].x.numpy()
+Mraw = data["market"].x.numpy().copy()
+# Unknown market categories can produce NaN indicators. As with wallet features, missing input
+# values are represented by zero. Infinities remain errors and must not be silently clipped.
+missing_market = int(np.isnan(Mraw).sum())
+Mraw[np.isnan(Mraw)] = 0
+if not np.isfinite(Mraw).all():
+    raise ValueError("frozen market features contain infinity; inspect the prepared market data")
+if missing_market:
+    log(f"imputed {missing_market} missing market feature values to zero before scaling")
 mcols = list(data["market"].cols) if "cols" in data["market"] else None  # names, needed by Gate C only
 msc = StandardScaler().fit(Mraw)
 Xm = msc.transform(Mraw).astype(np.float32)
@@ -116,7 +133,7 @@ midx = pd.Series(np.arange(len(Mraw)), index=data["market"].market_id.numpy())
 fz, scalers = frozen_csrs(data)
 del data
 # The state dict alone cannot reproduce predictions: retain feature order and all fitted scalers.
-prep_path = checkpoints / f"{split}_k{'-'.join(map(str, ks))}_preprocessing.pt"
+prep_path = checkpoints / f"{split}_k{'-'.join(map(str, ks))}_{'-'.join(methods)}_preprocessing.pt"
 tmp_prep = prep_path.with_suffix(".pt.tmp")
 torch.save(dict(wallet_columns=oc, wallet_mean=xsc.mean_, wallet_scale=xsc.scale_,
                 market_mean=msc.mean_, market_scale=msc.scale_, edge_scalers=scalers,
@@ -152,18 +169,18 @@ def asof_graph(k: int):
     fzk = dict(fz)
     fzk["held"] = CSR.build(np.r_[old_dst, dst], np.r_[h.src, e.src.to_numpy(np.int64)], np.r_[h.attr, a],
                             len(Mraw) + len(am))
-    Mk = np.r_[Mraw, am[mcols].to_numpy(np.float32)]
+    Ma = am[mcols].to_numpy(np.float32)
+    Ma[np.isnan(Ma)] = 0                    # same missing-value rule as the frozen market features
+    Mk = np.r_[Mraw, Ma]
     return Mk, msc.transform(Mk).astype(np.float32), fzk, imap
 
 
-def edge_target(k: int, nids: np.ndarray) -> np.ndarray:
+def edge_target(k: int, nids: np.ndarray, fit_idx=None) -> np.ndarray:
     """Centred z of half A, (x - mu) / sqrt(tau2 + phi s^2); NaN for wallets with < 10 bets in half A."""
     H = HALF[HALF.k == k].set_index("nid").reindex(nids)
     ok = (H["n0"] >= 10).to_numpy()
     assert ok.sum() > 100, f"no split halves for k={k}: run scripts/12_label_diagnostics.py {split} first"
-    x, s = H["x0"].to_numpy(), H["s0"].to_numpy()
-    v = variance_function(x[ok], s[ok])
-    return np.where(ok, (x - v["mu"]) / np.sqrt(v["tau2"] + v["phi"] * s ** 2), np.nan)[:, None]
+    return centered_edge_target(H, fit_idx)
 
 
 # ---------------------------------------------------------------- query graph for one k
@@ -250,30 +267,41 @@ for k in ks:
     Mk, Xmk, fzk, imap = asof_graph(k)
     E = query_edges(k, nids, pk.set_index("nid")["t_k"], imap)
     o = obs[(obs.rn <= k) & obs.nid.isin(nids)]
-    NBR = nbr_aggregates(E, n, o, nids, Mk)
+    NBR = nbr_aggregates(E, n, o, nids, Mk) if "xgb_nbr" in methods else None
     g = Graph(x={"wallet": Xf, "market": Xmk}, frozen=fzk, xq=Fq,
               query={r: CSR.build(d, s, a, n) for r, (d, s, a) in E.items()})
     log(f"k={k}: n={n} (new {new.sum()}), query edges", {r: len(v[0]) for r, v in E.items()})
     strat = Y[:, 1] * 4 + Y[:, 0] * 2 + new
-    Yt, obj = (Y, None) if target == "label" else (edge_target(k, nids), ["reg"])     # what the models are fit on
     splits = {}
     if mode == "random":
-        for seed in cfg["eval"]["seeds"]:
+        for seed in seeds:
             tr, te = train_test_split(np.arange(n), test_size=0.2, random_state=seed, stratify=strat)
             tr, va = train_test_split(tr, test_size=0.25, random_state=seed, stratify=strat[tr])
             splits[seed] = (tr, va, te)
+    elif mode == "holdout":
+        tr, va, te = wallet_holdout(nids, strat, split_seed)
+        splits = {seed: (tr, va, te) for seed in seeds}
+        roles = np.full(n, "train", dtype=object)
+        roles[va], roles[te] = "val", "test"
+        partition_path = preds / f"{split}_k{k}_wallet_split.parquet"
+        tmp_partition = partition_path.with_suffix(f".tmp.{os.getpid()}")
+        pd.DataFrame(dict(nid=nids, partition=roles)).to_parquet(tmp_partition, index=False)
+        tmp_partition.replace(partition_path)
+        log(f"fixed holdout split_seed={split_seed}: train={len(tr)} val={len(va)} test={len(te)}")
     else:                                  # "seed" = fold index (also seeds the GNN)
         folds = [te for _, te in StratifiedKFold(5, shuffle=True, random_state=0).split(np.zeros(n), strat)]
         for f in range(5):
             va = folds[(f + 1) % 5]
             splits[f] = (np.setdiff1d(np.arange(n), np.r_[folds[f], va]), va, folds[f])
+    target_fit = next(iter(splits.values()))[0] if mode == "holdout" else None
+    Yt, obj = (Y, None) if target == "label" else (edge_target(k, nids, target_fit), ["reg"])
     for m in methods:
         pred_path = preds / f"{split}_k{k}_{m}.parquet"
         method_signature = f"{signature}:{k}:{m}"
         if os.environ.get("PMGRAPH_RESUME") == "1" and completed_job(pred_path, method_signature):
             log(f"k={k} {m}: completed job matches code, settings and inputs; skipped")
             continue
-        rows, pr_rows = [], []
+        rows, pr_rows, val_rows = [], [], []
         model_paths = []
         tm = time.time()
         if m in ("xgb_own", "xgb_nbr"):    # trees need no early stopping: fit on train + val
@@ -287,14 +315,17 @@ for k in ks:
                 s = xs[seed]
             else:
                 rels = ["cp"] if m == "sage" else ["cp", "mf", "rev_mf", "rev_held", "held"]
-                model_path = checkpoints / f"{split}_k{k}_{m}_fold{seed}.pt"
+                suffix = "seed" if mode == "holdout" else "fold"
+                model_path = checkpoints / f"{split}_k{k}_{m}_{suffix}{seed}.pt"
                 s = train_hetero(g, rels, Yt, {"train": tr, "val": va}, seed, hp,
                                  log=lambda *a: log(f"k={k}", *a), objectives=obj, checkpoint_path=model_path,
                                  metadata=dict(split=split, k=k, method=m, mode=mode, target=target,
-                                               preprocessing=str(prep_path), signature=method_signature))
+                                               preprocessing=str(prep_path), signature=method_signature, split_seed=split_seed))
                 model_paths.extend([model_path, prep_path])
             if target == "edge":
                 pr_rows.append(pd.DataFrame({"seed": seed, "nid": nids[te], "new": new[te], "s_edge": s[te, 0]}))
+                if mode == "holdout":
+                    val_rows.append(pd.DataFrame({"seed": seed, "nid": nids[va], "new": new[va], "s_edge": s[va, 0]}))
                 continue
             rows += metrics_rows(s, Y, te, new, seed=seed, k=k, method=m)
             pr_rows.append(pd.DataFrame({"seed": seed, "nid": nids[te], "new": new[te], "z": pk.z.to_numpy()[te],
@@ -304,6 +335,12 @@ for k in ks:
         pd.concat(pr_rows).assign(k=k, method=m).to_parquet(tmp_pred, index=False)
         tmp_pred.replace(pred_path)
         if target == "edge":
+            if mode == "holdout":
+                val_path = pred_path.with_name(pred_path.stem + "_val.parquet")
+                tmp_val = val_path.with_suffix(".parquet.tmp")
+                pd.concat(val_rows).assign(k=k, method=m).to_parquet(tmp_val, index=False)
+                tmp_val.replace(val_path)
+                model_paths.extend([val_path, partition_path])
             finish_job(pred_path, method_signature, model_paths)
             log(f"k={k} {m:8s} {time.time()-tm:5.0f}s  edge scores saved")
             continue

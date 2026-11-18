@@ -15,7 +15,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_training_entrypoint_checkpoints_resume_and_complete_report(tmp_path):
+def prepared_graph(tmp_path, missing_market=False):
     for directory in ("src", "scripts", "configs"):
         shutil.copytree(ROOT / directory, tmp_path / directory, ignore=shutil.ignore_patterns("__pycache__"))
     for d in ("outputs/tables", "outputs/figures", "data/processed"):
@@ -30,6 +30,8 @@ def test_training_entrypoint_checkpoints_resume_and_complete_report(tmp_path):
     data["wallet"].x = torch.from_numpy(rng.normal(size=(nw, len(cols))).astype("float32"))
     data["wallet"].cols = cols
     data["market"].x = torch.from_numpy(rng.normal(size=(nm, 3)).astype("float32"))
+    if missing_market:
+        data["market"].x[0, 0] = float("nan")
     data["market"].market_id = torch.arange(nm)
     for relation, src, dst, width in [("cp", nw, nw, 1), ("mf", nw, nw, 1), ("held", nw, nm, 5)]:
         key = ("wallet", relation, "market" if relation == "held" else "wallet")
@@ -50,6 +52,11 @@ def test_training_entrypoint_checkpoints_resume_and_complete_report(tmp_path):
            "PMGRAPH_TAG": "integration", "KS": "1", "METHODS": "hist,sage,hgnn", "MPLCONFIGDIR": str(tmp_path / "mpl"),
            "PMGRAPH_GNN": json.dumps(dict(hidden=8, fanout=[2, 2], batch=32, eval_batch=16,
                                          epochs=2, patience=2, eval_reps=1, threads=1))}
+    return p, env, nq
+
+
+def test_training_entrypoint_checkpoints_resume_and_complete_report(tmp_path):
+    p, env, nq = prepared_graph(tmp_path)
     command = [sys.executable, "scripts/09_first_k_experiments.py", "train", "hist,sage,hgnn", "1", "cv", "edge"]
     result = subprocess.run(command, cwd=tmp_path, env=env, text=True, capture_output=True, timeout=120)
     assert result.returncode == 0, result.stdout + result.stderr

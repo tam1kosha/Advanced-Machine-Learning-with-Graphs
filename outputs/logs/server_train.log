@@ -1,0 +1,2561 @@
+/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/.venv/lib/python3.10/site-packages/torch/cuda/__init__.py:228: UserWarning: CUDA initialization: The NVIDIA driver on your system is too old (found version 12080). Please update your GPU driver by downloading and installing a new version from the URL: http://www.nvidia.com/Download/index.aspx Alternatively, go to: https://pytorch.org to install a PyTorch version that has been compiled with your version of the CUDA driver. (Triggered internally at /__w/pytorch/pytorch/c10/cuda/CUDAFunctions.cpp:119.)
+  return torch._C._cuda_getDeviceCount() > 0
+Traceback (most recent call last):
+  File "/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/scripts/server_check.py", line 203, in <module>
+    main()
+  File "/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/scripts/server_check.py", line 87, in main
+    raise RuntimeError("CUDA is unavailable. Install a CUDA-enabled torch build matching the driver; "
+RuntimeError: CUDA is unavailable. Install a CUDA-enabled torch build matching the driver; PMGRAPH_ALLOW_CPU=1 is an explicit CPU-only debugging override
+XGBoost import OK
+{
+  "time": "2026-11-17T03:07:26.945495+00:00",
+  "python": "3.10.12 (main, Jul 29 2024, 16:56:48) [GCC 11.4.0]",
+  "executable": "/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/.venv/bin/python",
+  "platform": "Linux-6.5.0-28-generic-x86_64-with-glibc2.35",
+  "cpu_count": 64,
+  "packages": {
+    "torch": "2.11.0+cu128",
+    "torch-geometric": "2.8.1",
+    "numpy": "2.2.6",
+    "pandas": "2.3.3",
+    "pyarrow": "25.0.1",
+    "duckdb": "1.5.6",
+    "scipy": "1.15.3",
+    "scikit-learn": "1.7.2",
+    "xgboost": "3.2.0",
+    "matplotlib": "3.10.9",
+    "pyyaml": "6.0.3",
+    "huggingface-hub": "2.4.0"
+  },
+  "cuda_build": "12.8",
+  "devices": [
+    {
+      "token": "0",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "1",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "2",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "3",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "4",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "5",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "6",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "7",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    }
+  ],
+  "disk_free_bytes": 407474651136,
+  "stages": [
+    "smoke",
+    "data",
+    "prep",
+    "diag",
+    "edge"
+  ],
+  "ks": [
+    1,
+    3,
+    5,
+    10,
+    20,
+    50
+  ],
+  "splits": [
+    "train",
+    "test"
+  ],
+  "methods": [
+    "hist",
+    "xgb_own",
+    "xgb_nbr",
+    "sage",
+    "hgnn"
+  ],
+  "gnn": {
+    "hidden": 64,
+    "fanout": [
+      10,
+      5
+    ],
+    "batch": 1024,
+    "epochs": 40,
+    "patience": 6,
+    "lr": 0.003,
+    "eval_reps": 3,
+    "threads": 2,
+    "gpu_scale": false
+  },
+  "settings": {
+    "PMGRAPH_TAG": "server",
+    "PMGRAPH_RESUME": "1",
+    "NGPU": "8",
+    "OMP_NUM_THREADS": "2",
+    "OPENBLAS_NUM_THREADS": "2"
+  },
+  "host_memory_bytes": {
+    "MemTotal": 540712529920,
+    "MemAvailable": 488143802368
+  },
+  "git_commit": "87ec4fe4c0ff3487ce5e76530fbc3922ce80e3f7",
+  "cpu_model": "Intel(R) Xeon(R) Gold 6426Y",
+  "nvidia_smi": "0, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n1, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n2, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n3, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n4, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n5, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n6, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n7, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB"
+}
+Preflight OK: /home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/preflight_20261117T030727024907.json
+== smoke 03:07:29
+XGBoost import OK
+{
+  "time": "2026-11-17T03:07:35.189222+00:00",
+  "python": "3.10.12 (main, Jul 29 2024, 16:56:48) [GCC 11.4.0]",
+  "executable": "/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/.venv/bin/python",
+  "platform": "Linux-6.5.0-28-generic-x86_64-with-glibc2.35",
+  "cpu_count": 64,
+  "packages": {
+    "torch": "2.11.0+cu128",
+    "torch-geometric": "2.8.1",
+    "numpy": "2.2.6",
+    "pandas": "2.3.3",
+    "pyarrow": "25.0.1",
+    "duckdb": "1.5.6",
+    "scipy": "1.15.3",
+    "scikit-learn": "1.7.2",
+    "xgboost": "3.2.0",
+    "matplotlib": "3.10.9",
+    "pyyaml": "6.0.3",
+    "huggingface-hub": "2.4.0"
+  },
+  "cuda_build": "12.8",
+  "devices": [
+    {
+      "token": "0",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "1",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "2",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "3",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "4",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "5",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "6",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "7",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    }
+  ],
+  "disk_free_bytes": 407474446336,
+  "stages": [],
+  "ks": [
+    1,
+    3,
+    5,
+    10,
+    20,
+    50
+  ],
+  "splits": [
+    "train",
+    "test"
+  ],
+  "methods": [
+    "hist",
+    "xgb_own",
+    "xgb_nbr",
+    "sage",
+    "hgnn"
+  ],
+  "gnn": {
+    "hidden": 64,
+    "fanout": [
+      10,
+      5
+    ],
+    "batch": 1024,
+    "epochs": 40,
+    "patience": 6,
+    "lr": 0.003,
+    "eval_reps": 3,
+    "threads": 2,
+    "gpu_scale": false
+  },
+  "settings": {
+    "PMGRAPH_TAG": "server",
+    "PMGRAPH_RESUME": "1",
+    "PMGRAPH_REQUIRE_CUDA": "1",
+    "NGPU": "8",
+    "OMP_NUM_THREADS": "2",
+    "OPENBLAS_NUM_THREADS": "2"
+  },
+  "host_memory_bytes": {
+    "MemTotal": 540712529920,
+    "MemAvailable": 488151838720
+  },
+  "git_commit": "87ec4fe4c0ff3487ce5e76530fbc3922ce80e3f7",
+  "cpu_model": "Intel(R) Xeon(R) Gold 6426Y",
+  "nvidia_smi": "0, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n1, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n2, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n3, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n4, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n5, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n6, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n7, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB"
+}
+Preflight OK: /home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/preflight_20261117T030735269031.json
+    device=cuda:0 parameters=369 seed=0 settings={'device': 'cuda:0', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:0", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.9166666666666666, "elapsed_seconds": 0.453900947002694, "process_peak_rss_bytes": 2209828864, "peak_cuda_allocated_bytes": 18140160, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:0", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:0 parameters=369 seed=0 settings={'device': 'cuda:0', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:0", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.39837011043782744, "elapsed_seconds": 0.21006182598648593, "process_peak_rss_bytes": 2389659648, "peak_cuda_allocated_bytes": 18141696, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:0", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:0 parameters=1,713 seed=0 settings={'device': 'cuda:0', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:0", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": 0.7291666666666666, "elapsed_seconds": 0.19322756401379593, "process_peak_rss_bytes": 2395426816, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:0", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:0 parameters=1,713 seed=0 settings={'device': 'cuda:0', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:0", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": -0.2145515318259158, "elapsed_seconds": 0.1879408780077938, "process_peak_rss_bytes": 2395426816, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:0", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:1 parameters=369 seed=0 settings={'device': 'cuda:1', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:1", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.9166666666666666, "elapsed_seconds": 0.1238075350120198, "process_peak_rss_bytes": 2447331328, "peak_cuda_allocated_bytes": 18140160, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:1", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:1 parameters=369 seed=0 settings={'device': 'cuda:1', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:1", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.39837011043782744, "elapsed_seconds": 0.10443667200161144, "process_peak_rss_bytes": 2464108544, "peak_cuda_allocated_bytes": 18141696, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:1", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:1 parameters=1,713 seed=0 settings={'device': 'cuda:1', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:1", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": 0.7291666666666666, "elapsed_seconds": 0.18796682701213285, "process_peak_rss_bytes": 2465157120, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:1", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:1 parameters=1,713 seed=0 settings={'device': 'cuda:1', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:1", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": -0.2145515318259158, "elapsed_seconds": 0.17762220700387843, "process_peak_rss_bytes": 2465157120, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:1", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:2 parameters=369 seed=0 settings={'device': 'cuda:2', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:2", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.9166666666666666, "elapsed_seconds": 0.14442647498799488, "process_peak_rss_bytes": 2517061632, "peak_cuda_allocated_bytes": 18140160, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:2", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:2 parameters=369 seed=0 settings={'device': 'cuda:2', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:2", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.39837011043782744, "elapsed_seconds": 0.10192471498157829, "process_peak_rss_bytes": 2533838848, "peak_cuda_allocated_bytes": 18141696, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:2", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:2 parameters=1,713 seed=0 settings={'device': 'cuda:2', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:2", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": 0.7291666666666666, "elapsed_seconds": 0.1802047099918127, "process_peak_rss_bytes": 2534887424, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:2", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:2 parameters=1,713 seed=0 settings={'device': 'cuda:2', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:2", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": -0.2145515318259158, "elapsed_seconds": 0.18621977299335413, "process_peak_rss_bytes": 2534887424, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:2", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:3 parameters=369 seed=0 settings={'device': 'cuda:3', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:3", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.9166666666666666, "elapsed_seconds": 0.1278526800160762, "process_peak_rss_bytes": 2586791936, "peak_cuda_allocated_bytes": 18140160, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:3", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:3 parameters=369 seed=0 settings={'device': 'cuda:3', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:3", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.39837011043782744, "elapsed_seconds": 0.11163923097774386, "process_peak_rss_bytes": 2603569152, "peak_cuda_allocated_bytes": 18141696, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:3", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:3 parameters=1,713 seed=0 settings={'device': 'cuda:3', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:3", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": 0.7291666666666666, "elapsed_seconds": 0.19148420399869792, "process_peak_rss_bytes": 2604617728, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:3", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:3 parameters=1,713 seed=0 settings={'device': 'cuda:3', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:3", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": -0.2145515318259158, "elapsed_seconds": 0.18981243399321102, "process_peak_rss_bytes": 2604617728, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:3", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:4 parameters=369 seed=0 settings={'device': 'cuda:4', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:4", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.9166666666666666, "elapsed_seconds": 0.1275769229978323, "process_peak_rss_bytes": 2656522240, "peak_cuda_allocated_bytes": 18140160, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:4", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:4 parameters=369 seed=0 settings={'device': 'cuda:4', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:4", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.39837011043782744, "elapsed_seconds": 0.11016129999188706, "process_peak_rss_bytes": 2673823744, "peak_cuda_allocated_bytes": 18141696, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:4", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:4 parameters=1,713 seed=0 settings={'device': 'cuda:4', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:4", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": 0.7291666666666666, "elapsed_seconds": 0.1865496690152213, "process_peak_rss_bytes": 2674872320, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:4", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:4 parameters=1,713 seed=0 settings={'device': 'cuda:4', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:4", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": -0.2145515318259158, "elapsed_seconds": 0.18783438799437135, "process_peak_rss_bytes": 2674872320, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:4", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:5 parameters=369 seed=0 settings={'device': 'cuda:5', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:5", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.9166666666666666, "elapsed_seconds": 0.12876302801305428, "process_peak_rss_bytes": 2726776832, "peak_cuda_allocated_bytes": 18140160, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:5", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:5 parameters=369 seed=0 settings={'device': 'cuda:5', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:5", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.39837011043782744, "elapsed_seconds": 0.10910006100311875, "process_peak_rss_bytes": 2744078336, "peak_cuda_allocated_bytes": 18141696, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:5", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:5 parameters=1,713 seed=0 settings={'device': 'cuda:5', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:5", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": 0.7291666666666666, "elapsed_seconds": 0.18551165200187825, "process_peak_rss_bytes": 2745126912, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:5", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:5 parameters=1,713 seed=0 settings={'device': 'cuda:5', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:5", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": -0.21455182656612007, "elapsed_seconds": 0.19527448900043964, "process_peak_rss_bytes": 2745126912, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:5", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:6 parameters=369 seed=0 settings={'device': 'cuda:6', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:6", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.9166666666666666, "elapsed_seconds": 0.12825383400195278, "process_peak_rss_bytes": 2797031424, "peak_cuda_allocated_bytes": 18140160, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:6", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:6 parameters=369 seed=0 settings={'device': 'cuda:6', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:6", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.39837011043782744, "elapsed_seconds": 0.11165982100646943, "process_peak_rss_bytes": 2814332928, "peak_cuda_allocated_bytes": 18141696, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:6", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:6 parameters=1,713 seed=0 settings={'device': 'cuda:6', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:6", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": 0.7291666666666666, "elapsed_seconds": 0.14215072197839618, "process_peak_rss_bytes": 2814857216, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:6", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:6 parameters=1,713 seed=0 settings={'device': 'cuda:6', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:6", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": -0.2145515318259158, "elapsed_seconds": 0.17497780901612714, "process_peak_rss_bytes": 2815381504, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:6", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:7 parameters=369 seed=0 settings={'device': 'cuda:7', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:7", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.9166666666666666, "elapsed_seconds": 0.1292323159868829, "process_peak_rss_bytes": 2866761728, "peak_cuda_allocated_bytes": 18141184, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:7", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:7 parameters=369 seed=0 settings={'device': 'cuda:7', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:7", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.39837011043782744, "elapsed_seconds": 0.11593575100414455, "process_peak_rss_bytes": 2883538944, "peak_cuda_allocated_bytes": 18142720, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:7", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:7 parameters=1,713 seed=0 settings={'device': 'cuda:7', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:7", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": 0.7291666666666666, "elapsed_seconds": 0.19083520799176767, "process_peak_rss_bytes": 2884587520, "peak_cuda_allocated_bytes": 18257920, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:7", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:7 parameters=1,713 seed=0 settings={'device': 'cuda:7', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:7", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": -0.2145515318259158, "elapsed_seconds": 0.19140901300124824, "process_peak_rss_bytes": 2884587520, "peak_cuda_allocated_bytes": 18257920, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:7", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+Smoke passed: GraphSAGE + hetero GraphSAGE, classification + regression, checkpoint reload, XGBoost
+== data 03:07:52
+Fetching 4 files:   0%|          | 0/4 [00:00<?, ?it/s]Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Fetching 4 files:  25%|██▌       | 1/4 [00:00<00:02,  1.26it/s]Fetching 4 files:  50%|█████     | 2/4 [00:03<00:03,  1.93s/it]Fetching 4 files:  75%|███████▌  | 3/4 [00:04<00:01,  1.47s/it]Fetching 4 files: 100%|██████████| 4/4 [00:05<00:00,  1.12s/it]Fetching 4 files: 100%|██████████| 4/4 [00:05<00:00,  1.25s/it]
+done: ['markets.parquet', 'events.parquet', 'predictions.parquet'] ...
+Fetching 549 files:   0%|          | 0/549 [00:00<?, ?it/s]Fetching 549 files:   0%|          | 1/549 [00:02<23:07,  2.53s/it]Fetching 549 files:   0%|          | 2/549 [00:02<11:04,  1.22s/it]Fetching 549 files:   1%|          | 3/549 [00:03<07:21,  1.24it/s]Fetching 549 files:   1%|          | 4/549 [00:03<05:21,  1.70it/s]Fetching 549 files:   1%|          | 5/549 [00:03<04:36,  1.96it/s]Fetching 549 files:   1%|          | 6/549 [00:04<04:44,  1.91it/s]Fetching 549 files:   1%|▏         | 7/549 [00:04<04:12,  2.14it/s]Fetching 549 files:   1%|▏         | 8/549 [00:04<03:30,  2.57it/s]Fetching 549 files:   2%|▏         | 9/549 [00:05<03:16,  2.75it/s]Fetching 549 files:   2%|▏         | 11/549 [00:05<03:01,  2.97it/s]Fetching 549 files:   2%|▏         | 12/549 [00:06<02:53,  3.09it/s]Fetching 549 files:   2%|▏         | 13/549 [00:06<02:56,  3.04it/s]Fetching 549 files:   3%|▎         | 14/549 [00:07<04:53,  1.82it/s]Fetching 549 files:   3%|▎         | 15/549 [00:08<05:03,  1.76it/s]Fetching 549 files:   3%|▎         | 16/549 [00:08<05:01,  1.77it/s]Fetching 549 files:   3%|▎         | 17/549 [00:09<04:41,  1.89it/s]Fetching 549 files:   3%|▎         | 18/549 [00:09<05:23,  1.64it/s]Fetching 549 files:   3%|▎         | 19/549 [00:10<04:25,  2.00it/s]Fetching 549 files:   4%|▎         | 20/549 [00:10<04:10,  2.11it/s]Fetching 549 files:   4%|▍         | 21/549 [00:11<04:06,  2.14it/s]Fetching 549 files:   4%|▍         | 22/549 [00:11<04:42,  1.87it/s]Fetching 549 files:   4%|▍         | 23/549 [00:12<03:54,  2.24it/s]Fetching 549 files:   4%|▍         | 24/549 [00:12<03:45,  2.33it/s]Fetching 549 files:   5%|▍         | 25/549 [00:12<03:46,  2.32it/s]Fetching 549 files:   5%|▍         | 27/549 [00:13<03:02,  2.86it/s]Fetching 549 files:   5%|▌         | 28/549 [00:13<02:34,  3.38it/s]Fetching 549 files:   5%|▌         | 29/549 [00:13<02:48,  3.09it/s]Fetching 549 files:   5%|▌         | 30/549 [00:14<02:45,  3.13it/s]Fetching 549 files:   6%|▌         | 31/549 [00:14<02:33,  3.37it/s]Fetching 549 files:   6%|▌         | 32/549 [00:14<03:03,  2.81it/s]Fetching 549 files:   6%|▌         | 33/549 [00:15<02:48,  3.07it/s]Fetching 549 files:   6%|▌         | 34/549 [00:15<02:38,  3.25it/s]Fetching 549 files:   7%|▋         | 36/549 [00:15<01:42,  5.03it/s]Fetching 549 files:   7%|▋         | 37/549 [00:15<01:51,  4.61it/s]Fetching 549 files:   7%|▋         | 38/549 [00:16<01:46,  4.81it/s]Fetching 549 files:   7%|▋         | 39/549 [00:16<01:51,  4.57it/s]Fetching 549 files:   7%|▋         | 40/549 [00:17<03:01,  2.81it/s]Fetching 549 files:   7%|▋         | 41/549 [00:17<03:28,  2.44it/s]Fetching 549 files:   8%|▊         | 44/549 [00:17<01:54,  4.42it/s]Fetching 549 files:   8%|▊         | 45/549 [00:18<02:01,  4.14it/s]Fetching 549 files:   9%|▊         | 47/549 [00:18<02:24,  3.48it/s]Fetching 549 files:   9%|▊         | 48/549 [00:19<02:42,  3.08it/s]Fetching 549 files:   9%|▉         | 49/549 [00:19<02:18,  3.62it/s]Fetching 549 files:   9%|▉         | 51/549 [00:20<02:35,  3.20it/s]Fetching 549 files:  10%|▉         | 53/549 [00:20<02:04,  4.00it/s]Fetching 549 files:  10%|▉         | 54/549 [00:20<02:07,  3.88it/s]Fetching 549 files:  10%|█         | 55/549 [00:20<01:58,  4.17it/s]Fetching 549 files:  10%|█         | 56/549 [00:21<01:55,  4.26it/s]Fetching 549 files:  10%|█         | 57/549 [00:21<01:47,  4.58it/s]Fetching 549 files:  11%|█         | 58/549 [00:21<02:19,  3.53it/s]Fetching 549 files:  11%|█         | 59/549 [00:21<02:14,  3.63it/s]Fetching 549 files:  11%|█         | 61/549 [00:22<01:49,  4.45it/s]Fetching 549 files:  11%|█▏        | 62/549 [00:22<02:07,  3.82it/s]Fetching 549 files:  11%|█▏        | 63/549 [00:23<02:44,  2.95it/s]Fetching 549 files:  12%|█▏        | 66/549 [00:23<01:44,  4.62it/s]Fetching 549 files:  12%|█▏        | 67/549 [00:24<02:33,  3.14it/s]Fetching 549 files:  13%|█▎        | 69/549 [00:24<01:58,  4.05it/s]Fetching 549 files:  13%|█▎        | 70/549 [00:25<02:38,  3.03it/s]Fetching 549 files:  13%|█▎        | 73/549 [00:25<01:32,  5.14it/s]Fetching 549 files:  14%|█▎        | 75/549 [00:27<03:07,  2.53it/s]Fetching 549 files:  14%|█▍        | 77/549 [00:27<02:17,  3.42it/s]Fetching 549 files:  14%|█▍        | 79/549 [00:27<02:20,  3.35it/s]Fetching 549 files:  15%|█▍        | 80/549 [00:27<02:05,  3.74it/s]Fetching 549 files:  15%|█▍        | 81/549 [00:28<02:31,  3.09it/s]Fetching 549 files:  15%|█▍        | 82/549 [00:28<02:33,  3.05it/s]Fetching 549 files:  15%|█▌        | 84/549 [00:28<01:43,  4.49it/s]Fetching 549 files:  15%|█▌        | 85/549 [00:28<01:33,  4.96it/s]Fetching 549 files:  16%|█▌        | 87/549 [00:29<01:59,  3.85it/s]Fetching 549 files:  16%|█▌        | 88/549 [00:30<02:26,  3.14it/s]Fetching 549 files:  16%|█▌        | 89/549 [00:30<02:11,  3.49it/s]Fetching 549 files:  16%|█▋        | 90/549 [00:30<01:54,  4.02it/s]Fetching 549 files:  17%|█▋        | 91/549 [00:30<01:37,  4.69it/s]Fetching 549 files:  17%|█▋        | 92/549 [00:31<02:24,  3.17it/s]Fetching 549 files:  17%|█▋        | 94/549 [00:32<02:35,  2.92it/s]Fetching 549 files:  17%|█▋        | 95/549 [00:32<02:32,  2.97it/s]Fetching 549 files:  17%|█▋        | 96/549 [00:32<02:52,  2.62it/s]Fetching 549 files:  18%|█▊        | 97/549 [00:32<02:24,  3.13it/s]Fetching 549 files:  18%|█▊        | 98/549 [00:33<02:31,  2.98it/s]Fetching 549 files:  18%|█▊        | 100/549 [00:33<01:35,  4.69it/s]Fetching 549 files:  19%|█▊        | 102/549 [00:35<03:16,  2.27it/s]Fetching 549 files:  19%|█▉        | 104/549 [00:35<02:18,  3.22it/s]Fetching 549 files:  19%|█▉        | 105/549 [00:35<02:08,  3.44it/s]Fetching 549 files:  19%|█▉        | 107/549 [00:35<01:32,  4.78it/s]Fetching 549 files:  20%|█▉        | 109/549 [00:35<01:28,  5.00it/s]Fetching 549 files:  20%|██        | 110/549 [00:37<02:45,  2.66it/s]Fetching 549 files:  20%|██        | 111/549 [00:37<02:19,  3.15it/s]Fetching 549 files:  21%|██        | 113/549 [00:38<03:08,  2.31it/s]Fetching 549 files:  21%|██        | 116/549 [00:38<02:02,  3.54it/s]Fetching 549 files:  21%|██▏       | 117/549 [00:38<01:57,  3.68it/s]Fetching 549 files:  21%|██▏       | 118/549 [00:39<02:33,  2.80it/s]Fetching 549 files:  22%|██▏       | 119/549 [00:40<02:47,  2.56it/s]Fetching 549 files:  22%|██▏       | 120/549 [00:40<02:32,  2.81it/s]Fetching 549 files:  22%|██▏       | 121/549 [00:41<03:13,  2.22it/s]Fetching 549 files:  22%|██▏       | 122/549 [00:41<03:11,  2.22it/s]Fetching 549 files:  22%|██▏       | 123/549 [00:42<03:36,  1.96it/s]Fetching 549 files:  23%|██▎       | 125/549 [00:42<02:31,  2.80it/s]Fetching 549 files:  23%|██▎       | 126/549 [00:42<02:14,  3.15it/s]Fetching 549 files:  23%|██▎       | 129/549 [00:44<02:41,  2.60it/s]Fetching 549 files:  24%|██▍       | 131/549 [00:44<02:03,  3.39it/s]Fetching 549 files:  24%|██▍       | 132/549 [00:44<02:31,  2.75it/s]Fetching 549 files:  24%|██▍       | 134/549 [00:45<01:51,  3.73it/s]Fetching 549 files:  25%|██▍       | 135/549 [00:46<03:09,  2.19it/s]Fetching 549 files:  25%|██▍       | 136/549 [00:46<02:42,  2.53it/s]Fetching 549 files:  25%|██▍       | 137/549 [00:46<02:22,  2.88it/s]Fetching 549 files:  25%|██▌       | 138/549 [00:46<02:10,  3.15it/s]Fetching 549 files:  26%|██▌       | 140/549 [00:47<01:44,  3.90it/s]Fetching 549 files:  26%|██▌       | 141/549 [00:47<02:15,  3.01it/s]Fetching 549 files:  26%|██▌       | 142/549 [00:48<02:05,  3.23it/s]Fetching 549 files:  26%|██▌       | 143/549 [00:48<02:30,  2.70it/s]Fetching 549 files:  26%|██▌       | 144/549 [00:48<02:12,  3.05it/s]Fetching 549 files:  27%|██▋       | 146/549 [00:49<01:37,  4.12it/s]Fetching 549 files:  27%|██▋       | 147/549 [00:49<01:31,  4.40it/s]Fetching 549 files:  27%|██▋       | 148/549 [00:50<02:31,  2.64it/s]Fetching 549 files:  27%|██▋       | 150/549 [00:50<01:41,  3.94it/s]Fetching 549 files:  28%|██▊       | 151/549 [00:50<02:00,  3.29it/s]Fetching 549 files:  28%|██▊       | 152/549 [00:50<01:43,  3.82it/s]Fetching 549 files:  28%|██▊       | 153/549 [00:51<01:45,  3.76it/s]Fetching 549 files:  28%|██▊       | 154/549 [00:51<02:10,  3.02it/s]Fetching 549 files:  28%|██▊       | 155/549 [00:51<01:49,  3.60it/s]Fetching 549 files:  28%|██▊       | 156/549 [00:52<02:20,  2.79it/s]Fetching 549 files:  29%|██▊       | 157/549 [00:52<01:56,  3.36it/s]Fetching 549 files:  29%|██▉       | 158/549 [00:53<02:23,  2.73it/s]Fetching 549 files:  29%|██▉       | 159/549 [00:53<02:29,  2.61it/s]Fetching 549 files:  29%|██▉       | 161/549 [00:53<01:38,  3.92it/s]Fetching 549 files:  30%|██▉       | 162/549 [00:54<02:08,  3.02it/s]Fetching 549 files:  30%|██▉       | 163/549 [00:55<03:01,  2.12it/s]Fetching 549 files:  30%|███       | 166/549 [00:55<01:38,  3.90it/s]Fetching 549 files:  30%|███       | 167/549 [00:55<01:38,  3.89it/s]Fetching 549 files:  31%|███       | 169/549 [00:57<03:18,  1.91it/s]Fetching 549 files:  31%|███       | 170/549 [00:58<03:26,  1.84it/s]Fetching 549 files:  31%|███       | 171/549 [00:58<03:14,  1.95it/s]Fetching 549 files:  32%|███▏      | 173/549 [00:58<02:14,  2.79it/s]Fetching 549 files:  32%|███▏      | 174/549 [00:58<01:53,  3.29it/s]Fetching 549 files:  32%|███▏      | 175/549 [01:00<03:17,  1.90it/s]Fetching 549 files:  32%|███▏      | 177/549 [01:01<03:21,  1.85it/s]Fetching 549 files:  32%|███▏      | 178/549 [01:01<03:30,  1.76it/s]Fetching 549 files:  33%|███▎      | 179/549 [01:02<03:25,  1.80it/s]Fetching 549 files:  33%|███▎      | 181/549 [01:02<02:08,  2.87it/s]Fetching 549 files:  33%|███▎      | 182/549 [01:02<01:58,  3.09it/s]Fetching 549 files:  33%|███▎      | 183/549 [01:03<02:32,  2.40it/s]Fetching 549 files:  34%|███▎      | 184/549 [01:03<02:10,  2.79it/s]Fetching 549 files:  34%|███▎      | 185/549 [01:03<01:55,  3.15it/s]Fetching 549 files:  34%|███▍      | 186/549 [01:04<02:53,  2.09it/s]Fetching 549 files:  34%|███▍      | 187/549 [01:05<02:31,  2.39it/s]Fetching 549 files:  34%|███▍      | 188/549 [01:05<02:20,  2.58it/s]Fetching 549 files:  34%|███▍      | 189/549 [01:05<02:00,  2.98it/s]Fetching 549 files:  35%|███▍      | 190/549 [01:06<02:16,  2.63it/s]Fetching 549 files:  35%|███▍      | 191/549 [01:06<01:48,  3.29it/s]Fetching 549 files:  35%|███▍      | 192/549 [01:07<02:47,  2.13it/s]Fetching 549 files:  35%|███▌      | 193/549 [01:07<02:18,  2.57it/s]Fetching 549 files:  35%|███▌      | 194/549 [01:07<01:57,  3.01it/s]Fetching 549 files:  36%|███▌      | 196/549 [01:07<01:38,  3.59it/s]Fetching 549 files:  36%|███▌      | 197/549 [01:08<02:07,  2.76it/s]Fetching 549 files:  36%|███▌      | 198/549 [01:08<01:46,  3.30it/s]Fetching 549 files:  36%|███▌      | 199/549 [01:08<01:39,  3.53it/s]Fetching 549 files:  36%|███▋      | 200/549 [01:09<01:59,  2.92it/s]Fetching 549 files:  37%|███▋      | 202/549 [01:10<02:11,  2.64it/s]Fetching 549 files:  37%|███▋      | 205/549 [01:10<01:41,  3.37it/s]Fetching 549 files:  38%|███▊      | 206/549 [01:11<01:38,  3.47it/s]Fetching 549 files:  38%|███▊      | 208/549 [01:11<01:41,  3.35it/s]Fetching 549 files:  38%|███▊      | 210/549 [01:12<01:29,  3.81it/s]Fetching 549 files:  39%|███▊      | 212/549 [01:12<01:24,  4.00it/s]Fetching 549 files:  39%|███▉      | 213/549 [01:13<01:35,  3.52it/s]Fetching 549 files:  39%|███▉      | 215/549 [01:13<01:23,  3.98it/s]Fetching 549 files:  39%|███▉      | 216/549 [01:14<01:49,  3.04it/s]Fetching 549 files:  40%|███▉      | 218/549 [01:14<01:41,  3.26it/s]Fetching 549 files:  40%|███▉      | 219/549 [01:14<01:39,  3.31it/s]Fetching 549 files:  40%|████      | 220/549 [01:15<01:30,  3.64it/s]Fetching 549 files:  40%|████      | 221/549 [01:15<01:36,  3.39it/s]Fetching 549 files:  40%|████      | 222/549 [01:15<01:22,  3.97it/s]Fetching 549 files:  41%|████      | 224/549 [01:16<01:42,  3.18it/s]Fetching 549 files:  41%|████      | 225/549 [01:16<01:28,  3.67it/s]Fetching 549 files:  41%|████      | 226/549 [01:17<02:06,  2.56it/s]Fetching 549 files:  41%|████▏     | 227/549 [01:17<01:46,  3.04it/s]Fetching 549 files:  42%|████▏     | 228/549 [01:17<02:11,  2.44it/s]Fetching 549 files:  42%|████▏     | 231/549 [01:18<01:18,  4.03it/s]Fetching 549 files:  42%|████▏     | 232/549 [01:18<01:10,  4.47it/s]Fetching 549 files:  42%|████▏     | 233/549 [01:19<01:46,  2.98it/s]Fetching 549 files:  43%|████▎     | 234/549 [01:19<01:44,  3.02it/s]Fetching 549 files:  43%|████▎     | 235/549 [01:19<01:36,  3.26it/s]Fetching 549 files:  43%|████▎     | 236/549 [01:19<01:27,  3.56it/s]Fetching 549 files:  43%|████▎     | 238/549 [01:20<01:05,  4.71it/s]Fetching 549 files:  44%|████▎     | 239/549 [01:20<01:12,  4.25it/s]Fetching 549 files:  44%|████▎     | 240/549 [01:20<01:34,  3.27it/s]Fetching 549 files:  44%|████▍     | 241/549 [01:21<01:55,  2.66it/s]Fetching 549 files:  44%|████▍     | 242/549 [01:22<02:21,  2.17it/s]Fetching 549 files:  44%|████▍     | 244/549 [01:22<01:37,  3.14it/s]Fetching 549 files:  45%|████▍     | 246/549 [01:22<01:20,  3.74it/s]Fetching 549 files:  45%|████▍     | 247/549 [01:23<01:22,  3.65it/s]Fetching 549 files:  45%|████▌     | 249/549 [01:24<01:49,  2.75it/s]Fetching 549 files:  46%|████▌     | 251/549 [01:24<01:39,  2.99it/s]Fetching 549 files:  46%|████▌     | 252/549 [01:24<01:27,  3.41it/s]Fetching 549 files:  46%|████▌     | 253/549 [01:25<01:15,  3.92it/s]Fetching 549 files:  46%|████▋     | 254/549 [01:25<01:04,  4.57it/s]Fetching 549 files:  47%|████▋     | 256/549 [01:26<01:53,  2.58it/s]Fetching 549 files:  47%|████▋     | 257/549 [01:26<01:41,  2.88it/s]Fetching 549 files:  47%|████▋     | 258/549 [01:26<01:27,  3.32it/s]Fetching 549 files:  47%|████▋     | 259/549 [01:26<01:15,  3.83it/s]Fetching 549 files:  48%|████▊     | 261/549 [01:27<00:51,  5.59it/s]Fetching 549 files:  48%|████▊     | 263/549 [01:27<00:45,  6.26it/s]Fetching 549 files:  48%|████▊     | 264/549 [01:28<01:38,  2.90it/s]Fetching 549 files:  48%|████▊     | 265/549 [01:28<01:25,  3.30it/s]Fetching 549 files:  48%|████▊     | 266/549 [01:28<01:16,  3.70it/s]Fetching 549 files:  49%|████▊     | 267/549 [01:28<01:06,  4.24it/s]Fetching 549 files:  49%|████▉     | 268/549 [01:28<00:58,  4.82it/s]Fetching 549 files:  49%|████▉     | 270/549 [01:29<00:55,  5.04it/s]Fetching 549 files:  49%|████▉     | 271/549 [01:29<01:20,  3.47it/s]Fetching 549 files:  50%|████▉     | 272/549 [01:30<01:30,  3.07it/s]Fetching 549 files:  50%|████▉     | 273/549 [01:30<01:26,  3.19it/s]Fetching 549 files:  50%|████▉     | 274/549 [01:30<01:32,  2.99it/s]Fetching 549 files:  50%|█████     | 275/549 [01:31<01:53,  2.42it/s]Fetching 549 files:  50%|█████     | 277/549 [01:32<02:00,  2.26it/s]Fetching 549 files:  51%|█████     | 278/549 [01:32<01:41,  2.66it/s]Fetching 549 files:  51%|█████     | 280/549 [01:32<01:13,  3.66it/s]Fetching 549 files:  51%|█████     | 281/549 [01:33<01:05,  4.11it/s]Fetching 549 files:  51%|█████▏    | 282/549 [01:33<01:00,  4.41it/s]Fetching 549 files:  52%|█████▏    | 283/549 [01:33<00:59,  4.46it/s]Fetching 549 files:  52%|█████▏    | 284/549 [01:33<00:53,  4.96it/s]Fetching 549 files:  52%|█████▏    | 285/549 [01:34<01:55,  2.28it/s]Fetching 549 files:  52%|█████▏    | 287/549 [01:34<01:10,  3.70it/s]Fetching 549 files:  53%|█████▎    | 289/549 [01:35<01:08,  3.81it/s]Fetching 549 files:  53%|█████▎    | 290/549 [01:35<01:01,  4.23it/s]Fetching 549 files:  53%|█████▎    | 292/549 [01:35<00:44,  5.83it/s]Fetching 549 files:  53%|█████▎    | 293/549 [01:36<01:29,  2.85it/s]Fetching 549 files:  54%|█████▎    | 294/549 [01:36<01:24,  3.01it/s]Fetching 549 files:  54%|█████▎    | 295/549 [01:37<01:11,  3.56it/s]Fetching 549 files:  54%|█████▍    | 297/549 [01:37<00:48,  5.21it/s]Fetching 549 files:  54%|█████▍    | 298/549 [01:37<00:55,  4.48it/s]Fetching 549 files:  55%|█████▍    | 300/549 [01:38<01:19,  3.13it/s]Fetching 549 files:  55%|█████▍    | 301/549 [01:38<01:21,  3.04it/s]Fetching 549 files:  55%|█████▌    | 302/549 [01:39<01:19,  3.12it/s]Fetching 549 files:  55%|█████▌    | 304/549 [01:39<01:17,  3.18it/s]Fetching 549 files:  56%|█████▌    | 306/549 [01:39<00:58,  4.14it/s]Fetching 549 files:  56%|█████▌    | 307/549 [01:40<00:56,  4.31it/s]Fetching 549 files:  56%|█████▌    | 308/549 [01:40<00:51,  4.68it/s]Fetching 549 files:  56%|█████▋    | 309/549 [01:40<01:18,  3.05it/s]Fetching 549 files:  56%|█████▋    | 310/549 [01:41<01:07,  3.54it/s]Fetching 549 files:  57%|█████▋    | 311/549 [01:41<01:43,  2.29it/s]Fetching 549 files:  57%|█████▋    | 313/549 [01:42<01:13,  3.22it/s]Fetching 549 files:  57%|█████▋    | 314/549 [01:42<01:13,  3.19it/s]Fetching 549 files:  58%|█████▊    | 316/549 [01:42<00:52,  4.48it/s]Fetching 549 files:  58%|█████▊    | 317/549 [01:43<01:30,  2.58it/s]Fetching 549 files:  58%|█████▊    | 319/549 [01:43<01:07,  3.39it/s]Fetching 549 files:  58%|█████▊    | 320/549 [01:44<01:03,  3.60it/s]Fetching 549 files:  58%|█████▊    | 321/549 [01:44<01:03,  3.58it/s]Fetching 549 files:  59%|█████▉    | 323/549 [01:44<00:49,  4.55it/s]Fetching 549 files:  59%|█████▉    | 325/549 [01:45<01:07,  3.33it/s]Fetching 549 files:  60%|█████▉    | 327/549 [01:46<01:02,  3.53it/s]Fetching 549 files:  60%|█████▉    | 328/549 [01:46<00:57,  3.86it/s]Fetching 549 files:  60%|██████    | 330/549 [01:46<00:41,  5.30it/s]Fetching 549 files:  60%|██████    | 331/549 [01:46<00:40,  5.35it/s]Fetching 549 files:  61%|██████    | 333/549 [01:47<01:00,  3.60it/s]Fetching 549 files:  61%|██████    | 334/549 [01:47<00:55,  3.86it/s]Fetching 549 files:  61%|██████    | 335/549 [01:47<00:59,  3.61it/s]Fetching 549 files:  61%|██████    | 336/549 [01:48<01:22,  2.59it/s]Fetching 549 files:  62%|██████▏   | 338/549 [01:48<00:52,  4.03it/s]Fetching 549 files:  62%|██████▏   | 339/549 [01:49<00:49,  4.28it/s]Fetching 549 files:  62%|██████▏   | 341/549 [01:49<00:49,  4.17it/s]Fetching 549 files:  62%|██████▏   | 342/549 [01:49<00:51,  4.06it/s]Fetching 549 files:  63%|██████▎   | 344/549 [01:50<01:04,  3.17it/s]Fetching 549 files:  63%|██████▎   | 346/549 [01:50<00:51,  3.97it/s]Fetching 549 files:  63%|██████▎   | 347/549 [01:51<00:47,  4.22it/s]Fetching 549 files:  63%|██████▎   | 348/549 [01:51<00:46,  4.35it/s]Fetching 549 files:  64%|██████▍   | 350/549 [01:51<00:38,  5.11it/s]Fetching 549 files:  64%|██████▍   | 351/549 [01:52<01:12,  2.74it/s]Fetching 549 files:  64%|██████▍   | 352/549 [01:53<01:21,  2.43it/s]Fetching 549 files:  64%|██████▍   | 354/549 [01:53<00:53,  3.63it/s]Fetching 549 files:  65%|██████▌   | 358/549 [01:54<00:55,  3.46it/s]Fetching 549 files:  65%|██████▌   | 359/549 [01:54<00:59,  3.20it/s]Fetching 549 files:  66%|██████▌   | 360/549 [01:55<00:58,  3.21it/s]Fetching 549 files:  66%|██████▌   | 363/549 [01:55<00:42,  4.36it/s]Fetching 549 files:  66%|██████▋   | 364/549 [01:55<00:39,  4.64it/s]Fetching 549 files:  66%|██████▋   | 365/549 [01:56<00:58,  3.14it/s]Fetching 549 files:  67%|██████▋   | 366/549 [01:56<01:02,  2.92it/s]Fetching 549 files:  67%|██████▋   | 367/549 [01:57<01:12,  2.52it/s]Fetching 549 files:  67%|██████▋   | 368/549 [01:57<01:02,  2.91it/s]Fetching 549 files:  67%|██████▋   | 370/549 [01:57<00:43,  4.08it/s]Fetching 549 files:  68%|██████▊   | 371/549 [01:58<00:59,  2.97it/s]Fetching 549 files:  68%|██████▊   | 372/549 [01:59<01:14,  2.37it/s]Fetching 549 files:  68%|██████▊   | 374/549 [01:59<00:54,  3.20it/s]Fetching 549 files:  69%|██████▊   | 377/549 [01:59<00:31,  5.47it/s]Fetching 549 files:  69%|██████▉   | 379/549 [02:00<00:39,  4.29it/s]Fetching 549 files:  69%|██████▉   | 380/549 [02:01<00:59,  2.85it/s]Fetching 549 files:  69%|██████▉   | 381/549 [02:01<00:52,  3.18it/s]Fetching 549 files:  70%|██████▉   | 382/549 [02:01<00:56,  2.97it/s]Fetching 549 files:  70%|███████   | 385/549 [02:01<00:33,  4.91it/s]Fetching 549 files:  70%|███████   | 387/549 [02:02<00:33,  4.83it/s]Fetching 549 files:  71%|███████   | 388/549 [02:03<00:59,  2.69it/s]Fetching 549 files:  71%|███████   | 389/549 [02:03<00:55,  2.91it/s]Fetching 549 files:  71%|███████▏  | 392/549 [02:04<00:36,  4.25it/s]Fetching 549 files:  72%|███████▏  | 393/549 [02:04<00:33,  4.62it/s]Fetching 549 files:  72%|███████▏  | 394/549 [02:04<00:48,  3.17it/s]Fetching 549 files:  72%|███████▏  | 396/549 [02:05<00:44,  3.40it/s]Fetching 549 files:  72%|███████▏  | 397/549 [02:06<00:57,  2.64it/s]Fetching 549 files:  73%|███████▎  | 399/549 [02:06<00:40,  3.73it/s]Fetching 549 files:  73%|███████▎  | 401/549 [02:07<00:56,  2.64it/s]Fetching 549 files:  73%|███████▎  | 402/549 [02:07<00:54,  2.71it/s]Fetching 549 files:  73%|███████▎  | 403/549 [02:08<00:49,  2.93it/s]Fetching 549 files:  74%|███████▍  | 405/549 [02:08<00:33,  4.28it/s]Fetching 549 files:  74%|███████▍  | 406/549 [02:08<00:35,  4.03it/s]Fetching 549 files:  74%|███████▍  | 407/549 [02:09<01:07,  2.09it/s]Fetching 549 files:  74%|███████▍  | 409/549 [02:09<00:47,  2.95it/s]Fetching 549 files:  75%|███████▍  | 411/549 [02:10<00:44,  3.08it/s]Fetching 549 files:  75%|███████▌  | 412/549 [02:10<00:42,  3.20it/s]Fetching 549 files:  75%|███████▌  | 413/549 [02:12<01:15,  1.81it/s]Fetching 549 files:  75%|███████▌  | 414/549 [02:12<01:00,  2.23it/s]Fetching 549 files:  76%|███████▌  | 415/549 [02:12<00:49,  2.73it/s]Fetching 549 files:  76%|███████▌  | 417/549 [02:12<00:33,  3.89it/s]Fetching 549 files:  76%|███████▋  | 419/549 [02:12<00:27,  4.66it/s]Fetching 549 files:  77%|███████▋  | 420/549 [02:13<00:24,  5.19it/s]Fetching 549 files:  77%|███████▋  | 421/549 [02:14<00:54,  2.36it/s]Fetching 549 files:  77%|███████▋  | 422/549 [02:14<00:44,  2.85it/s]Fetching 549 files:  77%|███████▋  | 423/549 [02:14<00:39,  3.19it/s]Fetching 549 files:  77%|███████▋  | 424/549 [02:14<00:36,  3.47it/s]Fetching 549 files:  78%|███████▊  | 427/549 [02:14<00:20,  5.94it/s]Fetching 549 files:  78%|███████▊  | 428/549 [02:15<00:27,  4.39it/s]Fetching 549 files:  78%|███████▊  | 429/549 [02:16<00:40,  2.97it/s]Fetching 549 files:  78%|███████▊  | 430/549 [02:16<00:38,  3.06it/s]Fetching 549 files:  79%|███████▊  | 431/549 [02:17<00:45,  2.57it/s]Fetching 549 files:  79%|███████▊  | 432/549 [02:17<00:36,  3.19it/s]Fetching 549 files:  79%|███████▉  | 435/549 [02:17<00:20,  5.50it/s]Fetching 549 files:  79%|███████▉  | 436/549 [02:17<00:22,  4.97it/s]Fetching 549 files:  80%|███████▉  | 437/549 [02:18<00:39,  2.81it/s]Fetching 549 files:  80%|███████▉  | 438/549 [02:18<00:34,  3.18it/s]Fetching 549 files:  80%|███████▉  | 439/549 [02:19<00:46,  2.38it/s]Fetching 549 files:  80%|████████  | 440/549 [02:19<00:37,  2.93it/s]Fetching 549 files:  81%|████████  | 442/549 [02:19<00:31,  3.42it/s]Fetching 549 files:  81%|████████  | 443/549 [02:20<00:30,  3.51it/s]Fetching 549 files:  81%|████████  | 444/549 [02:20<00:41,  2.51it/s]Fetching 549 files:  81%|████████  | 446/549 [02:22<00:51,  2.00it/s]Fetching 549 files:  81%|████████▏ | 447/549 [02:22<00:41,  2.45it/s]Fetching 549 files:  82%|████████▏ | 449/549 [02:22<00:27,  3.70it/s]Fetching 549 files:  82%|████████▏ | 450/549 [02:22<00:24,  4.04it/s]Fetching 549 files:  82%|████████▏ | 451/549 [02:23<00:33,  2.96it/s]Fetching 549 files:  83%|████████▎ | 453/549 [02:23<00:29,  3.25it/s]Fetching 549 files:  83%|████████▎ | 454/549 [02:24<00:44,  2.16it/s]Fetching 549 files:  83%|████████▎ | 455/549 [02:25<00:41,  2.27it/s]Fetching 549 files:  83%|████████▎ | 457/549 [02:25<00:28,  3.28it/s]Fetching 549 files:  84%|████████▎ | 459/549 [02:25<00:20,  4.39it/s]Fetching 549 files:  84%|████████▍ | 460/549 [02:26<00:34,  2.60it/s]Fetching 549 files:  84%|████████▍ | 461/549 [02:27<00:38,  2.26it/s]Fetching 549 files:  84%|████████▍ | 462/549 [02:27<00:41,  2.12it/s]Fetching 549 files:  84%|████████▍ | 463/549 [02:28<00:37,  2.27it/s]Fetching 549 files:  85%|████████▍ | 464/549 [02:28<00:30,  2.75it/s]Fetching 549 files:  85%|████████▍ | 465/549 [02:28<00:34,  2.45it/s]Fetching 549 files:  85%|████████▍ | 466/549 [02:29<00:31,  2.66it/s]Fetching 549 files:  85%|████████▌ | 468/549 [02:29<00:24,  3.33it/s]Fetching 549 files:  85%|████████▌ | 469/549 [02:30<00:32,  2.43it/s]Fetching 549 files:  86%|████████▌ | 470/549 [02:30<00:28,  2.76it/s]Fetching 549 files:  86%|████████▌ | 471/549 [02:31<00:34,  2.23it/s]Fetching 549 files:  86%|████████▌ | 472/549 [02:31<00:28,  2.66it/s]Fetching 549 files:  86%|████████▌ | 473/549 [02:32<00:37,  2.00it/s]Fetching 549 files:  86%|████████▋ | 474/549 [02:32<00:34,  2.19it/s]Fetching 549 files:  87%|████████▋ | 475/549 [02:32<00:31,  2.35it/s]Fetching 549 files:  87%|████████▋ | 477/549 [02:33<00:34,  2.10it/s]Fetching 549 files:  87%|████████▋ | 478/549 [02:34<00:38,  1.85it/s]Fetching 549 files:  88%|████████▊ | 481/549 [02:35<00:32,  2.07it/s]Fetching 549 files:  88%|████████▊ | 482/549 [02:36<00:28,  2.38it/s]Fetching 549 files:  88%|████████▊ | 483/549 [02:36<00:26,  2.45it/s]Fetching 549 files:  88%|████████▊ | 484/549 [02:36<00:26,  2.46it/s]Fetching 549 files:  88%|████████▊ | 485/549 [02:37<00:32,  1.97it/s]Fetching 549 files:  89%|████████▊ | 486/549 [02:38<00:34,  1.84it/s]Fetching 549 files:  89%|████████▊ | 487/549 [02:38<00:33,  1.85it/s]Fetching 549 files:  89%|████████▉ | 488/549 [02:39<00:39,  1.54it/s]Fetching 549 files:  89%|████████▉ | 490/549 [02:40<00:24,  2.45it/s]Fetching 549 files:  89%|████████▉ | 491/549 [02:40<00:27,  2.09it/s]Fetching 549 files:  90%|████████▉ | 492/549 [02:41<00:36,  1.55it/s]Fetching 549 files:  90%|████████▉ | 494/549 [02:42<00:22,  2.47it/s]Fetching 549 files:  90%|█████████ | 495/549 [02:43<00:36,  1.49it/s]Fetching 549 files:  90%|█████████ | 496/549 [02:43<00:30,  1.74it/s]Fetching 549 files:  91%|█████████ | 497/549 [02:44<00:24,  2.09it/s]Fetching 549 files:  91%|█████████ | 499/549 [02:46<00:36,  1.38it/s]Fetching 549 files:  91%|█████████ | 500/549 [02:46<00:28,  1.72it/s]Fetching 549 files:  91%|█████████▏| 501/549 [02:46<00:23,  2.07it/s]Fetching 549 files:  91%|█████████▏| 502/549 [02:46<00:21,  2.17it/s]Fetching 549 files:  92%|█████████▏| 503/549 [02:47<00:17,  2.58it/s]Fetching 549 files:  92%|█████████▏| 504/549 [02:48<00:28,  1.58it/s]Fetching 549 files:  92%|█████████▏| 505/549 [02:48<00:24,  1.82it/s]Fetching 549 files:  92%|█████████▏| 506/549 [02:48<00:20,  2.06it/s]Fetching 549 files:  92%|█████████▏| 507/549 [02:50<00:32,  1.29it/s]Fetching 549 files:  93%|█████████▎| 508/549 [02:51<00:32,  1.27it/s]Fetching 549 files:  93%|█████████▎| 510/549 [02:51<00:20,  1.91it/s]Fetching 549 files:  93%|█████████▎| 511/549 [02:52<00:22,  1.66it/s]Fetching 549 files:  93%|█████████▎| 512/549 [02:53<00:21,  1.72it/s]Fetching 549 files:  93%|█████████▎| 513/549 [02:53<00:18,  1.91it/s]Fetching 549 files:  94%|█████████▎| 514/549 [02:53<00:14,  2.40it/s]Fetching 549 files:  94%|█████████▍| 515/549 [02:55<00:24,  1.39it/s]Fetching 549 files:  94%|█████████▍| 516/549 [02:56<00:26,  1.24it/s]Fetching 549 files:  94%|█████████▍| 517/549 [02:56<00:21,  1.51it/s]Fetching 549 files:  94%|█████████▍| 518/549 [02:57<00:23,  1.30it/s]Fetching 549 files:  95%|█████████▍| 519/549 [02:57<00:17,  1.71it/s]Fetching 549 files:  95%|█████████▍| 520/549 [02:58<00:18,  1.59it/s]Fetching 549 files:  95%|█████████▍| 521/549 [02:59<00:19,  1.47it/s]Fetching 549 files:  95%|█████████▌| 522/549 [02:59<00:14,  1.82it/s]Fetching 549 files:  95%|█████████▌| 523/549 [03:00<00:17,  1.47it/s]Fetching 549 files:  95%|█████████▌| 524/549 [03:01<00:22,  1.11it/s]Fetching 549 files:  96%|█████████▌| 525/549 [03:01<00:16,  1.49it/s]Fetching 549 files:  96%|█████████▌| 526/549 [03:03<00:22,  1.03it/s]Fetching 549 files:  96%|█████████▌| 527/549 [03:03<00:15,  1.38it/s]Fetching 549 files:  96%|█████████▌| 528/549 [03:04<00:13,  1.60it/s]Fetching 549 files:  96%|█████████▋| 529/549 [03:04<00:11,  1.72it/s]Fetching 549 files:  97%|█████████▋| 530/549 [03:04<00:08,  2.22it/s]Fetching 549 files:  97%|█████████▋| 531/549 [03:06<00:12,  1.40it/s]Fetching 549 files:  97%|█████████▋| 532/549 [03:07<00:14,  1.17it/s]Fetching 549 files:  97%|█████████▋| 533/549 [03:08<00:14,  1.14it/s]Fetching 549 files:  97%|█████████▋| 534/549 [03:08<00:12,  1.19it/s]Fetching 549 files:  97%|█████████▋| 535/549 [03:09<00:12,  1.15it/s]Fetching 549 files:  98%|█████████▊| 536/549 [03:10<00:11,  1.15it/s]Fetching 549 files:  98%|█████████▊| 537/549 [03:11<00:08,  1.36it/s]Fetching 549 files:  98%|█████████▊| 538/549 [03:11<00:07,  1.46it/s]Fetching 549 files:  98%|█████████▊| 539/549 [03:12<00:06,  1.45it/s]Fetching 549 files:  98%|█████████▊| 540/549 [03:13<00:06,  1.31it/s]Fetching 549 files:  99%|█████████▊| 541/549 [03:14<00:06,  1.22it/s]Fetching 549 files:  99%|█████████▊| 542/549 [03:14<00:04,  1.62it/s]Fetching 549 files:  99%|█████████▉| 543/549 [03:16<00:05,  1.03it/s]Fetching 549 files:  99%|█████████▉| 544/549 [03:16<00:03,  1.27it/s]Fetching 549 files:  99%|█████████▉| 545/549 [03:17<00:03,  1.16it/s]Fetching 549 files:  99%|█████████▉| 546/549 [03:18<00:02,  1.33it/s]Fetching 549 files: 100%|█████████▉| 547/549 [03:19<00:01,  1.09it/s]Fetching 549 files: 100%|█████████▉| 548/549 [03:19<00:00,  1.32it/s]Fetching 549 files: 100%|██████████| 549/549 [03:21<00:00,  1.11it/s]Fetching 549 files: 100%|██████████| 549/549 [03:21<00:00,  2.73it/s]
+done: ['trades/year=2024/month=07/*', 'trades/year=2024/month=08/*', 'trades/year=2024/month=09/*'] ...
+== prep 03:11:34
+train graph {'window': ['2024-07-01', '2025-01-01'], 'raw_trades': 30438127, 'kept': 30436380, 'kept_resolved': 30391690, 'usd': 3736357061.1313467}
+train label {'window': ['2025-01-01', '2025-07-01'], 'raw_trades': 31023592, 'kept': 31014595, 'kept_resolved': 30963967, 'usd': 2828876702.263859}
+bets 6050235 wallets 564566 events 12501
+{
+  "bet_unit": "market",
+  "labelled_wallets": 37129,
+  "type_counts": {
+    "unskilled_loser": 20299,
+    "lucky_winner": 16736,
+    "skilled_winner": 86,
+    "unlucky_skilled": 8
+  },
+  "type_share": {
+    "unskilled_loser": 0.5467,
+    "lucky_winner": 0.4508,
+    "skilled_winner": 0.0023,
+    "unlucky_skilled": 0.0002
+  },
+  "share_profitable": 0.45306902959950446,
+  "share_skilled": 0.0025317137547469634,
+  "share_z_gt_2": 0.01995744566242021,
+  "median_bets": 44.0,
+  "median_markets_per_bet": 1.0,
+  "z_mean": -0.23046041077745336,
+  "z_sd": 1.3977169565668965,
+  "share_p_lt_05": 0.04215034070403189,
+  "by_n_bets": [
+    {
+      "n_bets": "30-49",
+      "n": 22909,
+      "p_lt_05": 0.0352,
+      "z_sd": 1.1025,
+      "skill_z2": 0.0131
+    },
+    {
+      "n_bets": "50-99",
+      "n": 10231,
+      "p_lt_05": 0.037,
+      "z_sd": 1.3263,
+      "skill_z2": 0.0175
+    },
+    {
+      "n_bets": "100-249",
+      "n": 2775,
+      "p_lt_05": 0.0634,
+      "z_sd": 2.0248,
+      "skill_z2": 0.0422
+    },
+    {
+      "n_bets": ">=250",
+      "n": 1214,
+      "p_lt_05": 0.168,
+      "z_sd": 3.2968,
+      "skill_z2": 0.1194
+    }
+  ],
+  "p_analytic_vs_mc_corr": 0.9086387972792505
+}
+features (633082, 25) 57s
+graph nnz 26134218 61s
+labelled wallets in graph: 17514 of 37129
+                        mean     std     min      max
+log_usd                5.640   2.725   0.000   18.499
+log_med_usd            2.246   1.909   0.000   11.728
+maker_share            0.126   0.237   0.000    1.000
+avg_buy_price          0.520   0.184   0.001    0.999
+frac_longshot          0.247   0.257   0.000    1.000
+frac_sureshot          0.289   0.297   0.000    1.000
+avg_log_h_to_close     5.825   1.462   0.000    9.084
+n_markets              1.952   0.983   0.693    8.747
+n_counterparties       2.635   1.228   0.693   11.920
+active_days            1.512   0.799   0.693    5.220
+age_days              61.262  47.282   0.042  184.000
+days_since_last       33.425  34.230   0.042  184.000
+cat_politics           0.490   0.412   0.000    1.000
+cat_sports             0.323   0.392   0.000    1.000
+cat_crypto             0.106   0.245   0.000    1.000
+cat_finance            0.035   0.119   0.000    1.000
+cat_culture            0.030   0.106   0.000    1.000
+cat_tech               0.012   0.063   0.000    1.000
+cat_weather            0.004   0.032   0.000    1.000
+log_n_fills            3.024   1.439   0.693   13.805
+hist_n_bets            0.752   0.980   0.000    7.986
+hist_T                -0.031   0.249  -0.997    0.997
+hist_z                -0.150   0.993 -18.617   18.617
+hist_raw_edge         -0.033   0.251  -0.999    0.994
+hist_profit_slog      -0.868   3.533 -15.544   16.908
+nbr_hist_z            -0.183   0.921 -11.705   12.332
+nbr_hist_raw_edge     -0.003   0.046  -0.900    0.922
+nbr_hist_profit_slog   0.643   3.647 -15.544   16.908
+nbr_log_usd           12.574   2.262   0.212   18.499
+nbr_maker_share        0.757   0.196   0.000    1.000
+nbr_frac_longshot      0.285   0.175   0.000    1.000
+nbr_log_n_fills        8.815   2.188   0.693   13.805
+deg_w                  2.510   1.257   0.527   12.093
+deg                    2.635   1.228   0.693   11.920
+[    2s] ids 1145602 graph wallets 633082
+[   18s] label-window sides 62029190
+[   52s] candidates 63036
+[   72s] k=1: population 34980 (new 18984), skill 0.0197, profitable 0.452, hist_z non-null new 0.000 | leakage asserts passed
+[   91s] k=3: population 32691 (new 17981), skill 0.0202, profitable 0.450, hist_z non-null new 0.203 | leakage asserts passed
+[  114s] k=5: population 30732 (new 17068), skill 0.0199, profitable 0.451, hist_z non-null new 0.331 | leakage asserts passed
+[  135s] k=10: population 26895 (new 15261), skill 0.0210, profitable 0.446, hist_z non-null new 0.519 | leakage asserts passed
+[  157s] k=20: population 21313 (new 12322), skill 0.0229, profitable 0.425, hist_z non-null new 0.707 | leakage asserts passed
+[  179s] k=50: population 10712 (new 5461), skill 0.0342, profitable 0.349, hist_z non-null new 0.788 | leakage asserts passed
+{
+ "label_after": "k",
+ "bet_unit": "market",
+ "subsample": 1.0,
+ "by_k": {
+  "1": {
+   "existing": {
+    "n": 15996,
+    "skill_z2": 0.0218,
+    "n_skill": 348,
+    "profitable": 0.4451,
+    "median_label_bets": 42.0,
+    "z_sd": 1.442
+   },
+   "new": {
+    "n": 18984,
+    "skill_z2": 0.0179,
+    "n_skill": 340,
+    "profitable": 0.4584,
+    "median_label_bets": 46.0,
+    "z_sd": 1.385
+   }
+  },
+  "3": {
+   "existing": {
+    "n": 14710,
+    "skill_z2": 0.022,
+    "n_skill": 323,
+    "profitable": 0.4409,
+    "median_label_bets": 43.0,
+    "z_sd": 1.473
+   },
+   "new": {
+    "n": 17981,
+    "skill_z2": 0.0187,
+    "n_skill": 336,
+    "profitable": 0.458,
+    "median_label_bets": 46.0,
+    "z_sd": 1.399
+   }
+  },
+  "5": {
+   "existing": {
+    "n": 13664,
+    "skill_z2": 0.0221,
+    "n_skill": 302,
+    "profitable": 0.4384,
+    "median_label_bets": 43.0,
+    "z_sd": 1.501
+   },
+   "new": {
+    "n": 17068,
+    "skill_z2": 0.0182,
+    "n_skill": 310,
+    "profitable": 0.4617,
+    "median_label_bets": 45.0,
+    "z_sd": 1.412
+   }
+  },
+  "10": {
+   "existing": {
+    "n": 11634,
+    "skill_z2": 0.0239,
+    "n_skill": 278,
+    "profitable": 0.4319,
+    "median_label_bets": 44.0,
+    "z_sd": 1.563
+   },
+   "new": {
+    "n": 15261,
+    "skill_z2": 0.0189,
+    "n_skill": 288,
+    "profitable": 0.4573,
+    "median_label_bets": 44.0,
+    "z_sd": 1.442
+   }
+  },
+  "20": {
+   "existing": {
+    "n": 8991,
+    "skill_z2": 0.0264,
+    "n_skill": 237,
+    "profitable": 0.4188,
+    "median_label_bets": 47.0,
+    "z_sd": 1.681
+   },
+   "new": {
+    "n": 12322,
+    "skill_z2": 0.0204,
+    "n_skill": 251,
+    "profitable": 0.4291,
+    "median_label_bets": 41.0,
+    "z_sd": 1.511
+   }
+  },
+  "50": {
+   "existing": {
+    "n": 5251,
+    "skill_z2": 0.0415,
+    "n_skill": 218,
+    "profitable": 0.3628,
+    "median_label_bets": 66.0,
+    "z_sd": 1.982
+   },
+   "new": {
+    "n": 5461,
+    "skill_z2": 0.0271,
+    "n_skill": 148,
+    "profitable": 0.3353,
+    "median_label_bets": 53.0,
+    "z_sd": 1.851
+   }
+  }
+ },
+ "attachment": {
+  "1": {
+   "new": {
+    "cp_in_graph": 0.627370417193426,
+    "market_in_graph": 0.39233038348082594
+   },
+   "existing": {
+    "cp_in_graph": 0.940735183795949,
+    "market_in_graph": 0.7760065016254063
+   }
+  },
+  "3": {
+   "new": {
+    "cp_in_graph": 0.631481378492112,
+    "market_in_graph": 0.3511855106315926
+   },
+   "existing": {
+    "cp_in_graph": 0.9148198504418763,
+    "market_in_graph": 0.7589394969408566
+   }
+  },
+  "5": {
+   "new": {
+    "cp_in_graph": 0.6370517928286853,
+    "market_in_graph": 0.32819310991328804
+   },
+   "existing": {
+    "cp_in_graph": 0.9023419203747073,
+    "market_in_graph": 0.7278542154566745
+   }
+  },
+  "10": {
+   "new": {
+    "cp_in_graph": 0.6396042199069524,
+    "market_in_graph": 0.2866522508354629
+   },
+   "existing": {
+    "cp_in_graph": 0.8837287261474988,
+    "market_in_graph": 0.6539367371497335
+   }
+  },
+  "20": {
+   "new": {
+    "cp_in_graph": 0.6271790293783477,
+    "market_in_graph": 0.23001541957474436
+   },
+   "existing": {
+    "cp_in_graph": 0.8637081525970415,
+    "market_in_graph": 0.5765932599265933
+   }
+  },
+  "50": {
+   "new": {
+    "cp_in_graph": 0.6578758469144845,
+    "market_in_graph": 0.21568210950375388
+   },
+   "existing": {
+    "cp_in_graph": 0.8402856598743097,
+    "market_in_graph": 0.5121462578556465
+   }
+  }
+ }
+}
+[  182s] done
+[   15s] pre-cutoff sides 60872760 max ts 2024-12-31 23:59:59+00:00
+[   17s] markets (13349, 15)
+[   23s] held edges 7462550
+[  303s] moved-first pairs 13307244 entries 10720196
+[  304s] saved HeteroData(
+  wallet={
+    x=[633082, 25],
+    cols=[25],
+  },
+  market={
+    x=[13349, 15],
+    cols=[15],
+    market_id=[13349],
+  },
+  (wallet, held, market)={
+    edge_index=[2, 7462550],
+    edge_attr=[7462550, 5],
+  },
+  (wallet, cp, wallet)={
+    edge_index=[2, 26134218],
+    edge_attr=[26134218, 1],
+  },
+  (wallet, mf, wallet)={
+    edge_index=[2, 13307244],
+    edge_attr=[13307244, 1],
+  }
+)
+[  335s] query moved-first edges 10491560 {'follow': 5276565, 'lead': 5214995}
+{
+ "wallets": 633082,
+ "markets": 13349,
+ "held_edges": 7462550,
+ "cp_nnz": 26134218,
+ "mf_edges_count_ge_min": 13307244,
+ "query_entries": 1109524,
+ "query_mf_edges": 10491560,
+ "frozen_max_ts": "2024-12-31 23:59:59+00:00",
+ "minutes": 5.6
+}
+XGBoost import OK
+{
+  "time": "2026-11-17T03:27:02.704161+00:00",
+  "python": "3.10.12 (main, Jul 29 2024, 16:56:48) [GCC 11.4.0]",
+  "executable": "/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/.venv/bin/python",
+  "platform": "Linux-6.5.0-28-generic-x86_64-with-glibc2.35",
+  "cpu_count": 64,
+  "packages": {
+    "torch": "2.11.0+cu128",
+    "torch-geometric": "2.8.1",
+    "numpy": "2.2.6",
+    "pandas": "2.3.3",
+    "pyarrow": "25.0.1",
+    "duckdb": "1.5.6",
+    "scipy": "1.15.3",
+    "scikit-learn": "1.7.2",
+    "xgboost": "3.2.0",
+    "matplotlib": "3.10.9",
+    "pyyaml": "6.0.3",
+    "huggingface-hub": "2.4.0"
+  },
+  "cuda_build": "12.8",
+  "devices": [
+    {
+      "token": "0",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "1",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "2",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "3",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "4",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "5",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "6",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "7",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    }
+  ],
+  "disk_free_bytes": 386392010752,
+  "stages": [
+    "smoke",
+    "data",
+    "prep",
+    "diag",
+    "edge"
+  ],
+  "ks": [
+    1,
+    3,
+    5,
+    10,
+    20,
+    50
+  ],
+  "splits": [
+    "train",
+    "test"
+  ],
+  "methods": [
+    "hist",
+    "xgb_own",
+    "xgb_nbr",
+    "sage",
+    "hgnn"
+  ],
+  "gnn": {
+    "hidden": 64,
+    "fanout": [
+      10,
+      5
+    ],
+    "batch": 1024,
+    "epochs": 40,
+    "patience": 6,
+    "lr": 0.003,
+    "eval_reps": 3,
+    "threads": 2,
+    "gpu_scale": false
+  },
+  "settings": {
+    "PMGRAPH_TAG": "server",
+    "PMGRAPH_RESUME": "1",
+    "NGPU": "8",
+    "OMP_NUM_THREADS": "2",
+    "OPENBLAS_NUM_THREADS": "2"
+  },
+  "host_memory_bytes": {
+    "MemTotal": 540712529920,
+    "MemAvailable": 485022687232
+  },
+  "git_commit": "87ec4fe4c0ff3487ce5e76530fbc3922ce80e3f7",
+  "cpu_model": "Intel(R) Xeon(R) Gold 6426Y",
+  "nvidia_smi": "0, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n1, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n2, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n3, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n4, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n5, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n6, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n7, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB"
+}
+Preflight OK: /home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/preflight_20261117T032702784042.json
+== smoke 03:27:05
+XGBoost import OK
+{
+  "time": "2026-11-17T03:27:09.830364+00:00",
+  "python": "3.10.12 (main, Jul 29 2024, 16:56:48) [GCC 11.4.0]",
+  "executable": "/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/.venv/bin/python",
+  "platform": "Linux-6.5.0-28-generic-x86_64-with-glibc2.35",
+  "cpu_count": 64,
+  "packages": {
+    "torch": "2.11.0+cu128",
+    "torch-geometric": "2.8.1",
+    "numpy": "2.2.6",
+    "pandas": "2.3.3",
+    "pyarrow": "25.0.1",
+    "duckdb": "1.5.6",
+    "scipy": "1.15.3",
+    "scikit-learn": "1.7.2",
+    "xgboost": "3.2.0",
+    "matplotlib": "3.10.9",
+    "pyyaml": "6.0.3",
+    "huggingface-hub": "2.4.0"
+  },
+  "cuda_build": "12.8",
+  "devices": [
+    {
+      "token": "0",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "1",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "2",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "3",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "4",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "5",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "6",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "7",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    }
+  ],
+  "disk_free_bytes": 386391879680,
+  "stages": [],
+  "ks": [
+    1,
+    3,
+    5,
+    10,
+    20,
+    50
+  ],
+  "splits": [
+    "train",
+    "test"
+  ],
+  "methods": [
+    "hist",
+    "xgb_own",
+    "xgb_nbr",
+    "sage",
+    "hgnn"
+  ],
+  "gnn": {
+    "hidden": 64,
+    "fanout": [
+      10,
+      5
+    ],
+    "batch": 1024,
+    "epochs": 40,
+    "patience": 6,
+    "lr": 0.003,
+    "eval_reps": 3,
+    "threads": 2,
+    "gpu_scale": false
+  },
+  "settings": {
+    "PMGRAPH_TAG": "server",
+    "PMGRAPH_RESUME": "1",
+    "PMGRAPH_REQUIRE_CUDA": "1",
+    "NGPU": "8",
+    "OMP_NUM_THREADS": "2",
+    "OPENBLAS_NUM_THREADS": "2"
+  },
+  "host_memory_bytes": {
+    "MemTotal": 540712529920,
+    "MemAvailable": 485027217408
+  },
+  "git_commit": "87ec4fe4c0ff3487ce5e76530fbc3922ce80e3f7",
+  "cpu_model": "Intel(R) Xeon(R) Gold 6426Y",
+  "nvidia_smi": "0, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n1, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n2, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n3, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n4, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n5, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n6, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n7, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB"
+}
+Preflight OK: /home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/preflight_20261117T032709909428.json
+    device=cuda:0 parameters=369 seed=0 settings={'device': 'cuda:0', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:0", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.9166666666666666, "elapsed_seconds": 0.3299147830111906, "process_peak_rss_bytes": 2208333824, "peak_cuda_allocated_bytes": 18140160, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:0", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:0 parameters=369 seed=0 settings={'device': 'cuda:0', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:0", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.39837011043782744, "elapsed_seconds": 0.1855577790120151, "process_peak_rss_bytes": 2389737472, "peak_cuda_allocated_bytes": 18141696, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:0", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:0 parameters=1,713 seed=0 settings={'device': 'cuda:0', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:0", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": 0.7291666666666666, "elapsed_seconds": 0.1673956539889332, "process_peak_rss_bytes": 2396028928, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:0", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:0 parameters=1,713 seed=0 settings={'device': 'cuda:0', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:0", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": -0.2145515318259158, "elapsed_seconds": 0.16540417101350613, "process_peak_rss_bytes": 2396028928, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:0", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:1 parameters=369 seed=0 settings={'device': 'cuda:1', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:1", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.9166666666666666, "elapsed_seconds": 0.12397334800334647, "process_peak_rss_bytes": 2447933440, "peak_cuda_allocated_bytes": 18140160, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:1", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:1 parameters=369 seed=0 settings={'device': 'cuda:1', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:1", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.39837011043782744, "elapsed_seconds": 0.09567043499555439, "process_peak_rss_bytes": 2465234944, "peak_cuda_allocated_bytes": 18141696, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:1", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:1 parameters=1,713 seed=0 settings={'device': 'cuda:1', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:1", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": 0.7291666666666666, "elapsed_seconds": 0.17342470798757859, "process_peak_rss_bytes": 2466283520, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:1", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:1 parameters=1,713 seed=0 settings={'device': 'cuda:1', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:1", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": -0.2145515318259158, "elapsed_seconds": 0.16691032200469635, "process_peak_rss_bytes": 2466283520, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:1", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:2 parameters=369 seed=0 settings={'device': 'cuda:2', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:2", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.9166666666666666, "elapsed_seconds": 0.11281727399909869, "process_peak_rss_bytes": 2518188032, "peak_cuda_allocated_bytes": 18140160, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:2", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:2 parameters=369 seed=0 settings={'device': 'cuda:2', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:2", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.39837011043782744, "elapsed_seconds": 0.09969745698617771, "process_peak_rss_bytes": 2536013824, "peak_cuda_allocated_bytes": 18141696, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:2", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:2 parameters=1,713 seed=0 settings={'device': 'cuda:2', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:2", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": 0.7291666666666666, "elapsed_seconds": 0.17476221101242118, "process_peak_rss_bytes": 2537062400, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:2", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:2 parameters=1,713 seed=0 settings={'device': 'cuda:2', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:2", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": -0.2145515318259158, "elapsed_seconds": 0.17065932101104409, "process_peak_rss_bytes": 2537062400, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:2", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:3 parameters=369 seed=0 settings={'device': 'cuda:3', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:3", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.9166666666666666, "elapsed_seconds": 0.12113221202162094, "process_peak_rss_bytes": 2588442624, "peak_cuda_allocated_bytes": 18140160, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:3", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:3 parameters=369 seed=0 settings={'device': 'cuda:3', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:3", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.39837011043782744, "elapsed_seconds": 0.1009301400044933, "process_peak_rss_bytes": 2605744128, "peak_cuda_allocated_bytes": 18141696, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:3", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:3 parameters=1,713 seed=0 settings={'device': 'cuda:3', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:3", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": 0.7291666666666666, "elapsed_seconds": 0.17255084699718282, "process_peak_rss_bytes": 2606792704, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:3", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:3 parameters=1,713 seed=0 settings={'device': 'cuda:3', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:3", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": -0.2145515318259158, "elapsed_seconds": 0.16921930699027143, "process_peak_rss_bytes": 2606792704, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:3", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:4 parameters=369 seed=0 settings={'device': 'cuda:4', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:4", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.9166666666666666, "elapsed_seconds": 0.10899228000198491, "process_peak_rss_bytes": 2658172928, "peak_cuda_allocated_bytes": 18140160, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:4", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:4 parameters=369 seed=0 settings={'device': 'cuda:4', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:4", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.39837011043782744, "elapsed_seconds": 0.09814795400598086, "process_peak_rss_bytes": 2675998720, "peak_cuda_allocated_bytes": 18141696, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:4", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:4 parameters=1,713 seed=0 settings={'device': 'cuda:4', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:4", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": 0.7291666666666666, "elapsed_seconds": 0.1701503339863848, "process_peak_rss_bytes": 2677047296, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:4", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:4 parameters=1,713 seed=0 settings={'device': 'cuda:4', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:4", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": -0.2145515318259158, "elapsed_seconds": 0.16740730401943438, "process_peak_rss_bytes": 2677047296, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:4", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:5 parameters=369 seed=0 settings={'device': 'cuda:5', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:5", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.9166666666666666, "elapsed_seconds": 0.11331495098420419, "process_peak_rss_bytes": 2728427520, "peak_cuda_allocated_bytes": 18140160, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:5", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:5 parameters=369 seed=0 settings={'device': 'cuda:5', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:5", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.39837011043782744, "elapsed_seconds": 0.10205278301145881, "process_peak_rss_bytes": 2745729024, "peak_cuda_allocated_bytes": 18141696, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:5", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:5 parameters=1,713 seed=0 settings={'device': 'cuda:5', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:5", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": 0.7291666666666666, "elapsed_seconds": 0.17319746798602864, "process_peak_rss_bytes": 2747301888, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:5", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:5 parameters=1,713 seed=0 settings={'device': 'cuda:5', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:5", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": -0.2145515318259158, "elapsed_seconds": 0.17464738499256782, "process_peak_rss_bytes": 2747301888, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:5", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:6 parameters=369 seed=0 settings={'device': 'cuda:6', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:6", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.9166666666666666, "elapsed_seconds": 0.12749380400055088, "process_peak_rss_bytes": 2798682112, "peak_cuda_allocated_bytes": 18140160, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:6", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:6 parameters=369 seed=0 settings={'device': 'cuda:6', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:6", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.39837011043782744, "elapsed_seconds": 0.10929570000735112, "process_peak_rss_bytes": 2816507904, "peak_cuda_allocated_bytes": 18141696, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:6", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:6 parameters=1,713 seed=0 settings={'device': 'cuda:6', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:6", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": 0.7291666666666666, "elapsed_seconds": 0.18205603197566234, "process_peak_rss_bytes": 2817556480, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:6", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:6 parameters=1,713 seed=0 settings={'device': 'cuda:6', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:6", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": -0.2145515318259158, "elapsed_seconds": 0.18463879701448604, "process_peak_rss_bytes": 2817556480, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:6", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:7 parameters=369 seed=0 settings={'device': 'cuda:7', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:7", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.9166666666666666, "elapsed_seconds": 0.12587604401051067, "process_peak_rss_bytes": 2869460992, "peak_cuda_allocated_bytes": 18141184, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:7", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:7 parameters=369 seed=0 settings={'device': 'cuda:7', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:7", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.39837011043782744, "elapsed_seconds": 0.10620176600059494, "process_peak_rss_bytes": 2887286784, "peak_cuda_allocated_bytes": 18142720, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:7", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:7 parameters=1,713 seed=0 settings={'device': 'cuda:7', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:7", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": 0.7291666666666666, "elapsed_seconds": 0.17641228597494774, "process_peak_rss_bytes": 2888335360, "peak_cuda_allocated_bytes": 18257920, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:7", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:7 parameters=1,713 seed=0 settings={'device': 'cuda:7', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:7", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": -0.2145515318259158, "elapsed_seconds": 0.18098323501180857, "process_peak_rss_bytes": 2888335360, "peak_cuda_allocated_bytes": 18257920, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:7", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+Smoke passed: GraphSAGE + hetero GraphSAGE, classification + regression, checkpoint reload, XGBoost
+== data 03:27:26
+Fetching 4 files:   0%|          | 0/4 [00:00<?, ?it/s]Fetching 4 files: 100%|██████████| 4/4 [00:00<00:00, 461.70it/s]
+done: ['markets.parquet', 'events.parquet', 'predictions.parquet'] ...
+Fetching 549 files:   0%|          | 0/549 [00:00<?, ?it/s]Fetching 549 files:   7%|▋         | 37/549 [00:00<00:01, 367.66it/s]Fetching 549 files:  16%|█▌        | 87/549 [00:00<00:01, 436.62it/s]Fetching 549 files:  25%|██▌       | 138/549 [00:00<00:00, 467.13it/s]Fetching 549 files:  34%|███▎      | 185/549 [00:00<00:00, 466.65it/s]Fetching 549 files:  42%|████▏     | 232/549 [00:00<00:00, 466.07it/s]Fetching 549 files:  51%|█████     | 280/549 [00:00<00:00, 466.70it/s]Fetching 549 files:  60%|█████▉    | 327/549 [00:00<00:00, 460.66it/s]Fetching 549 files:  68%|██████▊   | 374/549 [00:00<00:00, 460.11it/s]Fetching 549 files:  77%|███████▋  | 421/549 [00:00<00:00, 459.79it/s]Fetching 549 files:  85%|████████▌ | 468/549 [00:01<00:00, 457.87it/s]Fetching 549 files:  94%|█████████▎| 514/549 [00:01<00:00, 456.13it/s]Fetching 549 files: 100%|██████████| 549/549 [00:01<00:00, 462.70it/s]
+done: ['trades/year=2024/month=07/*', 'trades/year=2024/month=08/*', 'trades/year=2024/month=09/*'] ...
+== prep 03:27:28
+train graph {'window': ['2024-07-01', '2025-01-01'], 'raw_trades': 30438127, 'kept': 30436380, 'kept_resolved': 30391690, 'usd': 3736357061.133641}
+train label {'window': ['2025-01-01', '2025-07-01'], 'raw_trades': 31023592, 'kept': 31014595, 'kept_resolved': 30963967, 'usd': 2828876702.2628007}
+bets 6050235 wallets 564566 events 12501
+{
+  "bet_unit": "market",
+  "labelled_wallets": 37129,
+  "type_counts": {
+    "unskilled_loser": 20299,
+    "lucky_winner": 16736,
+    "skilled_winner": 86,
+    "unlucky_skilled": 8
+  },
+  "type_share": {
+    "unskilled_loser": 0.5467,
+    "lucky_winner": 0.4508,
+    "skilled_winner": 0.0023,
+    "unlucky_skilled": 0.0002
+  },
+  "share_profitable": 0.45306902959950446,
+  "share_skilled": 0.0025317137547469634,
+  "share_z_gt_2": 0.01995744566242021,
+  "median_bets": 44.0,
+  "median_markets_per_bet": 1.0,
+  "z_mean": -0.2304604107775636,
+  "z_sd": 1.3977169565669247,
+  "share_p_lt_05": 0.04215034070403189,
+  "by_n_bets": [
+    {
+      "n_bets": "30-49",
+      "n": 22909,
+      "p_lt_05": 0.0352,
+      "z_sd": 1.1025,
+      "skill_z2": 0.0131
+    },
+    {
+      "n_bets": "50-99",
+      "n": 10231,
+      "p_lt_05": 0.037,
+      "z_sd": 1.3263,
+      "skill_z2": 0.0175
+    },
+    {
+      "n_bets": "100-249",
+      "n": 2775,
+      "p_lt_05": 0.0634,
+      "z_sd": 2.0248,
+      "skill_z2": 0.0422
+    },
+    {
+      "n_bets": ">=250",
+      "n": 1214,
+      "p_lt_05": 0.168,
+      "z_sd": 3.2968,
+      "skill_z2": 0.1194
+    }
+  ],
+  "p_analytic_vs_mc_corr": 0.9088771958780341
+}
+features (633082, 25) 63s
+graph nnz 26134218 68s
+labelled wallets in graph: 17514 of 37129
+                        mean     std     min      max
+log_usd                5.640   2.725   0.000   18.499
+log_med_usd            2.246   1.909   0.000   11.728
+maker_share            0.126   0.237   0.000    1.000
+avg_buy_price          0.520   0.184   0.001    0.999
+frac_longshot          0.247   0.257   0.000    1.000
+frac_sureshot          0.289   0.297   0.000    1.000
+avg_log_h_to_close     5.825   1.462   0.000    9.084
+n_markets              1.952   0.983   0.693    8.747
+n_counterparties       2.635   1.228   0.693   11.920
+active_days            1.512   0.799   0.693    5.220
+age_days              61.262  47.282   0.042  184.000
+days_since_last       33.425  34.230   0.042  184.000
+cat_politics           0.490   0.412   0.000    1.000
+cat_sports             0.323   0.392   0.000    1.000
+cat_crypto             0.106   0.245   0.000    1.000
+cat_finance            0.035   0.119   0.000    1.000
+cat_culture            0.030   0.106   0.000    1.000
+cat_tech               0.012   0.063   0.000    1.000
+cat_weather            0.004   0.032   0.000    1.000
+log_n_fills            3.024   1.439   0.693   13.805
+hist_n_bets            0.752   0.980   0.000    7.986
+hist_T                -0.031   0.249  -0.997    0.997
+hist_z                -0.150   0.993 -18.617   18.617
+hist_raw_edge         -0.033   0.251  -0.999    0.994
+hist_profit_slog      -0.868   3.533 -15.544   16.908
+nbr_hist_z            -0.183   0.921 -11.705   12.332
+nbr_hist_raw_edge     -0.003   0.046  -0.900    0.922
+nbr_hist_profit_slog   0.643   3.647 -15.544   16.908
+nbr_log_usd           12.574   2.262   0.212   18.499
+nbr_maker_share        0.757   0.196   0.000    1.000
+nbr_frac_longshot      0.285   0.175   0.000    1.000
+nbr_log_n_fills        8.815   2.188   0.693   13.805
+deg_w                  2.510   1.257   0.527   12.093
+deg                    2.635   1.228   0.693   11.920
+[    2s] ids 1145602 graph wallets 633082
+[   18s] label-window sides 62029190
+[   57s] candidates 63036
+[   77s] k=1: population 34980 (new 18984), skill 0.0197, profitable 0.452, hist_z non-null new 0.000 | leakage asserts passed
+[   99s] k=3: population 32691 (new 17981), skill 0.0202, profitable 0.450, hist_z non-null new 0.203 | leakage asserts passed
+[  120s] k=5: population 30732 (new 17068), skill 0.0199, profitable 0.451, hist_z non-null new 0.331 | leakage asserts passed
+[  141s] k=10: population 26895 (new 15261), skill 0.0210, profitable 0.446, hist_z non-null new 0.519 | leakage asserts passed
+[  162s] k=20: population 21313 (new 12322), skill 0.0229, profitable 0.425, hist_z non-null new 0.707 | leakage asserts passed
+[  180s] k=50: population 10712 (new 5461), skill 0.0342, profitable 0.349, hist_z non-null new 0.788 | leakage asserts passed
+{
+ "label_after": "k",
+ "bet_unit": "market",
+ "subsample": 1.0,
+ "by_k": {
+  "1": {
+   "existing": {
+    "n": 15996,
+    "skill_z2": 0.0218,
+    "n_skill": 348,
+    "profitable": 0.4451,
+    "median_label_bets": 42.0,
+    "z_sd": 1.442
+   },
+   "new": {
+    "n": 18984,
+    "skill_z2": 0.0179,
+    "n_skill": 340,
+    "profitable": 0.4584,
+    "median_label_bets": 46.0,
+    "z_sd": 1.385
+   }
+  },
+  "3": {
+   "existing": {
+    "n": 14710,
+    "skill_z2": 0.022,
+    "n_skill": 323,
+    "profitable": 0.4409,
+    "median_label_bets": 43.0,
+    "z_sd": 1.473
+   },
+   "new": {
+    "n": 17981,
+    "skill_z2": 0.0187,
+    "n_skill": 336,
+    "profitable": 0.458,
+    "median_label_bets": 46.0,
+    "z_sd": 1.399
+   }
+  },
+  "5": {
+   "existing": {
+    "n": 13664,
+    "skill_z2": 0.0221,
+    "n_skill": 302,
+    "profitable": 0.4384,
+    "median_label_bets": 43.0,
+    "z_sd": 1.501
+   },
+   "new": {
+    "n": 17068,
+    "skill_z2": 0.0182,
+    "n_skill": 310,
+    "profitable": 0.4617,
+    "median_label_bets": 45.0,
+    "z_sd": 1.412
+   }
+  },
+  "10": {
+   "existing": {
+    "n": 11634,
+    "skill_z2": 0.0239,
+    "n_skill": 278,
+    "profitable": 0.4319,
+    "median_label_bets": 44.0,
+    "z_sd": 1.563
+   },
+   "new": {
+    "n": 15261,
+    "skill_z2": 0.0189,
+    "n_skill": 288,
+    "profitable": 0.4573,
+    "median_label_bets": 44.0,
+    "z_sd": 1.442
+   }
+  },
+  "20": {
+   "existing": {
+    "n": 8991,
+    "skill_z2": 0.0264,
+    "n_skill": 237,
+    "profitable": 0.4188,
+    "median_label_bets": 47.0,
+    "z_sd": 1.681
+   },
+   "new": {
+    "n": 12322,
+    "skill_z2": 0.0204,
+    "n_skill": 251,
+    "profitable": 0.4291,
+    "median_label_bets": 41.0,
+    "z_sd": 1.511
+   }
+  },
+  "50": {
+   "existing": {
+    "n": 5251,
+    "skill_z2": 0.0415,
+    "n_skill": 218,
+    "profitable": 0.3628,
+    "median_label_bets": 66.0,
+    "z_sd": 1.982
+   },
+   "new": {
+    "n": 5461,
+    "skill_z2": 0.0271,
+    "n_skill": 148,
+    "profitable": 0.3353,
+    "median_label_bets": 53.0,
+    "z_sd": 1.851
+   }
+  }
+ },
+ "attachment": {
+  "1": {
+   "new": {
+    "cp_in_graph": 0.627370417193426,
+    "market_in_graph": 0.39233038348082594
+   },
+   "existing": {
+    "cp_in_graph": 0.940735183795949,
+    "market_in_graph": 0.7760065016254063
+   }
+  },
+  "3": {
+   "new": {
+    "cp_in_graph": 0.631481378492112,
+    "market_in_graph": 0.3511855106315926
+   },
+   "existing": {
+    "cp_in_graph": 0.9148198504418763,
+    "market_in_graph": 0.7589394969408566
+   }
+  },
+  "5": {
+   "new": {
+    "cp_in_graph": 0.6370517928286853,
+    "market_in_graph": 0.32819310991328804
+   },
+   "existing": {
+    "cp_in_graph": 0.9023419203747073,
+    "market_in_graph": 0.7278542154566745
+   }
+  },
+  "10": {
+   "new": {
+    "cp_in_graph": 0.6396042199069524,
+    "market_in_graph": 0.2866522508354629
+   },
+   "existing": {
+    "cp_in_graph": 0.8837287261474988,
+    "market_in_graph": 0.6539367371497335
+   }
+  },
+  "20": {
+   "new": {
+    "cp_in_graph": 0.6271790293783477,
+    "market_in_graph": 0.23001541957474436
+   },
+   "existing": {
+    "cp_in_graph": 0.8637081525970415,
+    "market_in_graph": 0.5765932599265933
+   }
+  },
+  "50": {
+   "new": {
+    "cp_in_graph": 0.6578758469144845,
+    "market_in_graph": 0.21568210950375388
+   },
+   "existing": {
+    "cp_in_graph": 0.8402856598743097,
+    "market_in_graph": 0.5121462578556465
+   }
+  }
+ }
+}
+[  183s] done
+[   15s] pre-cutoff sides 60872760 max ts 2024-12-31 23:59:59+00:00
+[   17s] markets (13349, 15)
+[   23s] held edges 7462550
+[  299s] moved-first pairs 13307214 entries 10720196
+[  301s] saved HeteroData(
+  wallet={
+    x=[633082, 25],
+    cols=[25],
+  },
+  market={
+    x=[13349, 15],
+    cols=[15],
+    market_id=[13349],
+  },
+  (wallet, held, market)={
+    edge_index=[2, 7462550],
+    edge_attr=[7462550, 5],
+  },
+  (wallet, cp, wallet)={
+    edge_index=[2, 26134218],
+    edge_attr=[26134218, 1],
+  },
+  (wallet, mf, wallet)={
+    edge_index=[2, 13307214],
+    edge_attr=[13307214, 1],
+  }
+)
+[  330s] query moved-first edges 10491560 {'follow': 5276565, 'lead': 5214995}
+{
+ "wallets": 633082,
+ "markets": 13349,
+ "held_edges": 7462550,
+ "cp_nnz": 26134218,
+ "mf_edges_count_ge_min": 13307214,
+ "query_entries": 1109524,
+ "query_mf_edges": 10491560,
+ "frozen_max_ts": "2024-12-31 23:59:59+00:00",
+ "minutes": 5.5
+}
+test graph {'window': ['2025-01-01', '2025-07-01'], 'raw_trades': 31023592, 'kept': 31014595, 'kept_resolved': 30963967, 'usd': 2828876702.2637434}
+test label {'window': ['2025-07-01', '2026-01-01'], 'raw_trades': 111443784, 'kept': 111430261, 'kept_resolved': 107991889, 'usd': 6863605459.215963}
+bets 18384442 wallets 819857 events 83746
+{
+  "bet_unit": "market",
+  "labelled_wallets": 79945,
+  "type_counts": {
+    "unskilled_loser": 50330,
+    "lucky_winner": 28537,
+    "skilled_winner": 969,
+    "unlucky_skilled": 109
+  },
+  "type_share": {
+    "unskilled_loser": 0.6296,
+    "lucky_winner": 0.357,
+    "skilled_winner": 0.0121,
+    "unlucky_skilled": 0.0014
+  },
+  "share_profitable": 0.369078741634874,
+  "share_skilled": 0.013484270435924699,
+  "share_z_gt_2": 0.030395897179310776,
+  "median_bets": 55.0,
+  "median_markets_per_bet": 1.0,
+  "z_mean": -0.7702745818482879,
+  "z_sd": 2.290292245064899,
+  "share_p_lt_05": 0.045706423165926574,
+  "by_n_bets": [
+    {
+      "n_bets": "30-49",
+      "n": 34396,
+      "p_lt_05": 0.0224,
+      "z_sd": 1.3701,
+      "skill_z2": 0.0099
+    },
+    {
+      "n_bets": "50-99",
+      "n": 23596,
+      "p_lt_05": 0.0299,
+      "z_sd": 1.724,
+      "skill_z2": 0.0163
+    },
+    {
+      "n_bets": "100-249",
+      "n": 12979,
+      "p_lt_05": 0.051,
+      "z_sd": 2.5449,
+      "skill_z2": 0.0321
+    },
+    {
+      "n_bets": ">=250",
+      "n": 8974,
+      "p_lt_05": 0.1692,
+      "z_sd": 4.6305,
+      "skill_z2": 0.1435
+    }
+  ],
+  "p_analytic_vs_mc_corr": 0.9183841183993289
+}
+features (862759, 25) 73s
+graph nnz 27465906 78s
+labelled wallets in graph: 20600 of 79945
+                         mean     std     min      max
+log_usd                 4.259   2.582   0.000   17.941
+log_med_usd             1.357   1.480   0.000   12.302
+maker_share             0.137   0.235   0.000    1.000
+avg_buy_price           0.572   0.217   0.001    0.999
+frac_longshot           0.277   0.251   0.000    1.000
+frac_sureshot           0.421   0.314   0.000    1.000
+avg_log_h_to_close      5.680   1.461   0.000    9.297
+n_markets               2.022   0.936   0.693    9.704
+n_counterparties        2.449   1.064   0.693   12.080
+active_days             1.754   0.861   0.693    5.204
+age_days              138.007  44.968   0.042  181.000
+days_since_last        83.490  60.065   0.042  181.000
+cat_politics            0.265   0.331   0.000    1.000
+cat_sports              0.482   0.403   0.000    1.000
+cat_crypto              0.147   0.269   0.000    1.000
+cat_finance             0.029   0.107   0.000    1.000
+cat_culture             0.045   0.121   0.000    1.000
+cat_tech                0.025   0.093   0.000    1.000
+cat_weather             0.007   0.049   0.000    1.000
+log_n_fills             2.683   1.161   0.693   13.728
+hist_n_bets             1.125   1.144   0.000    9.048
+hist_T                 -0.028   0.183  -0.998    0.998
+hist_z                 -0.110   0.936 -20.257   20.257
+hist_raw_edge          -0.029   0.183  -0.999    0.996
+hist_profit_slog       -0.588   2.904 -14.311   13.917
+nbr_hist_z             -0.775   1.656 -20.122   10.627
+nbr_hist_raw_edge      -0.006   0.036  -0.940    0.915
+nbr_hist_profit_slog   -0.865   3.816 -14.311   13.917
+nbr_log_usd            11.944   3.074   0.050   17.941
+nbr_maker_share         0.759   0.198   0.000    1.000
+nbr_frac_longshot       0.396   0.171   0.000    1.000
+nbr_log_n_fills         9.000   2.704   0.693   13.728
+deg_w                   2.263   1.057   0.527   12.220
+deg                     2.449   1.064   0.693   12.080
+[    2s] ids 1522500 graph wallets 862759
+[   51s] label-window sides 222860522
+[  162s] candidates 116058
+[  230s] k=1: population 76585 (new 57112), skill 0.0315, profitable 0.360, hist_z non-null new 0.000 | leakage asserts passed
+[  298s] k=3: population 72757 (new 54376), skill 0.0330, profitable 0.347, hist_z non-null new 0.228 | leakage asserts passed
+[  366s] k=5: population 70075 (new 52666), skill 0.0339, profitable 0.340, hist_z non-null new 0.379 | leakage asserts passed
+[  433s] k=10: population 64603 (new 49128), skill 0.0358, profitable 0.330, hist_z non-null new 0.606 | leakage asserts passed
+[  503s] k=20: population 57379 (new 43865), skill 0.0389, profitable 0.317, hist_z non-null new 0.767 | leakage asserts passed
+[  569s] k=50: population 43242 (new 32804), skill 0.0472, profitable 0.294, hist_z non-null new 0.884 | leakage asserts passed
+{
+ "label_after": "k",
+ "bet_unit": "market",
+ "subsample": 1.0,
+ "by_k": {
+  "1": {
+   "existing": {
+    "n": 19473,
+    "skill_z2": 0.0304,
+    "n_skill": 592,
+    "profitable": 0.3913,
+    "median_label_bets": 53.0,
+    "z_sd": 2.224
+   },
+   "new": {
+    "n": 57112,
+    "skill_z2": 0.0319,
+    "n_skill": 1820,
+    "profitable": 0.3494,
+    "median_label_bets": 56.0,
+    "z_sd": 2.357
+   }
+  },
+  "3": {
+   "existing": {
+    "n": 18381,
+    "skill_z2": 0.0314,
+    "n_skill": 578,
+    "profitable": 0.3846,
+    "median_label_bets": 55.0,
+    "z_sd": 2.266
+   },
+   "new": {
+    "n": 54376,
+    "skill_z2": 0.0335,
+    "n_skill": 1820,
+    "profitable": 0.3339,
+    "median_label_bets": 57.0,
+    "z_sd": 2.399
+   }
+  },
+  "5": {
+   "existing": {
+    "n": 17409,
+    "skill_z2": 0.0325,
+    "n_skill": 566,
+    "profitable": 0.3761,
+    "median_label_bets": 57.0,
+    "z_sd": 2.308
+   },
+   "new": {
+    "n": 52666,
+    "skill_z2": 0.0344,
+    "n_skill": 1810,
+    "profitable": 0.3281,
+    "median_label_bets": 58.0,
+    "z_sd": 2.423
+   }
+  },
+  "10": {
+   "existing": {
+    "n": 15475,
+    "skill_z2": 0.035,
+    "n_skill": 542,
+    "profitable": 0.3632,
+    "median_label_bets": 63.0,
+    "z_sd": 2.402
+   },
+   "new": {
+    "n": 49128,
+    "skill_z2": 0.036,
+    "n_skill": 1768,
+    "profitable": 0.3195,
+    "median_label_bets": 61.0,
+    "z_sd": 2.48
+   }
+  },
+  "20": {
+   "existing": {
+    "n": 13514,
+    "skill_z2": 0.038,
+    "n_skill": 513,
+    "profitable": 0.3554,
+    "median_label_bets": 68.0,
+    "z_sd": 2.519
+   },
+   "new": {
+    "n": 43865,
+    "skill_z2": 0.0391,
+    "n_skill": 1717,
+    "profitable": 0.305,
+    "median_label_bets": 66.0,
+    "z_sd": 2.575
+   }
+  },
+  "50": {
+   "existing": {
+    "n": 10438,
+    "skill_z2": 0.0454,
+    "n_skill": 474,
+    "profitable": 0.3288,
+    "median_label_bets": 81.0,
+    "z_sd": 2.747
+   },
+   "new": {
+    "n": 32804,
+    "skill_z2": 0.0478,
+    "n_skill": 1569,
+    "profitable": 0.2834,
+    "median_label_bets": 83.0,
+    "z_sd": 2.841
+   }
+  }
+ },
+ "attachment": {
+  "1": {
+   "new": {
+    "cp_in_graph": 0.44584325535789326,
+    "market_in_graph": 0.1298151001540832
+   },
+   "existing": {
+    "cp_in_graph": 0.887587942279053,
+    "market_in_graph": 0.545627278796282
+   }
+  },
+  "3": {
+   "new": {
+    "cp_in_graph": 0.424966897160512,
+    "market_in_graph": 0.12004683438772007
+   },
+   "existing": {
+    "cp_in_graph": 0.8640987976715087,
+    "market_in_graph": 0.49338991349763345
+   }
+  },
+  "5": {
+   "new": {
+    "cp_in_graph": 0.41328371245205636,
+    "market_in_graph": 0.11261534956138686
+   },
+   "existing": {
+    "cp_in_graph": 0.8485381124705612,
+    "market_in_graph": 0.4712619909242346
+   }
+  },
+  "10": {
+   "new": {
+    "cp_in_graph": 0.3967981599088096,
+    "market_in_graph": 0.09836142322097378
+   },
+   "existing": {
+    "cp_in_graph": 0.8256607431340872,
+    "market_in_graph": 0.44137641357027463
+   }
+  },
+  "20": {
+   "new": {
+    "cp_in_graph": 0.37953265701584404,
+    "market_in_graph": 0.0833853869827881
+   },
+   "existing": {
+    "cp_in_graph": 0.8048246263134528,
+    "market_in_graph": 0.4125018499334024
+   }
+  },
+  "50": {
+   "new": {
+    "cp_in_graph": 0.3693781246189489,
+    "market_in_graph": 0.07273442263138642
+   },
+   "existing": {
+    "cp_in_graph": 0.7705173404866833,
+    "market_in_graph": 0.37118413489174173
+   }
+  }
+ }
+}
+[  575s] done
+[   17s] pre-cutoff sides 62029190 max ts 2025-06-30 23:59:58+00:00
+[   20s] markets (29408, 15)
+[   28s] held edges 10772660
+[  210s] moved-first pairs 11260757 entries 13039548
+[  212s] saved HeteroData(
+  wallet={
+    x=[862759, 25],
+    cols=[25],
+  },
+  market={
+    x=[29408, 15],
+    cols=[15],
+    market_id=[29408],
+  },
+  (wallet, held, market)={
+    edge_index=[2, 10772660],
+    edge_attr=[10772660, 5],
+  },
+  (wallet, cp, wallet)={
+    edge_index=[2, 27465906],
+    edge_attr=[27465906, 1],
+  },
+  (wallet, mf, wallet)={
+    edge_index=[2, 11260757],
+    edge_attr=[11260757, 1],
+  }
+)
+[  257s] query moved-first edges 14038263 {'follow': 7027810, 'lead': 7010453}
+{
+ "wallets": 862759,
+ "markets": 29408,
+ "held_edges": 10772660,
+ "cp_nnz": 27465906,
+ "mf_edges_count_ge_min": 11260757,
+ "query_entries": 2039358,
+ "query_mf_edges": 14038263,
+ "frozen_max_ts": "2025-06-30 23:59:58+00:00",
+ "minutes": 4.3
+}
+== diag 03:59:11
+XGBoost import OK
+{
+  "time": "2026-11-17T07:38:06.976146+00:00",
+  "python": "3.10.12 (main, Jul 29 2024, 16:56:48) [GCC 11.4.0]",
+  "executable": "/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/.venv/bin/python",
+  "platform": "Linux-6.5.0-28-generic-x86_64-with-glibc2.35",
+  "cpu_count": 64,
+  "packages": {
+    "torch": "2.11.0+cu128",
+    "torch-geometric": "2.8.1",
+    "numpy": "2.2.6",
+    "pandas": "2.3.3",
+    "pyarrow": "25.0.1",
+    "duckdb": "1.5.6",
+    "scipy": "1.15.3",
+    "scikit-learn": "1.7.2",
+    "xgboost": "3.2.0",
+    "matplotlib": "3.10.9",
+    "pyyaml": "6.0.3",
+    "huggingface-hub": "2.4.0"
+  },
+  "cuda_build": "12.8",
+  "devices": [
+    {
+      "token": "0",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "1",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "2",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "3",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "4",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "5",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "6",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "7",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    }
+  ],
+  "disk_free_bytes": 390784835584,
+  "stages": [
+    "smoke",
+    "data",
+    "prep",
+    "diag",
+    "edge"
+  ],
+  "ks": [
+    1,
+    3,
+    5,
+    10,
+    20,
+    50
+  ],
+  "splits": [
+    "train",
+    "test"
+  ],
+  "methods": [
+    "hist",
+    "xgb_own",
+    "xgb_nbr",
+    "sage",
+    "hgnn"
+  ],
+  "gnn": {
+    "hidden": 64,
+    "fanout": [
+      10,
+      5
+    ],
+    "batch": 1024,
+    "epochs": 40,
+    "patience": 6,
+    "lr": 0.003,
+    "eval_reps": 3,
+    "threads": 2,
+    "gpu_scale": false
+  },
+  "settings": {
+    "PMGRAPH_TAG": "server",
+    "PMGRAPH_RESUME": "1",
+    "NGPU": "8",
+    "OMP_NUM_THREADS": "2",
+    "OPENBLAS_NUM_THREADS": "2"
+  },
+  "host_memory_bytes": {
+    "MemTotal": 540712529920,
+    "MemAvailable": 493772169216
+  },
+  "git_commit": "ffecf90d3e56d1107267cab6f34fe76127530337",
+  "cpu_model": "Intel(R) Xeon(R) Gold 6426Y",
+  "nvidia_smi": "0, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n1, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n2, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n3, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n4, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n5, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n6, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n7, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB"
+}
+Preflight OK: /home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/preflight_20261117T073807052889.json
+== smoke 07:38:09
+XGBoost import OK
+{
+  "time": "2026-11-17T07:38:14.137419+00:00",
+  "python": "3.10.12 (main, Jul 29 2024, 16:56:48) [GCC 11.4.0]",
+  "executable": "/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/.venv/bin/python",
+  "platform": "Linux-6.5.0-28-generic-x86_64-with-glibc2.35",
+  "cpu_count": 64,
+  "packages": {
+    "torch": "2.11.0+cu128",
+    "torch-geometric": "2.8.1",
+    "numpy": "2.2.6",
+    "pandas": "2.3.3",
+    "pyarrow": "25.0.1",
+    "duckdb": "1.5.6",
+    "scipy": "1.15.3",
+    "scikit-learn": "1.7.2",
+    "xgboost": "3.2.0",
+    "matplotlib": "3.10.9",
+    "pyyaml": "6.0.3",
+    "huggingface-hub": "2.4.0"
+  },
+  "cuda_build": "12.8",
+  "devices": [
+    {
+      "token": "0",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "1",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "2",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "3",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "4",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "5",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "6",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    },
+    {
+      "token": "7",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vram_bytes": 25261047808
+    }
+  ],
+  "disk_free_bytes": 390784684032,
+  "stages": [],
+  "ks": [
+    1,
+    3,
+    5,
+    10,
+    20,
+    50
+  ],
+  "splits": [
+    "train",
+    "test"
+  ],
+  "methods": [
+    "hist",
+    "xgb_own",
+    "xgb_nbr",
+    "sage",
+    "hgnn"
+  ],
+  "gnn": {
+    "hidden": 64,
+    "fanout": [
+      10,
+      5
+    ],
+    "batch": 1024,
+    "epochs": 40,
+    "patience": 6,
+    "lr": 0.003,
+    "eval_reps": 3,
+    "threads": 2,
+    "gpu_scale": false
+  },
+  "settings": {
+    "PMGRAPH_TAG": "server",
+    "PMGRAPH_RESUME": "1",
+    "PMGRAPH_REQUIRE_CUDA": "1",
+    "NGPU": "8",
+    "OMP_NUM_THREADS": "2",
+    "OPENBLAS_NUM_THREADS": "2"
+  },
+  "host_memory_bytes": {
+    "MemTotal": 540712529920,
+    "MemAvailable": 493730484224
+  },
+  "git_commit": "ffecf90d3e56d1107267cab6f34fe76127530337",
+  "cpu_model": "Intel(R) Xeon(R) Gold 6426Y",
+  "nvidia_smi": "0, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n1, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n2, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n3, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n4, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n5, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n6, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB\n7, NVIDIA GeForce RTX 4090, 570.211.01, 24564 MiB"
+}
+Preflight OK: /home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/preflight_20261117T073814226524.json
+    device=cuda:0 parameters=369 seed=0 settings={'device': 'cuda:0', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:0", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.9166666666666666, "elapsed_seconds": 0.5121589380141813, "process_peak_rss_bytes": 2207752192, "peak_cuda_allocated_bytes": 18140160, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:0", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:0 parameters=369 seed=0 settings={'device': 'cuda:0', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:0", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.39837011043782744, "elapsed_seconds": 0.45108885000809096, "process_peak_rss_bytes": 2406457344, "peak_cuda_allocated_bytes": 18141696, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:0", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:0 parameters=1,713 seed=0 settings={'device': 'cuda:0', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:0", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": 0.7291666666666666, "elapsed_seconds": 0.5245051870006137, "process_peak_rss_bytes": 2412224512, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:0", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:0 parameters=1,713 seed=0 settings={'device': 'cuda:0', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:0", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": -0.2145515318259158, "elapsed_seconds": 0.6176496339903679, "process_peak_rss_bytes": 2412748800, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:0", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:1 parameters=369 seed=0 settings={'device': 'cuda:1', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:1", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.9166666666666666, "elapsed_seconds": 0.32133689400507137, "process_peak_rss_bytes": 2464653312, "peak_cuda_allocated_bytes": 18140160, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:1", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:1 parameters=369 seed=0 settings={'device': 'cuda:1', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:1", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.39837011043782744, "elapsed_seconds": 0.27840984900831245, "process_peak_rss_bytes": 2481430528, "peak_cuda_allocated_bytes": 18141696, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:1", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:1 parameters=1,713 seed=0 settings={'device': 'cuda:1', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:1", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": 0.7291666666666666, "elapsed_seconds": 0.5984193809854332, "process_peak_rss_bytes": 2482479104, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:1", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:1 parameters=1,713 seed=0 settings={'device': 'cuda:1', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:1", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": -0.2145515318259158, "elapsed_seconds": 0.6723239280108828, "process_peak_rss_bytes": 2482479104, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:1", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:2 parameters=369 seed=0 settings={'device': 'cuda:2', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:2", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.9166666666666666, "elapsed_seconds": 0.2655310870031826, "process_peak_rss_bytes": 2534383616, "peak_cuda_allocated_bytes": 18140160, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:2", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:2 parameters=369 seed=0 settings={'device': 'cuda:2', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:2", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.39837011043782744, "elapsed_seconds": 0.3364018629945349, "process_peak_rss_bytes": 2551685120, "peak_cuda_allocated_bytes": 18141696, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:2", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:2 parameters=1,713 seed=0 settings={'device': 'cuda:2', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:2", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": 0.7291666666666666, "elapsed_seconds": 0.5633743960061111, "process_peak_rss_bytes": 2552733696, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:2", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:2 parameters=1,713 seed=0 settings={'device': 'cuda:2', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:2", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": -0.2145515318259158, "elapsed_seconds": 0.6284038969897665, "process_peak_rss_bytes": 2552733696, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:2", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:3 parameters=369 seed=0 settings={'device': 'cuda:3', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:3", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.9166666666666666, "elapsed_seconds": 0.2961620280111674, "process_peak_rss_bytes": 2604638208, "peak_cuda_allocated_bytes": 18140160, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:3", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:3 parameters=369 seed=0 settings={'device': 'cuda:3', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:3", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.39837011043782744, "elapsed_seconds": 0.23262272699503228, "process_peak_rss_bytes": 2621939712, "peak_cuda_allocated_bytes": 18141696, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:3", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:3 parameters=1,713 seed=0 settings={'device': 'cuda:3', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:3", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": 0.7291666666666666, "elapsed_seconds": 0.5563947110204026, "process_peak_rss_bytes": 2622988288, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:3", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:3 parameters=1,713 seed=0 settings={'device': 'cuda:3', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:3", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": -0.2145515318259158, "elapsed_seconds": 0.6003893760207575, "process_peak_rss_bytes": 2622988288, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:3", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:4 parameters=369 seed=0 settings={'device': 'cuda:4', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:4", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.9166666666666666, "elapsed_seconds": 0.08944830001564696, "process_peak_rss_bytes": 2674368512, "peak_cuda_allocated_bytes": 18140160, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:4", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:4 parameters=369 seed=0 settings={'device': 'cuda:4', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:4", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.39837011043782744, "elapsed_seconds": 0.08054909101338126, "process_peak_rss_bytes": 2691670016, "peak_cuda_allocated_bytes": 18141696, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:4", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:4 parameters=1,713 seed=0 settings={'device': 'cuda:4', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:4", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": 0.7291666666666666, "elapsed_seconds": 0.1426227150077466, "process_peak_rss_bytes": 2692718592, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:4", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:4 parameters=1,713 seed=0 settings={'device': 'cuda:4', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:4", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": -0.2145515318259158, "elapsed_seconds": 0.13951781101059169, "process_peak_rss_bytes": 2692718592, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:4", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:5 parameters=369 seed=0 settings={'device': 'cuda:5', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:5", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.9166666666666666, "elapsed_seconds": 0.1122280010022223, "process_peak_rss_bytes": 2744623104, "peak_cuda_allocated_bytes": 18140160, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:5", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:5 parameters=369 seed=0 settings={'device': 'cuda:5', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:5", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.39837011043782744, "elapsed_seconds": 0.09120435500517488, "process_peak_rss_bytes": 2761924608, "peak_cuda_allocated_bytes": 18141696, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:5", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:5 parameters=1,713 seed=0 settings={'device': 'cuda:5', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:5", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": 0.7291666666666666, "elapsed_seconds": 0.15008481999393553, "process_peak_rss_bytes": 2762973184, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:5", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:5 parameters=1,713 seed=0 settings={'device': 'cuda:5', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:5", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": -0.2145515318259158, "elapsed_seconds": 0.14789316497626714, "process_peak_rss_bytes": 2762973184, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:5", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:6 parameters=369 seed=0 settings={'device': 'cuda:6', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:6", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.9166666666666666, "elapsed_seconds": 0.119237055972917, "process_peak_rss_bytes": 2814353408, "peak_cuda_allocated_bytes": 18140160, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:6", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:6 parameters=369 seed=0 settings={'device': 'cuda:6', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:6", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.39837011043782744, "elapsed_seconds": 0.097396219993243, "process_peak_rss_bytes": 2831654912, "peak_cuda_allocated_bytes": 18141696, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:6", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:6 parameters=1,713 seed=0 settings={'device': 'cuda:6', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:6", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": 0.7291666666666666, "elapsed_seconds": 0.15606647002277896, "process_peak_rss_bytes": 2832703488, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:6", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:6 parameters=1,713 seed=0 settings={'device': 'cuda:6', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:6", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": -0.2145515318259158, "elapsed_seconds": 0.15524876600829884, "process_peak_rss_bytes": 2832703488, "peak_cuda_allocated_bytes": 18256896, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:6", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:7 parameters=369 seed=0 settings={'device': 'cuda:7', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:7", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.9166666666666666, "elapsed_seconds": 0.1234749729919713, "process_peak_rss_bytes": 2884083712, "peak_cuda_allocated_bytes": 18141184, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:7", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:7 parameters=369 seed=0 settings={'device': 'cuda:7', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:7", "parameters": 369, "epochs": 2, "best_epoch": 1, "best_val_score": 0.39837011043782744, "elapsed_seconds": 0.09937317000003532, "process_peak_rss_bytes": 2901385216, "peak_cuda_allocated_bytes": 18142720, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:7", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:7 parameters=1,713 seed=0 settings={'device': 'cuda:7', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:7", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": 0.7291666666666666, "elapsed_seconds": 0.16110811600810848, "process_peak_rss_bytes": 2901909504, "peak_cuda_allocated_bytes": 18257920, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:7", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+    device=cuda:7 parameters=1,713 seed=0 settings={'device': 'cuda:7', 'hidden': 8, 'fanout': [2, 2], 'batch': 8, 'eval_batch': 8, 'epochs': 2, 'patience': 2, 'eval_reps': 1, 'threads': 1}
+    completed: {"seed": 0, "device": "cuda:7", "parameters": 1713, "epochs": 2, "best_epoch": 1, "best_val_score": -0.21455182656612007, "elapsed_seconds": 0.1516353579936549, "process_peak_rss_bytes": 2902433792, "peak_cuda_allocated_bytes": 18257920, "peak_cuda_reserved_bytes": 23068672, "device_name": "NVIDIA GeForce RTX 4090", "torch_version": "2.11.0+cu128", "settings": {"device": "cuda:7", "hidden": 8, "fanout": [2, 2], "batch": 8, "eval_batch": 8, "epochs": 2, "patience": 2, "eval_reps": 1, "threads": 1}, "metadata": {}}
+Smoke passed: GraphSAGE + hetero GraphSAGE, classification + regression, checkpoint reload, XGBoost
+== data 07:38:34
+Fetching 4 files:   0%|          | 0/4 [00:00<?, ?it/s]Fetching 4 files: 100%|██████████| 4/4 [00:00<00:00, 460.51it/s]
+done: ['markets.parquet', 'events.parquet', 'predictions.parquet'] ...
+Fetching 549 files:   0%|          | 0/549 [00:00<?, ?it/s]Fetching 549 files:  12%|█▏        | 65/549 [00:00<00:00, 631.56it/s]Fetching 549 files:  23%|██▎       | 129/549 [00:00<00:00, 614.33it/s]Fetching 549 files:  35%|███▍      | 191/549 [00:00<00:00, 536.85it/s]Fetching 549 files:  45%|████▍     | 246/549 [00:00<00:00, 512.33it/s]Fetching 549 files:  54%|█████▍    | 298/549 [00:00<00:00, 489.01it/s]Fetching 549 files:  63%|██████▎   | 348/549 [00:00<00:00, 477.94it/s]Fetching 549 files:  72%|███████▏  | 396/549 [00:00<00:00, 475.30it/s]Fetching 549 files:  81%|████████  | 444/549 [00:00<00:00, 472.46it/s]Fetching 549 files:  90%|████████▉ | 492/549 [00:01<00:00, 459.23it/s]Fetching 549 files:  98%|█████████▊| 538/549 [00:01<00:00, 427.08it/s]Fetching 549 files: 100%|██████████| 549/549 [00:01<00:00, 485.01it/s]
+done: ['trades/year=2024/month=07/*', 'trades/year=2024/month=08/*', 'trades/year=2024/month=09/*'] ...
+== prep 07:38:37
+train graph {'window': ['2024-07-01', '2025-01-01'], 'raw_trades': 30438127, 'kept': 30436380, 'kept_resolved': 30391690, 'usd': 3736357061.1292796}
+train label {'window': ['2025-01-01', '2025-07-01'], 'raw_trades': 31023592, 'kept': 31014595, 'kept_resolved': 30963967, 'usd': 2828876702.263747}
+bets 6050235 wallets 564566 events 12501
+{
+  "bet_unit": "market",
+  "labelled_wallets": 37129,
+  "type_counts": {
+    "unskilled_loser": 20299,
+    "lucky_winner": 16736,
+    "skilled_winner": 86,
+    "unlucky_skilled": 8
+  },
+  "type_share": {
+    "unskilled_loser": 0.5467,
+    "lucky_winner": 0.4508,
+    "skilled_winner": 0.0023,
+    "unlucky_skilled": 0.0002
+  },
+  "share_profitable": 0.45306902959950446,
+  "share_skilled": 0.0025317137547469634,
+  "share_z_gt_2": 0.01995744566242021,
+  "median_bets": 44.0,
+  "median_markets_per_bet": 1.0,
+  "z_mean": -0.23046041077757048,
+  "z_sd": 1.3977169565667298,
+  "share_p_lt_05": 0.04215034070403189,
+  "by_n_bets": [
+    {
+      "n_bets": "30-49",
+      "n": 22909,
+      "p_lt_05": 0.0352,
+      "z_sd": 1.1025,
+      "skill_z2": 0.0131
+    },
+    {
+      "n_bets": "50-99",
+      "n": 10231,
+      "p_lt_05": 0.037,
+      "z_sd": 1.3263,
+      "skill_z2": 0.0175
+    },
+    {
+      "n_bets": "100-249",
+      "n": 2775,
+      "p_lt_05": 0.0634,
+      "z_sd": 2.0248,
+      "skill_z2": 0.0422
+    },
+    {
+      "n_bets": ">=250",
+      "n": 1214,
+      "p_lt_05": 0.168,
+      "z_sd": 3.2968,
+      "skill_z2": 0.1194
+    }
+  ],
+  "p_analytic_vs_mc_corr": 0.9085546307206135
+}
+features (633082, 25) 61s
+graph nnz 26134218 65s
+labelled wallets in graph: 17514 of 37129
+                        mean     std     min      max
+log_usd                5.640   2.725   0.000   18.499
+log_med_usd            2.246   1.909   0.000   11.728
+maker_share            0.126   0.237   0.000    1.000
+avg_buy_price          0.520   0.184   0.001    0.999
+frac_longshot          0.247   0.257   0.000    1.000
+frac_sureshot          0.289   0.297   0.000    1.000
+avg_log_h_to_close     5.825   1.462   0.000    9.084
+n_markets              1.952   0.983   0.693    8.747
+n_counterparties       2.635   1.228   0.693   11.920
+active_days            1.512   0.799   0.693    5.220
+age_days              61.262  47.282   0.042  184.000
+days_since_last       33.425  34.230   0.042  184.000
+cat_politics           0.490   0.412   0.000    1.000
+cat_sports             0.323   0.392   0.000    1.000
+cat_crypto             0.106   0.245   0.000    1.000
+cat_finance            0.035   0.119   0.000    1.000
+cat_culture            0.030   0.106   0.000    1.000
+cat_tech               0.012   0.063   0.000    1.000
+cat_weather            0.004   0.032   0.000    1.000
+log_n_fills            3.024   1.439   0.693   13.805
+hist_n_bets            0.752   0.980   0.000    7.986
+hist_T                -0.031   0.249  -0.997    0.997
+hist_z                -0.150   0.993 -18.617   18.617
+hist_raw_edge         -0.033   0.251  -0.999    0.994
+hist_profit_slog      -0.868   3.533 -15.544   16.908
+nbr_hist_z            -0.183   0.921 -11.705   12.332
+nbr_hist_raw_edge     -0.003   0.046  -0.900    0.922
+nbr_hist_profit_slog   0.643   3.647 -15.544   16.908
+nbr_log_usd           12.574   2.262   0.212   18.499
+nbr_maker_share        0.757   0.196   0.000    1.000
+nbr_frac_longshot      0.285   0.175   0.000    1.000
+nbr_log_n_fills        8.815   2.188   0.693   13.805
+deg_w                  2.510   1.257   0.527   12.093
+deg                    2.635   1.228   0.693   11.920
+[    2s] ids 1145602 graph wallets 633082
+[   19s] label-window sides 62029190
+[   59s] candidates 63036
+[   82s] k=1: population 34980 (new 18984), skill 0.0197, profitable 0.452, hist_z non-null new 0.000 | leakage asserts passed
+[  107s] k=3: population 32691 (new 17981), skill 0.0202, profitable 0.450, hist_z non-null new 0.203 | leakage asserts passed
+[  130s] k=5: population 30732 (new 17068), skill 0.0199, profitable 0.451, hist_z non-null new 0.331 | leakage asserts passed
+[  154s] k=10: population 26895 (new 15261), skill 0.0210, profitable 0.446, hist_z non-null new 0.519 | leakage asserts passed
+[  177s] k=20: population 21313 (new 12322), skill 0.0229, profitable 0.425, hist_z non-null new 0.707 | leakage asserts passed
+[  198s] k=50: population 10712 (new 5461), skill 0.0342, profitable 0.349, hist_z non-null new 0.788 | leakage asserts passed
+{
+ "label_after": "k",
+ "bet_unit": "market",
+ "subsample": 1.0,
+ "by_k": {
+  "1": {
+   "existing": {
+    "n": 15996,
+    "skill_z2": 0.0218,
+    "n_skill": 348,
+    "profitable": 0.4451,
+    "median_label_bets": 42.0,
+    "z_sd": 1.442
+   },
+   "new": {
+    "n": 18984,
+    "skill_z2": 0.0179,
+    "n_skill": 340,
+    "profitable": 0.4584,
+    "median_label_bets": 46.0,
+    "z_sd": 1.385
+   }
+  },
+  "3": {
+   "existing": {
+    "n": 14710,
+    "skill_z2": 0.022,
+    "n_skill": 323,
+    "profitable": 0.4409,
+    "median_label_bets": 43.0,
+    "z_sd": 1.473
+   },
+   "new": {
+    "n": 17981,
+    "skill_z2": 0.0187,
+    "n_skill": 336,
+    "profitable": 0.458,
+    "median_label_bets": 46.0,
+    "z_sd": 1.399
+   }
+  },
+  "5": {
+   "existing": {
+    "n": 13664,
+    "skill_z2": 0.0221,
+    "n_skill": 302,
+    "profitable": 0.4384,
+    "median_label_bets": 43.0,
+    "z_sd": 1.501
+   },
+   "new": {
+    "n": 17068,
+    "skill_z2": 0.0182,
+    "n_skill": 310,
+    "profitable": 0.4617,
+    "median_label_bets": 45.0,
+    "z_sd": 1.412
+   }
+  },
+  "10": {
+   "existing": {
+    "n": 11634,
+    "skill_z2": 0.0239,
+    "n_skill": 278,
+    "profitable": 0.4319,
+    "median_label_bets": 44.0,
+    "z_sd": 1.563
+   },
+   "new": {
+    "n": 15261,
+    "skill_z2": 0.0189,
+    "n_skill": 288,
+    "profitable": 0.4573,
+    "median_label_bets": 44.0,
+    "z_sd": 1.442
+   }
+  },
+  "20": {
+   "existing": {
+    "n": 8991,
+    "skill_z2": 0.0264,
+    "n_skill": 237,
+    "profitable": 0.4188,
+    "median_label_bets": 47.0,
+    "z_sd": 1.681
+   },
+   "new": {
+    "n": 12322,
+    "skill_z2": 0.0204,
+    "n_skill": 251,
+    "profitable": 0.4291,
+    "median_label_bets": 41.0,
+    "z_sd": 1.511
+   }
+  },
+  "50": {
+   "existing": {
+    "n": 5251,
+    "skill_z2": 0.0415,
+    "n_skill": 218,
+    "profitable": 0.3628,
+    "median_label_bets": 66.0,
+    "z_sd": 1.982
+   },
+   "new": {
+    "n": 5461,
+    "skill_z2": 0.0271,
+    "n_skill": 148,
+    "profitable": 0.3353,
+    "median_label_bets": 53.0,
+    "z_sd": 1.851
+   }
+  }
+ },
+ "attachment": {
+  "1": {
+   "new": {
+    "cp_in_graph": 0.627370417193426,
+    "market_in_graph": 0.39233038348082594
+   },
+   "existing": {
+    "cp_in_graph": 0.940735183795949,
+    "market_in_graph": 0.7760065016254063
+   }
+  },
+  "3": {
+   "new": {
+    "cp_in_graph": 0.631481378492112,
+    "market_in_graph": 0.3511855106315926
+   },
+   "existing": {
+    "cp_in_graph": 0.9148198504418763,
+    "market_in_graph": 0.7589394969408566
+   }
+  },
+  "5": {
+   "new": {
+    "cp_in_graph": 0.6370517928286853,
+    "market_in_graph": 0.32819310991328804
+   },
+   "existing": {
+    "cp_in_graph": 0.9023419203747073,
+    "market_in_graph": 0.7278542154566745
+   }
+  },
+  "10": {
+   "new": {
+    "cp_in_graph": 0.6396042199069524,
+    "market_in_graph": 0.2866522508354629
+   },
+   "existing": {
+    "cp_in_graph": 0.8837287261474988,
+    "market_in_graph": 0.6539367371497335
+   }
+  },
+  "20": {
+   "new": {
+    "cp_in_graph": 0.6271790293783477,
+    "market_in_graph": 0.23001541957474436
+   },
+   "existing": {
+    "cp_in_graph": 0.8637081525970415,
+    "market_in_graph": 0.5765932599265933
+   }
+  },
+  "50": {
+   "new": {
+    "cp_in_graph": 0.6578758469144845,
+    "market_in_graph": 0.21568210950375388
+   },
+   "existing": {
+    "cp_in_graph": 0.8402856598743097,
+    "market_in_graph": 0.5121462578556465
+   }
+  }
+ }
+}
+[  202s] done
+[   16s] pre-cutoff sides 60872760 max ts 2024-12-31 23:59:59+00:00
+[   19s] markets (13349, 15)
+[   25s] held edges 7462550
+[  301s] moved-first pairs 13307246 entries 10720196
+[  304s] saved HeteroData(
+  wallet={
+    x=[633082, 25],
+    cols=[25],
+  },
+  market={
+    x=[13349, 15],
+    cols=[15],
+    market_id=[13349],
+  },
+  (wallet, held, market)={
+    edge_index=[2, 7462550],
+    edge_attr=[7462550, 5],
+  },
+  (wallet, cp, wallet)={
+    edge_index=[2, 26134218],
+    edge_attr=[26134218, 1],
+  },
+  (wallet, mf, wallet)={
+    edge_index=[2, 13307246],
+    edge_attr=[13307246, 1],
+  }
+)
+[  336s] query moved-first edges 10491560 {'follow': 5276565, 'lead': 5214995}
+{
+ "wallets": 633082,
+ "markets": 13349,
+ "held_edges": 7462550,
+ "cp_nnz": 26134218,
+ "mf_edges_count_ge_min": 13307246,
+ "query_entries": 1109524,
+ "query_mf_edges": 10491560,
+ "frozen_max_ts": "2024-12-31 23:59:59+00:00",
+ "minutes": 5.6
+}
+test graph {'window': ['2025-01-01', '2025-07-01'], 'raw_trades': 31023592, 'kept': 31014595, 'kept_resolved': 30963967, 'usd': 2828876702.263897}
+test label {'window': ['2025-07-01', '2026-01-01'], 'raw_trades': 111443784, 'kept': 111430261, 'kept_resolved': 107991889, 'usd': 6863605459.216074}
+bets 18384475 wallets 819857 events 83746
+{
+  "bet_unit": "market",
+  "labelled_wallets": 79945,
+  "type_counts": {
+    "unskilled_loser": 50330,
+    "lucky_winner": 28537,
+    "skilled_winner": 969,
+    "unlucky_skilled": 109
+  },
+  "type_share": {
+    "unskilled_loser": 0.6296,
+    "lucky_winner": 0.357,
+    "skilled_winner": 0.0121,
+    "unlucky_skilled": 0.0014
+  },
+  "share_profitable": 0.369078741634874,
+  "share_skilled": 0.013484270435924699,
+  "share_z_gt_2": 0.030395897179310776,
+  "median_bets": 55.0,
+  "median_markets_per_bet": 1.0,
+  "z_mean": -0.7702751988793275,
+  "z_sd": 2.290292448117084,
+  "share_p_lt_05": 0.045706423165926574,
+  "by_n_bets": [
+    {
+      "n_bets": "30-49",
+      "n": 34396,
+      "p_lt_05": 0.0224,
+      "z_sd": 1.3701,
+      "skill_z2": 0.0099
+    },
+    {
+      "n_bets": "50-99",
+      "n": 23596,
+      "p_lt_05": 0.0299,
+      "z_sd": 1.724,
+      "skill_z2": 0.0163
+    },
+    {
+      "n_bets": "100-249",
+      "n": 12979,
+      "p_lt_05": 0.051,
+      "z_sd": 2.5449,
+      "skill_z2": 0.0321
+    },
+    {
+      "n_bets": ">=250",
+      "n": 8974,
+      "p_lt_05": 0.1692,
+      "z_sd": 4.6305,
+      "skill_z2": 0.1435
+    }
+  ],
+  "p_analytic_vs_mc_corr": 0.918625536912037
+}
+features (862759, 25) 95s
+graph nnz 27465906 99s
+labelled wallets in graph: 20600 of 79945
+                         mean     std     min      max
+log_usd                 4.259   2.582   0.000   17.941
+log_med_usd             1.357   1.480   0.000   12.302
+maker_share             0.137   0.235   0.000    1.000
+avg_buy_price           0.572   0.217   0.001    0.999
+frac_longshot           0.277   0.251   0.000    1.000
+frac_sureshot           0.421   0.314   0.000    1.000
+avg_log_h_to_close      5.680   1.461   0.000    9.297
+n_markets               2.022   0.936   0.693    9.704
+n_counterparties        2.449   1.064   0.693   12.080
+active_days             1.754   0.861   0.693    5.204
+age_days              138.007  44.968   0.042  181.000
+days_since_last        83.490  60.065   0.042  181.000
+cat_politics            0.265   0.331   0.000    1.000
+cat_sports              0.482   0.403   0.000    1.000
+cat_crypto              0.147   0.269   0.000    1.000
+cat_finance             0.029   0.107   0.000    1.000
+cat_culture             0.045   0.121   0.000    1.000
+cat_tech                0.025   0.093   0.000    1.000
+cat_weather             0.007   0.049   0.000    1.000
+log_n_fills             2.683   1.161   0.693   13.728
+hist_n_bets             1.125   1.144   0.000    9.048
+hist_T                 -0.028   0.183  -0.998    0.998
+hist_z                 -0.110   0.936 -20.257   20.257
+hist_raw_edge          -0.029   0.183  -0.999    0.996
+hist_profit_slog       -0.588   2.904 -14.311   13.917
+nbr_hist_z             -0.775   1.656 -20.122   10.627
+nbr_hist_raw_edge      -0.006   0.036  -0.940    0.915
+nbr_hist_profit_slog   -0.865   3.816 -14.311   13.917
+nbr_log_usd            11.944   3.074   0.050   17.941
+nbr_maker_share         0.759   0.198   0.000    1.000
+nbr_frac_longshot       0.396   0.171   0.000    1.000
+nbr_log_n_fills         9.000   2.704   0.693   13.728
+deg_w                   2.263   1.057   0.527   12.220
+deg                     2.449   1.064   0.693   12.080
+[    2s] ids 1522500 graph wallets 862759
+[   60s] label-window sides 222860522
+[  186s] candidates 116058
+[  268s] k=1: population 76585 (new 57112), skill 0.0315, profitable 0.360, hist_z non-null new 0.000 | leakage asserts passed
+[  348s] k=3: population 72757 (new 54376), skill 0.0330, profitable 0.347, hist_z non-null new 0.228 | leakage asserts passed
+[  433s] k=5: population 70075 (new 52666), skill 0.0339, profitable 0.340, hist_z non-null new 0.379 | leakage asserts passed
+[  515s] k=10: population 64603 (new 49128), skill 0.0358, profitable 0.330, hist_z non-null new 0.606 | leakage asserts passed
+[  596s] k=20: population 57379 (new 43865), skill 0.0389, profitable 0.317, hist_z non-null new 0.767 | leakage asserts passed
+[  674s] k=50: population 43242 (new 32804), skill 0.0472, profitable 0.294, hist_z non-null new 0.884 | leakage asserts passed
+{
+ "label_after": "k",
+ "bet_unit": "market",
+ "subsample": 1.0,
+ "by_k": {
+  "1": {
+   "existing": {
+    "n": 19473,
+    "skill_z2": 0.0304,
+    "n_skill": 592,
+    "profitable": 0.3913,
+    "median_label_bets": 53.0,
+    "z_sd": 2.224
+   },
+   "new": {
+    "n": 57112,
+    "skill_z2": 0.0319,
+    "n_skill": 1820,
+    "profitable": 0.3494,
+    "median_label_bets": 56.0,
+    "z_sd": 2.357
+   }
+  },
+  "3": {
+   "existing": {
+    "n": 18381,
+    "skill_z2": 0.0314,
+    "n_skill": 578,
+    "profitable": 0.3846,
+    "median_label_bets": 55.0,
+    "z_sd": 2.266
+   },
+   "new": {
+    "n": 54376,
+    "skill_z2": 0.0335,
+    "n_skill": 1820,
+    "profitable": 0.3339,
+    "median_label_bets": 57.0,
+    "z_sd": 2.399
+   }
+  },
+  "5": {
+   "existing": {
+    "n": 17409,
+    "skill_z2": 0.0325,
+    "n_skill": 566,
+    "profitable": 0.3761,
+    "median_label_bets": 57.0,
+    "z_sd": 2.308
+   },
+   "new": {
+    "n": 52666,
+    "skill_z2": 0.0344,
+    "n_skill": 1810,
+    "profitable": 0.3281,
+    "median_label_bets": 58.0,
+    "z_sd": 2.423
+   }
+  },
+  "10": {
+   "existing": {
+    "n": 15475,
+    "skill_z2": 0.035,
+    "n_skill": 542,
+    "profitable": 0.3632,
+    "median_label_bets": 63.0,
+    "z_sd": 2.402
+   },
+   "new": {
+    "n": 49128,
+    "skill_z2": 0.036,
+    "n_skill": 1768,
+    "profitable": 0.3195,
+    "median_label_bets": 61.0,
+    "z_sd": 2.48
+   }
+  },
+  "20": {
+   "existing": {
+    "n": 13514,
+    "skill_z2": 0.038,
+    "n_skill": 513,
+    "profitable": 0.3554,
+    "median_label_bets": 68.0,
+    "z_sd": 2.519
+   },
+   "new": {
+    "n": 43865,
+    "skill_z2": 0.0391,
+    "n_skill": 1717,
+    "profitable": 0.305,
+    "median_label_bets": 66.0,
+    "z_sd": 2.575
+   }
+  },
+  "50": {
+   "existing": {
+    "n": 10438,
+    "skill_z2": 0.0454,
+    "n_skill": 474,
+    "profitable": 0.3288,
+    "median_label_bets": 81.0,
+    "z_sd": 2.747
+   },
+   "new": {
+    "n": 32804,
+    "skill_z2": 0.0478,
+    "n_skill": 1569,
+    "profitable": 0.2834,
+    "median_label_bets": 83.0,
+    "z_sd": 2.841
+   }
+  }
+ },
+ "attachment": {
+  "1": {
+   "new": {
+    "cp_in_graph": 0.44584325535789326,
+    "market_in_graph": 0.1298151001540832
+   },
+   "existing": {
+    "cp_in_graph": 0.887587942279053,
+    "market_in_graph": 0.545627278796282
+   }
+  },
+  "3": {
+   "new": {
+    "cp_in_graph": 0.424966897160512,
+    "market_in_graph": 0.12004683438772007
+   },
+   "existing": {
+    "cp_in_graph": 0.8640987976715087,
+    "market_in_graph": 0.49338991349763345
+   }
+  },
+  "5": {
+   "new": {
+    "cp_in_graph": 0.41328371245205636,
+    "market_in_graph": 0.11261534956138686
+   },
+   "existing": {
+    "cp_in_graph": 0.8485381124705612,
+    "market_in_graph": 0.4712619909242346
+   }
+  },
+  "10": {
+   "new": {
+    "cp_in_graph": 0.3967981599088096,
+    "market_in_graph": 0.09836142322097378
+   },
+   "existing": {
+    "cp_in_graph": 0.8256607431340872,
+    "market_in_graph": 0.44137641357027463
+   }
+  },
+  "20": {
+   "new": {
+    "cp_in_graph": 0.37953265701584404,
+    "market_in_graph": 0.0833853869827881
+   },
+   "existing": {
+    "cp_in_graph": 0.8048246263134528,
+    "market_in_graph": 0.4125018499334024
+   }
+  },
+  "50": {
+   "new": {
+    "cp_in_graph": 0.3693781246189489,
+    "market_in_graph": 0.07273442263138642
+   },
+   "existing": {
+    "cp_in_graph": 0.7705173404866833,
+    "market_in_graph": 0.37118413489174173
+   }
+  }
+ }
+}
+[  679s] done
+[   17s] pre-cutoff sides 62029190 max ts 2025-06-30 23:59:58+00:00
+[   21s] markets (29408, 15)
+[   30s] held edges 10772660
+[  211s] moved-first pairs 11261137 entries 13039548
+[  213s] saved HeteroData(
+  wallet={
+    x=[862759, 25],
+    cols=[25],
+  },
+  market={
+    x=[29408, 15],
+    cols=[15],
+    market_id=[29408],
+  },
+  (wallet, held, market)={
+    edge_index=[2, 10772660],
+    edge_attr=[10772660, 5],
+  },
+  (wallet, cp, wallet)={
+    edge_index=[2, 27465906],
+    edge_attr=[27465906, 1],
+  },
+  (wallet, mf, wallet)={
+    edge_index=[2, 11261137],
+    edge_attr=[11261137, 1],
+  }
+)
+[  260s] query moved-first edges 14038287 {'follow': 7027814, 'lead': 7010473}
+{
+ "wallets": 862759,
+ "markets": 29408,
+ "held_edges": 10772660,
+ "cp_nnz": 27465906,
+ "mf_edges_count_ge_min": 11261137,
+ "query_entries": 2039360,
+ "query_mf_edges": 14038287,
+ "frozen_max_ts": "2025-06-30 23:59:58+00:00",
+ "minutes": 4.3
+}
+== diag 08:13:16
+== edge 08:53:43
+Starting worker=0 device=0: python scripts/09_first_k_experiments.py train hist\,xgb_own\,xgb_nbr\,sage\,hgnn 1 cv edge > outputs/logs/09_edge_server_train_k1.log 2>&1
+Starting worker=1 device=1: python scripts/09_first_k_experiments.py train hist\,xgb_own\,xgb_nbr\,sage\,hgnn 3 cv edge > outputs/logs/09_edge_server_train_k3.log 2>&1
+Starting worker=2 device=2: python scripts/09_first_k_experiments.py train hist\,xgb_own\,xgb_nbr\,sage\,hgnn 5 cv edge > outputs/logs/09_edge_server_train_k5.log 2>&1
+Starting worker=3 device=3: python scripts/09_first_k_experiments.py train hist\,xgb_own\,xgb_nbr\,sage\,hgnn 10 cv edge > outputs/logs/09_edge_server_train_k10.log 2>&1
+Starting worker=4 device=4: python scripts/09_first_k_experiments.py train hist\,xgb_own\,xgb_nbr\,sage\,hgnn 20 cv edge > outputs/logs/09_edge_server_train_k20.log 2>&1
+Starting worker=5 device=5: python scripts/09_first_k_experiments.py train hist\,xgb_own\,xgb_nbr\,sage\,hgnn 50 cv edge > outputs/logs/09_edge_server_train_k50.log 2>&1
+Starting worker=6 device=6: python scripts/09_first_k_experiments.py test hist\,xgb_own\,xgb_nbr\,sage\,hgnn 1 cv edge > outputs/logs/09_edge_server_test_k1.log 2>&1
+Starting worker=7 device=7: python scripts/09_first_k_experiments.py test hist\,xgb_own\,xgb_nbr\,sage\,hgnn 3 cv edge > outputs/logs/09_edge_server_test_k3.log 2>&1
+Starting worker=0 device=0: python scripts/09_first_k_experiments.py test hist\,xgb_own\,xgb_nbr\,sage\,hgnn 5 cv edge > outputs/logs/09_edge_server_test_k5.log 2>&1
+Starting worker=3 device=3: python scripts/09_first_k_experiments.py test hist\,xgb_own\,xgb_nbr\,sage\,hgnn 50 cv edge > outputs/logs/09_edge_server_test_k50.log 2>&1
+Starting worker=1 device=1: python scripts/09_first_k_experiments.py test hist\,xgb_own\,xgb_nbr\,sage\,hgnn 10 cv edge > outputs/logs/09_edge_server_test_k10.log 2>&1
+Starting worker=2 device=2: python scripts/09_first_k_experiments.py test hist\,xgb_own\,xgb_nbr\,sage\,hgnn 20 cv edge > outputs/logs/09_edge_server_test_k20.log 2>&1

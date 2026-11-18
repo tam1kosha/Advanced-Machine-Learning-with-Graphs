@@ -1,0 +1,13 @@
+# An editable starting profile, not tuned settings. CLI flags override these values.
+hidden: 64
+fanout: [10, 5]
+batch: 1024
+eval_batch: 1024
+epochs: 40
+patience: 6
+lr: 0.003
+dropout: 0.2
+weight_decay: 0.0001
+grad_clip: 1.0
+eval_reps: 3
+threads: 2

@@ -629,3 +629,90 @@ every setting.
    graph could still matter.
 5. Optional, for completeness on the server: repeat Gate C on the second period
    (`run_server.sh asof`). TGN / DyGFormer / pretraining only if something above changes the picture.
+
+## First-k label reconstruction fix (17 Nov 2026)
+
+Server logs: train diagnostics (12) and the train target bake-off (13) completed; test diagnostics
+failed at k=1 when reconstructed T did not match fk_pop. The main GNN stage was not reached.
+No full server data are available locally, so the log alone does not identify the discrepant bets.
+
+Reproduced a concrete numerical cause locally with the actual bet/first-k functions: long quantities
+0.1 + 0.2 + 0.8 and short quantities 0.3 + 0.6 have net/gross direction 0.1 mathematically. Ordinary
+floating-point SUM with two fill orders kept this bet in one calculation and dropped it in another.
+A first-k fixture then contained 31 versus 30 label bets and different T values, matching the failed
+consistency check. Both new regression tests failed before the fix.
+
+`bets_from_sides` now uses compensated FSUM aggregates and a 1e-12 comparison tolerance on the bounded
+net-direction ratio. This preserves the intended inclusive 0.1 eligibility rule at machine precision;
+a genuinely below-threshold bet (tested at ~5e-11 below it) remains excluded. This affects all callers,
+so regenerate labels/features/first-k/graph artifacts together from existing raw data, rather than
+reusing old populations with the new aggregation. Historical committed results were not regenerated.
+
+The diagnostic check keeps its original T comparison tolerance (atol 1e-9, rtol 1e-5), also verifies
+bet counts, rejects missing/nonfinite values, and writes per-wallet saved/rebuilt values to
+outputs/tables/exp4_<split>_label_mismatch_k<k>.csv on failure. The message includes mismatch counts
+and maximum absolute delta. It does not replace saved labels or skip an inconsistency.
+
+Validation: `python -m pytest -q tests` — 38 passed; error/undefined-name lint and diff checks pass.
+New tests cover all 120 fill permutations at the threshold, true below-threshold exclusion, first-k
+label reconstruction, wallet reordering, roundoff, count/value/missing-wallet mismatches and NaN/inf.
+Existing PyTorch/Pandas dependency deprecation warnings remain. See docs/SERVER.md for recovery.
+The full server run remains the confirmation that this was the original failure's cause; if it still
+fails, retain the assertion and inspect the new mismatch report for additional data/artifact issues.
+
+## Experiment 6 interface — GNN-only tuning (18 Nov 2026; no full-data run)
+
+Added scripts/17_gnn_only.py and docs/GNN_ONLY.md for training/evaluating only sage/hgnn on the
+already prepared graphs. It schedules model x k x period jobs over allocated GPUs, has CLI/YAML
+hyperparameters, saves per-trial manifests/logs/checkpoints, resumes matching completed jobs, and
+produces its own validation/test metrics and paired hgnn-minus-sage intervals without XGBoost.
+
+For tuning, the new `holdout` mode of 09 uses one fixed, stratified 60/20/20 wallet partition across
+models/settings/initialization seeds. Half-A target variance normalization fits training wallets
+only. Early stopping uses validation half-A correlation; configuration selection can use the
+validation-wallet half-B metrics. --stage train withholds the test report; --stage test evaluates
+saved test-wallet predictions without fitting. --stage train-test runs both. This is a new evaluation
+protocol (exp6), not the previous five-fold experiment or an earlier-period-to-later-period transfer.
+Old exp4 result tables/checkpoints remain separate. Any later baseline claim needs matching splits.
+
+Stability changes: missing market features are imputed to zero before scaling, matching wallet
+missing-input handling. A NaN market feature reproduces an invalid heterogeneous input path in a
+test fixture; the fixed path trains and evaluates both models successfully. Other nonfinite node/
+edge inputs fail with their source/index before sampling; gradients are checked before optimizer
+updates; weight decay and gradient clipping are configurable (new CLI default clip 1). Logs now name
+the actual validation metric and save epoch histories. The old k=20/50 epoch-3 failures cannot be
+attributed conclusively without the server data; the new checks preserve failures rather than hide them.
+
+Artifacts: outputs/logs/gnn/<tag>/ for logs/manifests/readable reports,
+outputs/tables/exp6_<tag>_{val,test}_{metrics,paired}.csv for numerical results,
+data/processed/{exp6_preds_<tag>,checkpoints/exp6_<tag>} for predictions/weights/scalers/partitions.
+Changing settings/code/prepared inputs/package versions under an existing trial name requires a
+new tag. Data preparation is not run automatically and no baseline model is fit by the new script.
+
+Validation: 45 tests pass, including real CPU training of both models through the CLI, separate
+validation/test evaluation, resume, held-out target normalization, fixed/disjoint partitions,
+missing-market inputs, nonfinite-gradient detection, job failure propagation and tag isolation.
+The prior CV/report integration test still passes. Error/undefined-name lint and diff checks pass.
+CUDA scheduling reuses allocation ids/UUIDs and checks kernels, but no remote GPU/full-data tuning
+run has been performed locally. Existing dependency deprecation warnings remain.
+
+## Server logs reviewed + hetero NaN fix (18 Nov 2026)
+
+Read the committed server snapshot in `outputs/logs/` (no new run here).
+* **Graph claim, later period (`14_test_server_early.log`, k = 1–10 only):** on new wallets XGBoost own
+  scores .256/.281/.296/.318. hgnn − XGBoost is −.009, −.009, −.010, −.015 and sage − XGBoost is
+  −.013, −.010, −.010, −.015, with every paired CI below 0. xgb_nbr ties XGBoost. The verdict is NOT MET,
+  and here the GNNs are measurably worse. The earlier-period server rerun (`14_train_server.log`)
+  reproduces exp4 within ≈ .003.
+* **Target comparison, later period (`13_test.log`):** the continuous targets reach .26–.39 on new wallets.
+  The z > 2 classifiers are negative up to k = 10, and history-only is ≈ 0 at k = 1. The earlier-period
+  ranking holds. `12_test.log` now completes, so the 17 Nov label fix held.
+* **exp6 trials 001/002:** lr 0.001 vs 0.0005 differ by < .004 (validation corr., selection-biased), and
+  hgnn beats sage in 9/10 settings. No val/test report was produced because hgnn test k = 20/50 failed.
+
+**Cause of those failures and of the old "nonfinite loss at epoch 3":** `held_edges_pd` computed
+`log1p(hours_to_close.clip(0))`. Pandas `clip` keeps NaN for markets without close_time, so query
+rev_held column 3 (`log_h_to_close`) became NaN. The frozen path's DuckDB `greatest(NULL, 0)` returns 0.
+The fix adds `fillna(0)` so the two paths agree. New test `test_held_edges_pd_matches_sql_with_missing_close_time`
+fails before the fix. 46 tests pass. Next on the server, with a new trial tag: hgnn test k = 20/50,
+`14` for the later period at k = 20/50, and `15` out-of-time (still no numbers).

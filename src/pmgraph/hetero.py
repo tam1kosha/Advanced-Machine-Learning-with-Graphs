@@ -83,9 +83,10 @@ def held_edges(con, sides_table: str, where: str = "") -> pd.DataFrame:
 
 
 def held_edges_pd(o: pd.DataFrame) -> pd.DataFrame:
-    """Same aggregation as HELD_SQL, in pandas, for the (small) query-fill table."""
+    """Same aggregation as HELD_SQL, in pandas, for the (small) query-fill table.
+    DuckDB's greatest(NULL, 0) is 0, so a missing close_time counts as 0 hours here too (not NaN)."""
     o = o.assign(sq=np.where(o.long_, o.qty, -o.qty), pq=o.price * o.qty,
-                 lh=np.log1p(o.hours_to_close.clip(lower=0)))
+                 lh=np.log1p(o.hours_to_close.fillna(0).clip(lower=0)))
     g = o.groupby(["nid", "market_id"])
     e = pd.DataFrame({"net_dir": g.sq.sum() / g.qty.sum(), "log_usd": np.log1p(g.usd.sum()),
                       "vwap_price": g.pq.sum() / g.qty.sum(), "log_h_to_close": g.lh.mean(),
@@ -185,6 +186,16 @@ class Graph:
     frozen: dict[str, CSR]
     xq: np.ndarray = None
     query: dict[str, CSR] = field(default_factory=dict)
+
+
+def require_finite(values: np.ndarray, name: str) -> None:
+    """Locate invalid graph inputs before stochastic sampling obscures their source."""
+    for start in range(0, len(values), 1_000_000):
+        ok = np.isfinite(values[start:start + 1_000_000])
+        if not ok.all():
+            where = np.argwhere(~ok)[0]
+            where[0] += start
+            raise ValueError(f"{name}: nonfinite input at index {tuple(map(int, where))}; inspect the prepared features/edges")
 
 
 def sample_in(csr: CSR, v: np.ndarray, fanout: int, rng) -> tuple[np.ndarray, np.ndarray]:
@@ -303,6 +314,16 @@ def train_hetero(g: Graph, rels: list[str], Y: np.ndarray, idx: dict, seed: int,
     Device: hp["device"], else CUDA when available, else CPU. Neighbour sampling stays on the CPU
     (numpy), so on a GPU raise hp["batch"] / hp["hidden"] rather than expect a speed-up at the defaults."""
     from sklearn.metrics import average_precision_score
+    types = {t for r in rels for t in RELS[r]}
+    require_finite(g.xq, "query.wallet.x")
+    for node_type in types:
+        require_finite(g.x[node_type], f"frozen.{node_type}.x")
+    for relation in rels:
+        require_finite(g.frozen[relation].attr, f"frozen.{relation}.edge_attr")
+        if relation in g.query:
+            require_finite(g.query[relation].attr, f"query.{relation}.edge_attr")
+    if np.isinf(Y).any():
+        raise ValueError("targets contain infinity (only NaN for missing targets is allowed)")
     rng = np.random.default_rng(seed)
     torch.manual_seed(seed)
     torch.set_num_threads(hp.get("threads", 2))
@@ -317,7 +338,7 @@ def train_hetero(g: Graph, rels: list[str], Y: np.ndarray, idx: dict, seed: int,
     model = HeteroSAGE(dims, rels, hp.get("hidden", 64), 2, Y.shape[1], hp.get("dropout", 0.2)).to(dev)
     n_params = sum(p.numel() for p in model.parameters())
     log(f"    device={dev} parameters={n_params:,} seed={seed} settings={hp}")
-    opt = torch.optim.AdamW(model.parameters(), lr=hp.get("lr", 3e-3), weight_decay=1e-4)
+    opt = torch.optim.AdamW(model.parameters(), lr=hp.get("lr", 3e-3), weight_decay=hp.get("weight_decay", 1e-4))
     reg = [o == "reg" for o in (objectives or ["binary"] * Y.shape[1])]
     Y = Y.astype(np.float32)
     target_mean, target_std = np.zeros(Y.shape[1]), np.ones(Y.shape[1])
@@ -368,9 +389,12 @@ def train_hetero(g: Graph, rels: list[str], Y: np.ndarray, idx: dict, seed: int,
         return out / reps
 
     best, best_state, bad, best_epoch = -np.inf, None, 0, 0
+    history = []
+    val_metric = "correlation" if all(reg) else ("mean_objective_score" if any(reg) else "average_precision")
     for ep in range(hp.get("epochs", 40)):
         model.train()
         perm = rng.permutation(idx["train"])
+        loss_sum, batches = 0.0, 0
         for i in range(0, len(perm), bs):
             s = perm[i:i + bs]
             if not np.isfinite(Y[s]).any():
@@ -380,7 +404,18 @@ def train_hetero(g: Graph, rels: list[str], Y: np.ndarray, idx: dict, seed: int,
             if not torch.isfinite(loss):
                 raise FloatingPointError(f"nonfinite loss at epoch {ep + 1}, seed {seed}")
             loss.backward()
+            clip = hp.get("grad_clip", 0.0)
+            # Check gradients before AdamW can turn a finite loss into corrupt model weights.
+            try:
+                nn.utils.clip_grad_norm_(model.parameters(), clip if clip > 0 else float("inf"), error_if_nonfinite=True)
+            except RuntimeError as exc:
+                raise FloatingPointError(f"nonfinite gradient at epoch {ep + 1}, seed {seed}; "
+                                         "inspect inputs and reduce lr/use grad_clip") from exc
             opt.step()
+            loss_sum += float(loss.detach())
+            batches += 1
+        if not batches:
+            raise ValueError("training fold has no finite targets")
         sv = predict(idx["val"], 1)
         score = np.mean([val_score(Y[idx["val"], j], sv[:, j]) if reg[j] else
                          average_precision_score(Y[idx["val"], j], sv[:, j]) for j in range(Y.shape[1])])
@@ -390,8 +425,9 @@ def train_hetero(g: Graph, rels: list[str], Y: np.ndarray, idx: dict, seed: int,
             best_state = {k: v.clone() for k, v in model.state_dict().items()}
         else:
             bad += 1
-        if ep % 10 == 9:
-            log(f"    {'+'.join(rels)} seed{seed} ep{ep+1} loss {loss.item():.4f} val-AP {score:.4f}")
+        history.append(dict(epoch=ep + 1, train_loss=loss_sum / batches, val_score=float(score)))
+        if ep == 0 or ep % 10 == 9:
+            log(f"    {'+'.join(rels)} seed{seed} ep{ep+1} loss {loss_sum / batches:.4f} val-{val_metric} {score:.4f}")
         if bad >= hp.get("patience", 8):
             break
     if best_state is None:
@@ -407,7 +443,8 @@ def train_hetero(g: Graph, rels: list[str], Y: np.ndarray, idx: dict, seed: int,
                  peak_cuda_allocated_bytes=torch.cuda.max_memory_allocated(dev) if dev.type == "cuda" else 0,
                  peak_cuda_reserved_bytes=torch.cuda.max_memory_reserved(dev) if dev.type == "cuda" else 0,
                  device_name=torch.cuda.get_device_name(dev) if dev.type == "cuda" else "CPU",
-                 torch_version=str(torch.__version__), settings=hp, metadata=metadata or {})
+                 torch_version=str(torch.__version__), settings=hp, metadata=metadata or {},
+                 val_metric=val_metric, history=history)
     if checkpoint_path is not None:
         path = Path(checkpoint_path)
         path.parent.mkdir(parents=True, exist_ok=True)

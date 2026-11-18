@@ -211,6 +211,11 @@ python scripts/14_graph_on_edge.py train
 ```
 ### GPU server
 
+To train/tune **only GraphSAGE and heterogeneous GraphSAGE**, use
+[`scripts/17_gnn_only.py`](scripts/17_gnn_only.py) and [`docs/GNN_ONLY.md`](docs/GNN_ONLY.md).
+This has a fixed wallet holdout, hyperparameter flags, validation/test reports and one job per GPU;
+it fits no XGBoost model and needs no baseline report. It reuses the already prepared graph data.
+
 Fresh-clone setup, CUDA preflight/smoke test, pilot, restart behaviour and model/resource artifacts:
 [`docs/SERVER.md`](docs/SERVER.md). Run `bash run_server.sh check` and `bash run_server.sh smoke`
 before downloading data. GPU stages fail if CUDA is unavailable; `CUDA_VISIBLE_DEVICES` allocations
