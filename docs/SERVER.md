@@ -4,6 +4,9 @@ The interface runs independent first-k experiments on allocated GPUs. It does no
 across eight cards. Each process keeps its own historical graph in host RAM; only sampled batches
 and the neural network go to the GPU. Eight cards do not provide one combined VRAM pool.
 
+For the dedicated two-GNN training/tuning entry point (no baseline training), see
+[`GNN_ONLY.md`](GNN_ONLY.md). The interface below is the original full CV comparison pipeline.
+
 ## Fresh Linux installation
 
 Clone the branch containing this server audit, then enter the repository. Use Python 3.11:

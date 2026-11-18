@@ -562,3 +562,39 @@ label reconstruction, wallet reordering, roundoff, count/value/missing-wallet mi
 Existing PyTorch/Pandas dependency deprecation warnings remain. See docs/SERVER.md for recovery.
 The full server run remains the confirmation that this was the original failure's cause; if it still
 fails, retain the assertion and inspect the new mismatch report for additional data/artifact issues.
+
+## Experiment 6 interface — GNN-only tuning (18 Nov 2026; no full-data run)
+
+Added scripts/17_gnn_only.py and docs/GNN_ONLY.md for training/evaluating only sage/hgnn on the
+already prepared graphs. It schedules model x k x period jobs over allocated GPUs, has CLI/YAML
+hyperparameters, saves per-trial manifests/logs/checkpoints, resumes matching completed jobs, and
+produces its own validation/test metrics and paired hgnn-minus-sage intervals without XGBoost.
+
+For tuning, the new `holdout` mode of 09 uses one fixed, stratified 60/20/20 wallet partition across
+models/settings/initialization seeds. Half-A target variance normalization fits training wallets
+only. Early stopping uses validation half-A correlation; configuration selection can use the
+validation-wallet half-B metrics. --stage train withholds the test report; --stage test evaluates
+saved test-wallet predictions without fitting. --stage train-test runs both. This is a new evaluation
+protocol (exp6), not the previous five-fold experiment or an earlier-period-to-later-period transfer.
+Old exp4 result tables/checkpoints remain separate. Any later baseline claim needs matching splits.
+
+Stability changes: missing market features are imputed to zero before scaling, matching wallet
+missing-input handling. A NaN market feature reproduces an invalid heterogeneous input path in a
+test fixture; the fixed path trains and evaluates both models successfully. Other nonfinite node/
+edge inputs fail with their source/index before sampling; gradients are checked before optimizer
+updates; weight decay and gradient clipping are configurable (new CLI default clip 1). Logs now name
+the actual validation metric and save epoch histories. The old k=20/50 epoch-3 failures cannot be
+attributed conclusively without the server data; the new checks preserve failures rather than hide them.
+
+Artifacts: outputs/logs/gnn/<tag>/ for logs/manifests/readable reports,
+outputs/tables/exp6_<tag>_{val,test}_{metrics,paired}.csv for numerical results,
+data/processed/{exp6_preds_<tag>,checkpoints/exp6_<tag>} for predictions/weights/scalers/partitions.
+Changing settings/code/prepared inputs/package versions under an existing trial name requires a
+new tag. Data preparation is not run automatically and no baseline model is fit by the new script.
+
+Validation: 45 tests pass, including real CPU training of both models through the CLI, separate
+validation/test evaluation, resume, held-out target normalization, fixed/disjoint partitions,
+missing-market inputs, nonfinite-gradient detection, job failure propagation and tag isolation.
+The prior CV/report integration test still passes. Error/undefined-name lint and diff checks pass.
+CUDA scheduling reuses allocation ids/UUIDs and checks kernels, but no remote GPU/full-data tuning
+run has been performed locally. Existing dependency deprecation warnings remain.
