@@ -1,10 +1,24 @@
 # Server training logs
 
-This folder contains a committed snapshot of the server logs shared with the group. Start with
-the [learning-rate comparison](gnn/learning_rate_comparison.md) for the latest GNN experiments.
+This folder contains committed snapshots of the server logs shared with the group. The latest
+GNN-only runs are trial003 and trial004 below. The earlier
+[learning-rate comparison](gnn/learning_rate_comparison.md) covers trial001 and trial002.
 The next server run is described step by step in [`docs/SERVER_RERUN.md`](../../docs/SERVER_RERUN.md).
 
 ## Latest GNN-only trials
+
+| Trial | Learning rate | Settings and job status | Launcher log | Validation report |
+|---|---:|---|---|---|
+| trial003 | 0.001 | [Settings](gnn/trial003/run.json), [jobs](gnn/trial003/jobs.json) | [gnn_trial003.log](gnn_trial003.log) | [Validation](gnn/trial003/val_report.log) |
+| trial004 | 0.0005 | [Settings](gnn/trial004/run.json), [jobs](gnn/trial004/jobs.json) | [gnn_trial004.log](gnn_trial004.log) | [Validation](gnn/trial004/val_report.log) |
+
+Both trials completed all 24 model/k/calendar-period jobs, with five initialization seeds per job:
+120 successful model fits per trial. Detailed epoch histories and resource measurements are in
+[trial003](gnn/trial003/) and [trial004](gnn/trial004/). Both snapshots include validation reports;
+neither contains a final held-out test report. These results should be used for validation-based
+comparison rather than presented as final test performance.
+
+## Earlier GNN-only trials
 
 | Trial | Learning rate | Settings and job status | Launcher log |
 |---|---:|---|---|

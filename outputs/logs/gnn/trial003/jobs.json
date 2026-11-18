@@ -1,0 +1,194 @@
+[
+  {
+    "split": "train",
+    "k": 10,
+    "model": "sage",
+    "device": "6",
+    "returncode": 0,
+    "log": "/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial003/train_k10_sage.log"
+  },
+  {
+    "split": "train",
+    "k": 1,
+    "model": "sage",
+    "device": "0",
+    "returncode": 0,
+    "log": "/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial003/train_k1_sage.log"
+  },
+  {
+    "split": "train",
+    "k": 5,
+    "model": "sage",
+    "device": "4",
+    "returncode": 0,
+    "log": "/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial003/train_k5_sage.log"
+  },
+  {
+    "split": "train",
+    "k": 3,
+    "model": "sage",
+    "device": "2",
+    "returncode": 0,
+    "log": "/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial003/train_k3_sage.log"
+  },
+  {
+    "split": "train",
+    "k": 20,
+    "model": "sage",
+    "device": "6",
+    "returncode": 0,
+    "log": "/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial003/train_k20_sage.log"
+  },
+  {
+    "split": "train",
+    "k": 50,
+    "model": "sage",
+    "device": "4",
+    "returncode": 0,
+    "log": "/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial003/train_k50_sage.log"
+  },
+  {
+    "split": "train",
+    "k": 1,
+    "model": "hgnn",
+    "device": "1",
+    "returncode": 0,
+    "log": "/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial003/train_k1_hgnn.log"
+  },
+  {
+    "split": "train",
+    "k": 50,
+    "model": "hgnn",
+    "device": "2",
+    "returncode": 0,
+    "log": "/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial003/train_k50_hgnn.log"
+  },
+  {
+    "split": "train",
+    "k": 10,
+    "model": "hgnn",
+    "device": "7",
+    "returncode": 0,
+    "log": "/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial003/train_k10_hgnn.log"
+  },
+  {
+    "split": "train",
+    "k": 3,
+    "model": "hgnn",
+    "device": "3",
+    "returncode": 0,
+    "log": "/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial003/train_k3_hgnn.log"
+  },
+  {
+    "split": "test",
+    "k": 1,
+    "model": "sage",
+    "device": "6",
+    "returncode": 0,
+    "log": "/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial003/test_k1_sage.log"
+  },
+  {
+    "split": "train",
+    "k": 20,
+    "model": "hgnn",
+    "device": "0",
+    "returncode": 0,
+    "log": "/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial003/train_k20_hgnn.log"
+  },
+  {
+    "split": "train",
+    "k": 5,
+    "model": "hgnn",
+    "device": "5",
+    "returncode": 0,
+    "log": "/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial003/train_k5_hgnn.log"
+  },
+  {
+    "split": "test",
+    "k": 3,
+    "model": "sage",
+    "device": "1",
+    "returncode": 0,
+    "log": "/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial003/test_k3_sage.log"
+  },
+  {
+    "split": "test",
+    "k": 5,
+    "model": "sage",
+    "device": "7",
+    "returncode": 0,
+    "log": "/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial003/test_k5_sage.log"
+  },
+  {
+    "split": "test",
+    "k": 10,
+    "model": "sage",
+    "device": "6",
+    "returncode": 0,
+    "log": "/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial003/test_k10_sage.log"
+  },
+  {
+    "split": "test",
+    "k": 20,
+    "model": "sage",
+    "device": "5",
+    "returncode": 0,
+    "log": "/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial003/test_k20_sage.log"
+  },
+  {
+    "split": "test",
+    "k": 50,
+    "model": "sage",
+    "device": "7",
+    "returncode": 0,
+    "log": "/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial003/test_k50_sage.log"
+  },
+  {
+    "split": "test",
+    "k": 1,
+    "model": "hgnn",
+    "device": "4",
+    "returncode": 0,
+    "log": "/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial003/test_k1_hgnn.log"
+  },
+  {
+    "split": "test",
+    "k": 3,
+    "model": "hgnn",
+    "device": "2",
+    "returncode": 0,
+    "log": "/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial003/test_k3_hgnn.log"
+  },
+  {
+    "split": "test",
+    "k": 10,
+    "model": "hgnn",
+    "device": "0",
+    "returncode": 0,
+    "log": "/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial003/test_k10_hgnn.log"
+  },
+  {
+    "split": "test",
+    "k": 5,
+    "model": "hgnn",
+    "device": "3",
+    "returncode": 0,
+    "log": "/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial003/test_k5_hgnn.log"
+  },
+  {
+    "split": "test",
+    "k": 50,
+    "model": "hgnn",
+    "device": "6",
+    "returncode": 0,
+    "log": "/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial003/test_k50_hgnn.log"
+  },
+  {
+    "split": "test",
+    "k": 20,
+    "model": "hgnn",
+    "device": "1",
+    "returncode": 0,
+    "log": "/home/cooperlin/projects/Advanced-Machine-Learning-with-Graphs/outputs/logs/gnn/trial003/test_k20_hgnn.log"
+  }
+]
